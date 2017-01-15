@@ -7,7 +7,6 @@ import time
 
 
 class View:
-
     def __init__(self):
         self.tick_count = 0
 
@@ -47,7 +46,7 @@ class MainFrame(View):
 
     def initialise(self, game: model.Game):
 
-        super(MainFrame,self).initialise()
+        super(MainFrame, self).initialise()
 
         self.game = game
 
@@ -71,7 +70,7 @@ class MainFrame(View):
 
     def tick(self):
 
-        super(MainFrame,self).tick()
+        super(MainFrame, self).tick()
 
         self.title.tick()
         self.status.tick()
@@ -81,7 +80,7 @@ class MainFrame(View):
 
     def draw(self):
 
-        super(MainFrame,self).draw()
+        super(MainFrame, self).draw()
 
         self.surface.fill(Colours.BLACK)
 
@@ -96,8 +95,6 @@ class MainFrame(View):
         self.surface.blit(self.title.surface, (x, y))
 
         y += MainFrame.TITLE_HEIGHT
-
-        self.surface.blit(self.game_view.surface, (x, y))
 
         x = 0
         y = pane_rect.bottom - MainFrame.STATUS_HEIGHT
@@ -128,14 +125,12 @@ class MainFrame(View):
 
             self.surface.blit(self.game_over.surface, (x, y))
 
-
-
     def update(self):
         pygame.display.update()
 
     def end(self):
 
-        super(MainFrame,self).end()
+        super(MainFrame, self).end()
 
         self.game_view.end()
         self.title.end()
@@ -152,17 +147,16 @@ class TitleBar(View):
         super(TitleBar, self).__init__()
 
         self.surface = pygame.Surface((width, height))
-        self.title = "Title"
+        self.title = None
         self.title_image = None
         self.game = None
 
     def initialise(self, game: model.Game):
 
-        super(TitleBar,self).initialise()
+        super(TitleBar, self).initialise()
 
         self.game = game
         self.title = game.name
-
 
         try:
             filename = MainFrame.RESOURCES_DIR + "title.jpg"
@@ -173,12 +167,17 @@ class TitleBar(View):
 
     def draw(self):
 
-        super(TitleBar,self).draw()
+        super(TitleBar, self).draw()
 
         self.surface.fill(TitleBar.BG_COLOUR)
         pane_rect = self.surface.get_rect()
 
-        if self.title is not None:
+        if self.title_image is not None:
+
+            self.surface.blit(self.title_image, (0, 0))
+
+        elif self.title is not None:
+
             draw_text(self.surface,
                       msg=self.title,
                       x=pane_rect.centerx,
@@ -187,15 +186,11 @@ class TitleBar(View):
                       bg_colour=TitleBar.BG_COLOUR,
                       size=pane_rect.height)
 
-        if self.title_image is not None:
-            self.surface.blit(self.title_image,(0,0))
-
 
 class StatusBar(View):
-
     FG_COLOUR = Colours.BLACK
     BG_COLOUR = Colours.RED
-    PADDING = 4
+    PADDING = 40
 
     def __init__(self, width: int, height: int):
 
@@ -207,14 +202,13 @@ class StatusBar(View):
 
     def initialise(self, game: model.Game):
 
-        super(StatusBar,self).initialise()
+        super(StatusBar, self).initialise()
 
         self.game = game
         self.title = game.name
         self.current_message_number = 0
         for i in range(4):
             self.status_messages.append("Msg {0}".format(i))
-
 
     def tick(self):
 
@@ -223,7 +217,6 @@ class StatusBar(View):
         self.current_message_number += 1
         if self.current_message_number >= len(self.status_messages):
             self.current_message_number = 0
-
 
     def draw(self):
 
@@ -246,15 +239,14 @@ class StatusBar(View):
 
         if self.game.state == model.Game.PLAYING:
             draw_text(self.surface,
-                      msg=time.strftime("Time:%H:%M:%S", self.game.elapsed_time),
+                      msg=time.strftime("%H:%M:%S", self.game.elapsed_time),
                       x=StatusBar.PADDING, y=int(pane_rect.height / 2),
                       fg_colour=StatusBar.FG_COLOUR,
                       bg_colour=StatusBar.BG_COLOUR,
-                      size=pane_rect.height)
+                      size=int(pane_rect.height*3/4))
 
 
 class HighScoreTableView(View):
-
     TITLE_HEIGHT = 24
     TITLE_TEXT_SIZE = 30
     SCORE_HEIGHT = 20
@@ -272,7 +264,7 @@ class HighScoreTableView(View):
 
     def initialise(self, hst: utils.HighScoreTable):
 
-        super(HighScoreTableView,self).initialise()
+        super(HighScoreTableView, self).initialise()
 
         self.hst = hst
 
@@ -314,14 +306,11 @@ class HighScoreTableView(View):
                 rank += 1
 
 
-
 class GameReadyView(View):
-
     FG_COLOUR = Colours.GOLD
     BG_COLOUR = Colours.GREY
 
     def __init__(self, width: int, height: int = 500):
-
         super(GameReadyView, self).__init__()
 
         self.game = None
@@ -329,13 +318,11 @@ class GameReadyView(View):
 
         self.surface = pygame.Surface((width, height))
 
-    def initialise(self, game : model.Game):
-
+    def initialise(self, game: model.Game):
         self.game = game
         self.hst.initialise(self.game.hst)
 
     def draw(self):
-
         if self.game is None:
             raise ("No Game to view!")
 
@@ -343,25 +330,24 @@ class GameReadyView(View):
 
         pane_rect = self.surface.get_rect()
 
-        x=pane_rect.centerx
-        y=20
+        x = pane_rect.centerx
+        y = 20
 
         draw_text(self.surface,
                   msg="G A M E    R E A D Y",
                   x=x,
                   y=y,
-                  size = 30,
+                  size=30,
                   fg_colour=GameReadyView.FG_COLOUR,
                   bg_colour=GameReadyView.BG_COLOUR)
 
-        x=0
-        y=pane_rect.bottom - self.hst.surface.get_height()
+        x = 0
+        y = pane_rect.bottom - self.hst.surface.get_height()
         self.hst.draw()
         self.surface.blit(self.hst.surface, (x, y))
 
 
 class GameOverView(View):
-
     FG_COLOUR = Colours.WHITE
     BG_COLOUR = Colours.GREY
     SCORE_TEXT_SIZE = 25
@@ -375,7 +361,7 @@ class GameOverView(View):
 
         self.surface = pygame.Surface((width, height))
 
-    def initialise(self, game : model.Game):
+    def initialise(self, game: model.Game):
 
         self.game = game
         self.hst.initialise(self.game.hst)
@@ -389,24 +375,24 @@ class GameOverView(View):
 
         pane_rect = self.surface.get_rect()
 
-        y=20
+        y = 20
         x = pane_rect.centerx
 
         draw_text(self.surface,
-                  msg="G A M E    O  V E R",
+                  msg="G A M E    O V E R",
                   x=x,
                   y=y,
-                  size = 30,
+                  size=30,
                   fg_colour=GameOverView.FG_COLOUR,
                   bg_colour=GameOverView.BG_COLOUR)
 
-        y+=30
+        y += 30
 
         draw_text(self.surface,
                   msg="Final Scores",
                   x=x,
                   y=y,
-                  size = GameOverView.SCORE_TEXT_SIZE,
+                  size=GameOverView.SCORE_TEXT_SIZE,
                   fg_colour=GameOverView.FG_COLOUR,
                   bg_colour=GameOverView.BG_COLOUR)
 
@@ -419,58 +405,47 @@ class GameOverView(View):
             draw_text(self.surface,
                       x=x,
                       y=y,
-                      msg="{0}. {1} : {2}".format(rank,player,score),
+                      msg="{0}. {1} : {2}".format(rank, player, score),
                       fg_colour=GameOverView.FG_COLOUR,
                       bg_colour=GameOverView.BG_COLOUR,
                       size=GameOverView.SCORE_TEXT_SIZE
                       )
-            y+=GameOverView.SCORE_TEXT_SIZE
-            rank +=1
+            y += GameOverView.SCORE_TEXT_SIZE
+            rank += 1
 
-
-
-        x=0
-        y=pane_rect.bottom - self.hst.surface.get_height()
+        x = 0
+        y = pane_rect.bottom - self.hst.surface.get_height()
 
         self.hst.draw()
         self.surface.blit(self.hst.surface, (x, y))
 
-class GameView(View):
 
+class GameView(View):
     BG_COLOUR = Colours.GREEN
     FG_COLOUR = Colours.WHITE
 
     def __init__(self, width: int, height: int):
-
         super(GameView, self).__init__()
 
         self.surface = pygame.Surface((width, height))
         self.game = None
 
     def initialise(self, game: model.Game):
-
-        super(GameView,self).initialise()
+        super(GameView, self).initialise()
 
         self.game = game
 
     def tick(self):
-
-        super(GameView,self).tick()
-
+        super(GameView, self).tick()
 
     def draw(self):
-
         self.surface.fill(GameView.BG_COLOUR)
 
         if self.game is None:
             raise ("No Game to view!")
 
-
-
     def end(self):
-
-        super(GameView,self).end()
-
+        super(GameView, self).end()
 
 
 def draw_text(surface, msg, x, y, size=32, fg_colour=Colours.WHITE, bg_colour=Colours.BLACK):
