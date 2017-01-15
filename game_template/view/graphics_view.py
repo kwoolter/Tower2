@@ -25,7 +25,7 @@ class View:
 
 
 class MainFrame(View):
-    TITLE_HEIGHT = 30
+    TITLE_HEIGHT = 60
     STATUS_HEIGHT = 30
 
     RESOURCES_DIR = os.path.dirname(__file__) + "\\resources\\"
@@ -55,9 +55,12 @@ class MainFrame(View):
         pygame.init()
         pygame.display.set_caption(self.game.name)
         filename = MainFrame.RESOURCES_DIR + self.game.name + ".jpg"
-        image = pygame.image.load(filename)
-        image = pygame.transform.scale(image, (32, 32))
-        pygame.display.set_icon(image)
+        try:
+            image = pygame.image.load(filename)
+            image = pygame.transform.scale(image, (32, 32))
+            pygame.display.set_icon(image)
+        except Exception as err:
+            print(str(err))
 
         self.title.initialise(self.game)
         self.status.initialise(self.game)
@@ -105,7 +108,7 @@ class MainFrame(View):
 
             self.game_view.draw()
             x = 0
-            y = MainFrame.STATUS_HEIGHT
+            y = MainFrame.TITLE_HEIGHT
 
             self.surface.blit(self.game_view.surface, (x, y))
 
@@ -113,7 +116,7 @@ class MainFrame(View):
 
             self.game_ready.draw()
             x = 0
-            y = MainFrame.STATUS_HEIGHT
+            y = MainFrame.TITLE_HEIGHT
 
             self.surface.blit(self.game_ready.surface, (x, y))
 
@@ -121,7 +124,7 @@ class MainFrame(View):
 
             self.game_over.draw()
             x = 0
-            y = MainFrame.STATUS_HEIGHT
+            y = MainFrame.TITLE_HEIGHT
 
             self.surface.blit(self.game_over.surface, (x, y))
 
@@ -150,6 +153,7 @@ class TitleBar(View):
 
         self.surface = pygame.Surface((width, height))
         self.title = "Title"
+        self.title_image = None
         self.game = None
 
     def initialise(self, game: model.Game):
@@ -158,6 +162,14 @@ class TitleBar(View):
 
         self.game = game
         self.title = game.name
+
+
+        try:
+            filename = MainFrame.RESOURCES_DIR + "title.jpg"
+            image = pygame.image.load(filename)
+            self.title_image = pygame.transform.scale(image, (self.surface.get_width(), self.surface.get_height()))
+        except Exception as err:
+            print(str(err))
 
     def draw(self):
 
@@ -174,6 +186,9 @@ class TitleBar(View):
                       fg_colour=TitleBar.FG_COLOUR,
                       bg_colour=TitleBar.BG_COLOUR,
                       size=pane_rect.height)
+
+        if self.title_image is not None:
+            self.surface.blit(self.title_image,(0,0))
 
 
 class StatusBar(View):
