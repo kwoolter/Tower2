@@ -1,6 +1,7 @@
 import logging
 import game_template.utils as utils
 import time
+from operator import itemgetter
 
 class Player:
 
@@ -77,6 +78,16 @@ class Game:
             return
 
         logging.info("Ticking {0}...".format(self.name))
+
+    def get_scores(self):
+
+        scores = []
+
+        for player_name, score in self.player_scores.items():
+
+            scores.append((player_name, score))
+
+        return sorted(scores,key=itemgetter(1, 0), reverse=True)
 
     @property
     def elapsed_time(self):

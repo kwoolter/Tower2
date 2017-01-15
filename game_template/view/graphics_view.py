@@ -54,7 +54,7 @@ class MainFrame(View):
         os.environ["SDL_VIDEO_CENTERED"] = "1"
         pygame.init()
         pygame.display.set_caption(self.game.name)
-        filename = MainFrame.RESOURCES_DIR + self.game.name + ".jpg"
+        filename = MainFrame.RESOURCES_DIR + "icon.jpg"
         try:
             image = pygame.image.load(filename)
             image = pygame.transform.scale(image, (32, 32))
@@ -229,6 +229,9 @@ class StatusBar(View):
 
         self.surface.fill(StatusBar.BG_COLOUR)
 
+        self.status_messages = []
+        self.status_messages.append("Game {0}".format(self.game.state))
+
         pane_rect = self.surface.get_rect()
 
         msg = self.status_messages[self.current_message_number]
@@ -359,20 +362,23 @@ class GameReadyView(View):
 
 class GameOverView(View):
 
-    FG_COLOUR = Colours.GOLD
+    FG_COLOUR = Colours.WHITE
     BG_COLOUR = Colours.GREY
+    SCORE_TEXT_SIZE = 25
 
     def __init__(self, width: int, height: int = 500):
 
         super(GameOverView, self).__init__()
 
         self.game = None
+        self.hst = HighScoreTableView(width=width, height=300)
 
         self.surface = pygame.Surface((width, height))
 
     def initialise(self, game : model.Game):
 
         self.game = game
+        self.hst.initialise(self.game.hst)
 
     def draw(self):
 
@@ -383,13 +389,51 @@ class GameOverView(View):
 
         pane_rect = self.surface.get_rect()
 
+        y=20
+        x = pane_rect.centerx
+
         draw_text(self.surface,
                   msg="G A M E    O  V E R",
-                  x=pane_rect.centerx,
-                  y=pane_rect.centery,
+                  x=x,
+                  y=y,
                   size = 30,
                   fg_colour=GameOverView.FG_COLOUR,
                   bg_colour=GameOverView.BG_COLOUR)
+
+        y+=30
+
+        draw_text(self.surface,
+                  msg="Final Scores",
+                  x=x,
+                  y=y,
+                  size = GameOverView.SCORE_TEXT_SIZE,
+                  fg_colour=GameOverView.FG_COLOUR,
+                  bg_colour=GameOverView.BG_COLOUR)
+
+        y += GameOverView.SCORE_TEXT_SIZE
+
+        rank = 1
+        scores = self.game.get_scores()
+        for score in scores:
+            player, score = score
+            draw_text(self.surface,
+                      x=x,
+                      y=y,
+                      msg="{0}. {1} : {2}".format(rank,player,score),
+                      fg_colour=GameOverView.FG_COLOUR,
+                      bg_colour=GameOverView.BG_COLOUR,
+                      size=GameOverView.SCORE_TEXT_SIZE
+                      )
+            y+=GameOverView.SCORE_TEXT_SIZE
+            rank +=1
+
+
+
+        x=0
+        y=pane_rect.bottom - self.hst.surface.get_height()
+
+        self.hst.draw()
+        self.surface.blit(self.hst.surface, (x, y))
 
 class GameView(View):
 
@@ -420,6 +464,8 @@ class GameView(View):
 
         if self.game is None:
             raise ("No Game to view!")
+
+
 
     def end(self):
 

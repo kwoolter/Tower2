@@ -1,6 +1,6 @@
 import pygame,os, sys
 from pygame.locals import *
-import game_template.model as game
+import game_template.model as model
 import game_template.view as view
 
 class Controller:
@@ -16,16 +16,16 @@ class Controller:
         self.view = None
 
     def initialise(self):
-        self.game = game.Game("MyGame")
+        self.game = model.Game("MyGame")
         self.view = view.MainFrame()
 
         self.game.initialise()
         self.view.initialise(self.game)
 
-        new_player = game.Player("Keith")
+        new_player = model.Player("Keith")
         self.game.add_player(new_player)
 
-        new_player = game.Player("Jack")
+        new_player = model.Player("Jack")
         self.game.add_player(new_player)
 
 
@@ -47,7 +47,8 @@ class Controller:
                     loop = False
                 elif event.type == USEREVENT + 1:
                     try:
-                        self.game.tick()
+                        if self.game.state == model.Game.PLAYING:
+                            self.game.tick()
                         self.view.tick()
 
                     except Exception as err:
