@@ -1,0 +1,1 @@
+from .graphics_view import MainFrame
