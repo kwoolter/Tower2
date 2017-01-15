@@ -1,10 +1,13 @@
-import pygame,os, sys
+import os
+import pygame
+import sys
 from pygame.locals import *
+
 import game_template.model as model
 import game_template.view as view
 
-class Controller:
 
+class Controller:
     KEY_INITIALISE = K_i
     KEY_PAUSE = K_ESCAPE
     KEY_START = K_SPACE
@@ -27,7 +30,6 @@ class Controller:
 
         new_player = model.Player("Jack")
         self.game.add_player(new_player)
-
 
     def run(self):
 
@@ -55,32 +57,32 @@ class Controller:
                         print(str(err))
                 elif event.type == KEYUP:
 
-                     if event.key == Controller.KEY_INITIALISE:
+                    if event.key == Controller.KEY_INITIALISE:
 
                         try:
                             self.game.initialise()
                         except Exception as err:
                             print(str(err))
 
-                     elif event.key == Controller.KEY_START:
+                    elif event.key == Controller.KEY_START:
                         try:
                             self.game.start()
                         except Exception as err:
                             print(str(err))
 
-                     elif event.key == Controller.KEY_PAUSE:
+                    elif event.key == Controller.KEY_PAUSE:
                         try:
                             self.game.pause()
                         except Exception as err:
                             print(str(err))
 
-                     elif event.key == Controller.KEY_GAME_OVER:
+                    elif event.key == Controller.KEY_GAME_OVER:
                         try:
                             self.game.game_over()
                         except Exception as err:
                             print(str(err))
 
-                     elif event.key == Controller.KEY_END:
+                    elif event.key == Controller.KEY_END:
                         try:
                             self.game.end()
                         except Exception as err:
@@ -95,7 +97,6 @@ class Controller:
 
         pygame.quit()
         sys.exit()
-
 
     def end(self):
         self.view.end()
