@@ -2,6 +2,8 @@ import logging
 import game_template.utils as utils
 import time
 from operator import itemgetter
+import game_template.model as model
+
 
 class Player:
 
@@ -26,6 +28,12 @@ class Game:
 
         self.hst = utils.HighScoreTable(self.name)
 
+        #
+        #
+
+
+        self.levels = model.LevelBuilder()
+
 
     def initialise(self):
 
@@ -37,6 +45,16 @@ class Game:
         self.player_scores = {}
 
         self.hst.load()
+
+        #
+        #
+        self.floors = FloorBuilder()
+        self.floors.initialise()
+
+        self.levels = LevelBuilder()
+        self.levels.initialise(self.floors)
+
+
 
     def add_player(self, new_player : Player):
 

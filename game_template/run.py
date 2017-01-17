@@ -1,5 +1,6 @@
-import game_template.controller as controller
 import logging
+
+import game_template.controller as controller
 
 
 def main():
@@ -8,7 +9,6 @@ def main():
     c.run()
 
     exit(0)
-
 
 
 if __name__ == "__main__":
