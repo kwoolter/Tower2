@@ -5,7 +5,6 @@ import os
 import game_template.utils as utils
 import time
 
-
 class View:
     def __init__(self):
         self.tick_count = 0
@@ -428,12 +427,19 @@ class GameView(View):
         super(GameView, self).__init__()
 
         self.surface = pygame.Surface((width, height))
+
+        self.rpg_view = FloorView(width, height)
+
         self.game = None
 
     def initialise(self, game: model.Game):
+
         super(GameView, self).initialise()
 
         self.game = game
+
+        self.rpg_view.initialise(self.game.get_current_floor())
+
 
     def tick(self):
         super(GameView, self).tick()
@@ -443,6 +449,9 @@ class GameView(View):
 
         if self.game is None:
             raise ("No Game to view!")
+
+        self.rpg_view.draw()
+        self.surface.blit(self.rpg_view.surface,(0,0))
 
     def end(self):
         super(GameView, self).end()
@@ -455,3 +464,25 @@ def draw_text(surface, msg, x, y, size=32, fg_colour=Colours.WHITE, bg_colour=Co
     textpos.centerx = x
     textpos.centery = y
     surface.blit(text, textpos)
+
+##
+
+class FloorView(View):
+
+    BG_COLOUR = Colours.WHITE
+
+    def __init__(self, width : int, height : int):
+        super(FloorView, self).__init__()
+
+        self.surface = pygame.Surface((width, height))
+        self.floor = None
+
+    def initialise(self, floor : model.Floor):
+        self.floor = floor
+
+
+    def draw(self):
+        self.surface.fill(FloorView.BG_COLOUR)
+
+        if self.floor is None:
+            raise ("No Floor to view!")

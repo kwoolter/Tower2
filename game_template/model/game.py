@@ -2,7 +2,7 @@ import logging
 import game_template.utils as utils
 import time
 from operator import itemgetter
-import game_template.model as model
+from game_template.model import *
 
 
 class Player:
@@ -29,11 +29,18 @@ class Game:
         self.hst = utils.HighScoreTable(self.name)
 
         #
-        #
+        ##
 
 
-        self.levels = model.LevelBuilder()
+        self.levels = LevelBuilder()
+        self.current_level_id = 1
+        self.current_floor_id = 1
 
+
+        ##
+
+    def get_current_floor(self):
+        return self.levels.get_floor(self.current_floor_id)
 
     def initialise(self):
 

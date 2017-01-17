@@ -1,9 +1,12 @@
 import game_template.model as rpg_world_model
-from game_template.view import *
+from .graphics_view import *
 import pygame
+from .colours import Colours
 
 
 class FloorView(View):
+
+    BG_COLOUR = Colours.WHITE
 
     def __init__(self, width : int, height : int):
         super(FloorView, self).__init__()
@@ -16,5 +19,8 @@ class FloorView(View):
 
 
     def draw(self):
-        pass
+        self.surface.fill(FloorView.BG_COLOUR)
+
+        if self.floor is None:
+            raise ("No Floor to view!")
 

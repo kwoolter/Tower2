@@ -214,3 +214,11 @@ class LevelBuilder:
             self.levels[level_id] = new_level
 
         logging.info("Finished building levels. {0} levels built.".format(len(self.levels.keys())))
+
+    def get_floor(self, floor_id : int):
+        floor = None
+
+        if floor_id in self.floor_builder.floors.keys():
+            floor = self.floor_builder.floors[floor_id]
+
+        return floor
