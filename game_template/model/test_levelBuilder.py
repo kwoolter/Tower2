@@ -23,7 +23,7 @@ class TestLevelBuilder(TestCase):
         levels.initialise(floors)
 
         for level in levels.levels.values():
-            print(str(level))
+            print(str(level)+"\n")
 
         self.fail()
 

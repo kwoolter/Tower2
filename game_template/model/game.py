@@ -42,6 +42,35 @@ class Game:
     def get_current_floor(self):
         return self.levels.get_floor(self.current_floor_id)
 
+    def get_current_level(self):
+        return self.levels.get_level(self.current_level_id)
+
+
+    def next_floor(self):
+
+        current_level = self.levels.get_level(self.current_level_id)
+
+        floor_ids = sorted(current_level.floors.keys())
+
+        index = floor_ids.index(self.current_floor_id)
+        index += 1
+        if index >= len(floor_ids):
+            index = 0
+
+        self.current_floor_id = floor_ids[index]
+
+    def next_level(self):
+
+        level_ids = sorted(self.levels.levels.keys())
+        index = level_ids.index(self.current_level_id)
+        index += 1
+        if index >= len(level_ids):
+            index = 0
+
+        self.current_level_id = level_ids[index]
+
+        self.current_floor_id = min(self.get_current_level().floors.keys())
+
     def initialise(self):
 
         logging.info("Initialising {0}...".format(self.name))

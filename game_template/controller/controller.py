@@ -20,7 +20,7 @@ class Controller:
 
     def initialise(self):
         self.game = model.Game("MyGame")
-        self.view = view.MainFrame()
+        self.view = view.MainFrame(width=20*32, height=730)
 
         self.game.initialise()
         self.view.initialise(self.game)
@@ -73,6 +73,18 @@ class Controller:
                     elif event.key == Controller.KEY_PAUSE:
                         try:
                             self.game.pause()
+                        except Exception as err:
+                            print(str(err))
+
+                    elif event.key == K_n:
+                        try:
+                            self.game.next_floor()
+                        except Exception as err:
+                            print(str(err))
+
+                    elif event.key == K_l:
+                        try:
+                            self.game.next_level()
                         except Exception as err:
                             print(str(err))
 

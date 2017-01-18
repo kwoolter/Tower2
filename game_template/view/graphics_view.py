@@ -139,7 +139,7 @@ class MainFrame(View):
 
 class TitleBar(View):
     FG_COLOUR = Colours.WHITE
-    BG_COLOUR = Colours.BLUE
+    BG_COLOUR = Colours.BLACK
 
     def __init__(self, width: int, height: int):
 
@@ -164,6 +164,7 @@ class TitleBar(View):
         except Exception as err:
             print(str(err))
 
+
     def draw(self):
 
         super(TitleBar, self).draw()
@@ -174,6 +175,17 @@ class TitleBar(View):
         if self.title_image is not None:
 
             self.surface.blit(self.title_image, (0, 0))
+
+            msg = "  {0} - {1}  ".format(self.game.get_current_level().name,
+                                             self.game.get_current_floor().name)
+            pane_rect = self.surface.get_rect()
+            draw_text(self.surface,
+                      msg=msg,
+                      x=pane_rect.centerx,
+                      y=int(pane_rect.height / 2),
+                      fg_colour=TitleBar.FG_COLOUR,
+                      bg_colour=TitleBar.BG_COLOUR,
+                      size=int(pane_rect.height/2))
 
         elif self.title is not None:
 
@@ -422,13 +434,18 @@ class GameOverView(View):
 class GameView(View):
     BG_COLOUR = Colours.GREEN
     FG_COLOUR = Colours.WHITE
+    TILE_WIDTH = 32
+    TILE_HEIGHT = 32
 
     def __init__(self, width: int, height: int):
         super(GameView, self).__init__()
 
         self.surface = pygame.Surface((width, height))
 
-        self.rpg_view = FloorView(width, height)
+        self.rpg_view = FloorView(self.surface.get_width(),
+                                  self.surface.get_height(),
+                                  tile_width=GameView.TILE_WIDTH,
+                                  tile_height=GameView.TILE_HEIGHT)
 
         self.game = None
 
@@ -443,12 +460,16 @@ class GameView(View):
 
     def tick(self):
         super(GameView, self).tick()
+        self.rpg_view.tick()
 
     def draw(self):
         self.surface.fill(GameView.BG_COLOUR)
 
         if self.game is None:
             raise ("No Game to view!")
+
+        self.rpg_view.floor = self.game.get_current_floor()
+        self.rpg_view.skin_name = self.game.get_current_level().skin_name
 
         self.rpg_view.draw()
         self.surface.blit(self.rpg_view.surface,(0,0))
@@ -465,20 +486,28 @@ def draw_text(surface, msg, x, y, size=32, fg_colour=Colours.WHITE, bg_colour=Co
     textpos.centery = y
     surface.blit(text, textpos)
 
-##
 
 class FloorView(View):
 
-    BG_COLOUR = Colours.WHITE
+    BG_COLOUR = Colours.GREY
 
-    def __init__(self, width : int, height : int):
+    TILE_WIDTH = 32
+    TILE_HEIGHT = 32
+
+    def __init__(self, width : int, height : int, tile_width : int = TILE_WIDTH, tile_height : int = TILE_HEIGHT):
         super(FloorView, self).__init__()
 
         self.surface = pygame.Surface((width, height))
         self.floor = None
+        self.tile_width = tile_width
+        self.tile_height = tile_height
+        self.skin_name = None
+
+        self.image_manager = ImageManager()
 
     def initialise(self, floor : model.Floor):
         self.floor = floor
+        self.image_manager.initialise()
 
 
     def draw(self):
@@ -486,3 +515,96 @@ class FloorView(View):
 
         if self.floor is None:
             raise ("No Floor to view!")
+
+        width = self.floor.width
+        height = self.floor.height
+
+        for y in range(height):
+            for x in range (width):
+                tile = self.floor.get_tile(x, y)
+                image = self.image_manager.get_skin_image(skin_name=self.skin_name, tile_name=tile, tick = self.tick_count)
+
+                if image is not None:
+                    self.surface.blit(image,(x * self.tile_width, y * self.tile_height, self.tile_width, self.tile_height))
+
+
+
+class ImageManager:
+
+    def __init__(self):
+        self.image_cache = {}
+        self.skins = {}
+
+    def initialise(self):
+        self.load_skins()
+
+
+    def get_image(self, image_file_name : str, width : int = 32, height : int =32):
+
+        if image_file_name not in self.image_cache.keys():
+
+            filename = MainFrame.RESOURCES_DIR + image_file_name
+            try:
+                image = pygame.image.load(filename)
+                image = pygame.transform.scale(image, (width, height))
+                self.image_cache[image_file_name] = image
+            except Exception as err:
+                print(str(err))
+
+
+
+        return self.image_cache[image_file_name]
+
+
+    def load_skins(self):
+
+        new_skin_name = "winter"
+        new_skin = (new_skin_name, {model.Tiles.WALL : "winter_wall.png",
+                                    model.Tiles.EMPTY : None,
+                                    model.Tiles.DOOR : "door.png",
+                                    model.Tiles.TREE: "winter_tree.png",
+                                    model.Tiles.MONSTER1 : ("goblin1.png", "goblin2.png"),
+                                    model.Tiles.BRAZIER : ("brazier.png", "brazier_lit.png")})
+
+        self.skins[new_skin_name] = new_skin
+
+        new_skin_name = "forest"
+        new_skin = (new_skin_name, {model.Tiles.WALL: "forest_wall.png",
+                                    model.Tiles.EMPTY: None,
+                                    model.Tiles.DOOR: "door.png",
+                                    model.Tiles.TREE: "forest_tree.png",
+                                    model.Tiles.MONSTER1: ("goblin1.png", "goblin2.png"),
+                                    model.Tiles.BRAZIER: ("brazier.png", "brazier_lit.png")})
+
+        self.skins[new_skin_name] = new_skin
+
+    def get_skin_image(self, skin_name : str, tile_name : str, tick = 0):
+
+        if skin_name not in self.skins.keys():
+            raise Exception("Can't find specified skin {0}".format(skin_name))
+
+        name, tile_map = self.skins[skin_name]
+
+        if tile_name not in tile_map.keys():
+            raise Exception("Can't find tile name '{0}' in skin '{1}'!".format(tile_name, skin_name))
+
+        tile_file_names = tile_map[tile_name]
+
+        image = None
+
+        if tile_file_names is None:
+            image = None
+        elif isinstance(tile_file_names, tuple):
+            if tick == 0:
+                tile_file_name = tile_file_names[0]
+            else:
+                tile_file_name = tile_file_names[tick % len(tile_file_names)]
+
+            image = self.get_image(tile_file_name)
+
+        else:
+            image = self.get_image(tile_file_names)
+
+
+        return image
+

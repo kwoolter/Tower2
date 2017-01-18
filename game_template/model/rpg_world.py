@@ -6,6 +6,7 @@ class Tiles:
     BEACH = "s"
     BOSS_DOOR = "d"
     BOSS_KEY = "$"
+    BRAZIER = "B"
     DOOR = "D"
     EMPTY = " "
     ENTRANCE = "-"
@@ -26,6 +27,7 @@ class Tiles:
     TREE = "T"
     WALL = ":"
     WATER = "W"
+    MONSTER1 = "1"
 
 class FloorPlan:
 
@@ -34,7 +36,16 @@ class FloorPlan:
         self.plan = deepcopy(plan)
 
     def get_tile(self, x : int, y : int):
-        return self.plan[x][y]
+        row = self.plan[y]
+        return row[x]
+
+    @property
+    def width(self):
+        return len(self.plan[0])
+
+    @property
+    def height(self):
+        return len(self.plan)
 
 class Floor:
 
@@ -56,13 +67,27 @@ class Floor:
 
     def __str__(self):
         string = "Floor {1}: '{0}'".format(self.name, self.id)
+        if self.floor_plan is not None:
+            string += " ({0}x{1})".format(self.floor_plan.width,self.floor_plan.height)
+
         return string
+
+    @property
+    def width(self):
+        return self.floor_plan.width
+
+    @property
+    def height(self):
+        return self.floor_plan.height
 
 class Level:
 
-    def __init__(self, id : int, name : str):
+    DEFAULT_SKIN = "Default"
+
+    def __init__(self, id : int, name : str, skin_name : str = DEFAULT_SKIN):
         self.id = id
         self.name = name
+        self.skin_name = skin_name
 
     def initialise(self):
 
@@ -74,7 +99,7 @@ class Level:
 
     def __str__(self):
 
-        string = "Level {1}: '{0}' - {2} floors.".format(self.name, self.id, len(self.floors))
+        string = "Level {1}: '{0}' ({3}) - {2} floors.".format(self.name, self.id, len(self.floors), self.skin_name)
 
         for floor in self.floors.values():
             string += "\n\t" + str(floor)
@@ -104,32 +129,133 @@ class FloorBuilder:
         new_floor_plan = (
 
             '::::::::::::::::::::',
+            ':B                B:',
+            ':  B               :',
             ':                  :',
             ':                  :',
+            ':            1     :',
+            ':                  :',
+            ':      T           :',
+            'D                  D',
+            ':                  :',
+            ':         T        :',
             ':                  :',
             ':                  :',
+            ':     T       1    :',
             ':                  :',
             ':                  :',
+            ':         T        :',
             ':                  :',
-            ':                  :',
-            ':                  :',
-            ':                  :',
-            ':                  :',
-            ':                  :',
-            ':                  :',
-            ':                  :',
-            ':                  :',
-            ':                  :',
-            ':                  :',
-            ':                  :',
+            ':B                B:',
             '::::::::::::::::::::',
-
         )
 
-        self.floor_plans[1] = deepcopy(new_floor_plan)
-        self.floor_plans[2] = deepcopy(new_floor_plan)
-        self.floor_plans[100] = deepcopy(new_floor_plan)
-        self.floor_plans[101] = deepcopy(new_floor_plan)
+        self.floor_plans[1] = FloorPlan(1, deepcopy(new_floor_plan))
+
+        new_floor_plan = (
+
+        '::::::::::::::::::::',
+        ':                  :',
+        ':       1          :',
+        ':                  :',
+        ':                  :',
+        ':                  :',
+        ':                  :',
+        ':                  :',
+        '::::            ::::',
+        'D                  D',
+        '::::            ::::',
+        ':                  :',
+        ':                  :',
+        ':                  :',
+        ':                  :',
+        ':                  :',
+        ':                  :',
+        ':       1          :',
+        ':                  :',
+        '::::::::::::::::::::',
+        )
+
+        self.floor_plans[2] = FloorPlan(2,deepcopy(new_floor_plan))
+
+        new_floor_plan = (
+
+        '::::::::::::::::::::',
+        ':                  :',
+        ':       1          :',
+        ':                  :',
+        ':  :::::     ::::  :',
+        ':  :   :     :  :  :',
+        ':  :   :     B  :  :',
+        ':  :   :        :  :',
+        ':  :   B        :  :',
+        'D  :            :  D',
+        '::::            ::::',
+        ':       B:::B      :',
+        ':         :        :',
+        ':         :        :',
+        ':         : 1  1   :',
+        ':         :        :',
+        ':         :        :',
+        ':       1 :        :',
+        ':         :        :',
+        '::::::::::::::::::::',
+        )
+
+        self.floor_plans[3] = FloorPlan(3,deepcopy(new_floor_plan))
+
+        new_floor_plan = (
+
+        '::::::::::::::::::::',
+        ':                  :',
+        ':                  :',
+        ':      T   T       :',
+        ':  T               :',
+        ':    T T           :',
+        ':                  :',
+        ':    T             :',
+        ':                  :',
+        'D                  D',
+        ':          T T     :',
+        ':                  :',
+        ':                  :',
+        ':            T     :',
+        ':   T              :',
+        ': T                :',
+        ':     T            :',
+        ':                  :',
+        ':                  :',
+        '::::::::::::::::::::',
+        )
+
+        self.floor_plans[100] = FloorPlan(100,deepcopy(new_floor_plan))
+
+        new_floor_plan = (
+
+        '::::::::::::::::::::',
+        ':                  :',
+        ':       1          :',
+        ':                  :',
+        ':  :::::     ::::  :',
+        ':  :   :     :  :  :',
+        ':  :   :     B  :  :',
+        ':  :   :        :  :',
+        ':  :   B        :  :',
+        'D  :            :  D',
+        '::::            ::::',
+        ':       B:::B      :',
+        ':         :        :',
+        ':         :        :',
+        ':         : 1  1   :',
+        ':         :        :',
+        ':         :        :',
+        ':       1 :        :',
+        ':         :        :',
+        '::::::::::::::::::::',
+        )
+
+
+        self.floor_plans[101] = FloorPlan(101,deepcopy(new_floor_plan))
 
         logging.info("Finished loading floor plans. {0} floor plans loaded.".format(len(self.floor_plans.keys())))
 
@@ -140,6 +266,8 @@ class FloorBuilder:
         new_floor_data = (1,"Start",2,3,4)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (2,"Middle",2,3,4)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (3, "Zastaross", 2, 3, 4)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (100,"Home straight",2,3,4)
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -186,10 +314,10 @@ class LevelBuilder:
 
         logging.info("Starting loading Level Data...")
 
-        new_level_data = (1, "Level 1", (1,2,3))
+        new_level_data = (1, "Forest World", (1,2,3),"forest")
         self.level_data[1] = new_level_data
 
-        new_level_data = (2, "Level 2", (100,101))
+        new_level_data = (2, "Winter World", (100,101),"winter")
         self.level_data[2] = new_level_data
 
         logging.info("Finished Loading Level Data. {0} levels loaded.".format(len(self.level_data.keys())))
@@ -199,8 +327,8 @@ class LevelBuilder:
         logging.info("Starting building levels...")
 
         for level_id in self.level_data.keys():
-            id, name, floor_ids = self.level_data[level_id]
-            new_level = Level(id=id, name=name)
+            id, name, floor_ids, skin_name = self.level_data[level_id]
+            new_level = Level(id=id, name=name, skin_name=skin_name)
             new_level.initialise()
             for floor_id in floor_ids:
                 if floor_id in self.floor_builder.floors.keys():
@@ -214,6 +342,14 @@ class LevelBuilder:
             self.levels[level_id] = new_level
 
         logging.info("Finished building levels. {0} levels built.".format(len(self.levels.keys())))
+
+    def get_level(self, level_id):
+        level = None
+
+        if level_id in self.levels.keys():
+            level = self.levels[level_id]
+
+        return level
 
     def get_floor(self, floor_id : int):
         floor = None
