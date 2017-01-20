@@ -19,7 +19,7 @@ class Controller:
         self.view = None
 
     def initialise(self):
-        self.game = model.Game("MyGame")
+        self.game = model.Game("Adventure World")
         self.view = view.MainFrame(width=20*32, height=730)
 
         self.game.initialise()
@@ -37,7 +37,7 @@ class Controller:
 
         FPSCLOCK = pygame.time.Clock()
 
-        pygame.time.set_timer(USEREVENT + 1, 1000)
+        pygame.time.set_timer(USEREVENT + 1, 500)
 
         loop = True
 
@@ -99,6 +99,15 @@ class Controller:
                             self.game.end()
                         except Exception as err:
                             print(str(err))
+
+                    elif event.key in (K_UP, K_w):
+                        self.game.move_player(0, -1)
+                    elif event.key in (K_DOWN, K_s):
+                        self.game.move_player(0, 1)
+                    elif event.key in (K_LEFT, K_a):
+                        self.game.move_player(-1, 0)
+                    elif event.key in (K_RIGHT, K_d):
+                        self.game.move_player(1, 0)
 
             FPSCLOCK.tick(30)
 

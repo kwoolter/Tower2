@@ -23,7 +23,8 @@ class View:
 
 
 class MainFrame(View):
-    TITLE_HEIGHT = 60
+
+    TITLE_HEIGHT = 80
     STATUS_HEIGHT = 30
 
     RESOURCES_DIR = os.path.dirname(__file__) + "\\resources\\"
@@ -33,6 +34,8 @@ class MainFrame(View):
         super(MainFrame, self).__init__()
 
         self.game = None
+
+        height = MainFrame.TITLE_HEIGHT + MainFrame.STATUS_HEIGHT + (32*20)
 
         self.surface = pygame.display.set_mode((width, height))
 
@@ -138,8 +141,9 @@ class MainFrame(View):
 
 
 class TitleBar(View):
-    FG_COLOUR = Colours.WHITE
-    BG_COLOUR = Colours.BLACK
+    FILL_COLOUR = Colours.BLACK
+    TEXT_FG_COLOUR = Colours.WHITE
+    TEXT_BG_COLOUR = None
 
     def __init__(self, width: int, height: int):
 
@@ -158,7 +162,7 @@ class TitleBar(View):
         self.title = game.name
 
         try:
-            filename = MainFrame.RESOURCES_DIR + "title.jpg"
+            filename = MainFrame.RESOURCES_DIR + "title.png"
             image = pygame.image.load(filename)
             self.title_image = pygame.transform.scale(image, (self.surface.get_width(), self.surface.get_height()))
         except Exception as err:
@@ -169,7 +173,7 @@ class TitleBar(View):
 
         super(TitleBar, self).draw()
 
-        self.surface.fill(TitleBar.BG_COLOUR)
+        self.surface.fill(TitleBar.FILL_COLOUR)
         pane_rect = self.surface.get_rect()
 
         if self.title_image is not None:
@@ -183,8 +187,8 @@ class TitleBar(View):
                       msg=msg,
                       x=pane_rect.centerx,
                       y=int(pane_rect.height / 2),
-                      fg_colour=TitleBar.FG_COLOUR,
-                      bg_colour=TitleBar.BG_COLOUR,
+                      fg_colour=TitleBar.TEXT_FG_COLOUR,
+                      bg_colour=TitleBar.TEXT_BG_COLOUR,
                       size=int(pane_rect.height/2))
 
         elif self.title is not None:
@@ -193,8 +197,8 @@ class TitleBar(View):
                       msg=self.title,
                       x=pane_rect.centerx,
                       y=int(pane_rect.height / 2),
-                      fg_colour=TitleBar.FG_COLOUR,
-                      bg_colour=TitleBar.BG_COLOUR,
+                      fg_colour=TitleBar.TEXT_FG_COLOUR,
+                      bg_colour=TitleBar.TEXT_BG_COLOUR,
                       size=pane_rect.height)
 
 
@@ -478,13 +482,17 @@ class GameView(View):
         super(GameView, self).end()
 
 
-def draw_text(surface, msg, x, y, size=32, fg_colour=Colours.WHITE, bg_colour=Colours.BLACK):
+def draw_text(surface, msg, x, y, size=32, fg_colour=Colours.WHITE, bg_colour=Colours.BLACK, alpha : int = 255):
     font = pygame.font.Font(None, size)
-    text = font.render(msg, 1, fg_colour, bg_colour)
+    if bg_colour is not None:
+        text = font.render(msg, 1, fg_colour, bg_colour)
+    else:
+        text = font.render(msg, 1, fg_colour)
     textpos = text.get_rect()
     textpos.centerx = x
     textpos.centery = y
     surface.blit(text, textpos)
+    surface.set_alpha(alpha)
 
 
 class FloorView(View):
@@ -527,7 +535,14 @@ class FloorView(View):
                 if image is not None:
                     self.surface.blit(image,(x * self.tile_width, y * self.tile_height, self.tile_width, self.tile_height))
 
+        tile = model.Tiles.PLAYER
+        image = self.image_manager.get_skin_image(skin_name=self.skin_name, tile_name=tile, tick=self.tick_count)
 
+        if self.floor.player is not None and image is not None:
+            self.surface.blit(image, (self.floor.player.x * self.tile_width,
+                                      self.floor.player.y * self.tile_height,
+                                      self.tile_width,
+                                      self.tile_height))
 
 class ImageManager:
 
@@ -561,9 +576,12 @@ class ImageManager:
         new_skin_name = "winter"
         new_skin = (new_skin_name, {model.Tiles.WALL : "winter_wall.png",
                                     model.Tiles.EMPTY : None,
-                                    model.Tiles.DOOR : "door.png",
+                                    model.Tiles.PLAYER : "player.png",
+                                    model.Tiles.DOOR : "winter_door.png",
                                     model.Tiles.TREE: "winter_tree.png",
-                                    model.Tiles.MONSTER1 : ("goblin1.png", "goblin2.png"),
+                                    model.Tiles.MONSTER1 : ("squirrel1.png","squirrel2.png"),
+                                    model.Tiles.MONSTER2: ("goblin1.png", "goblin2.png"),
+                                    model.Tiles.MONSTER3: ("skeleton1.png", "skeleton2.png"),
                                     model.Tiles.BRAZIER : ("brazier.png", "brazier_lit.png")})
 
         self.skins[new_skin_name] = new_skin
@@ -571,9 +589,23 @@ class ImageManager:
         new_skin_name = "forest"
         new_skin = (new_skin_name, {model.Tiles.WALL: "forest_wall.png",
                                     model.Tiles.EMPTY: None,
+                                    model.Tiles.PLAYER: "player.png",
                                     model.Tiles.DOOR: "door.png",
                                     model.Tiles.TREE: "forest_tree.png",
-                                    model.Tiles.MONSTER1: ("goblin1.png", "goblin2.png"),
+                                    model.Tiles.MONSTER1: ("eye1.png", "eye2.png", "eye3.png", "eye2.png","eye4.png", "eye2.png"),
+                                    model.Tiles.MONSTER2: ("goblin1.png", "goblin2.png"),
+                                    model.Tiles.MONSTER3: ("goblin1.png", "goblin2.png"),
+                                    model.Tiles.BRAZIER: ("fire1.png", "fire2.png", "fire3.png", "fire4.png")})
+
+        self.skins[new_skin_name] = new_skin
+
+        new_skin_name = "desert"
+        new_skin = (new_skin_name, {model.Tiles.WALL: "forest_wall.png",
+                                    model.Tiles.EMPTY: None,
+                                    model.Tiles.PLAYER: "player.png",
+                                    model.Tiles.DOOR: "door.png",
+                                    model.Tiles.TREE: "forest_tree.png",
+                                    model.Tiles.MONSTER1: ("fire1.png", "fire2.png", "fire3.png", "fire4.png"),
                                     model.Tiles.BRAZIER: ("brazier.png", "brazier_lit.png")})
 
         self.skins[new_skin_name] = new_skin

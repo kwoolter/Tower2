@@ -1,5 +1,6 @@
 import logging
 from copy import deepcopy
+import random
 
 class Tiles:
 
@@ -14,7 +15,6 @@ class Tiles:
     EXIT_KEY = "%"
     GOAL = "G"
     KEY = "?"
-    PLAYER = "&"
     SAFETY = "8"
     SECRET_WALL = ";"
     SKY = "~"
@@ -28,42 +28,118 @@ class Tiles:
     WALL = ":"
     WATER = "W"
     MONSTER1 = "1"
+    MONSTER2 = "2"
+    MONSTER3 = "3"
+    PLAYER = "P"
+
+    MONSTERS = (MONSTER1, MONSTER2, MONSTER3)
+    MONSTER_EMPTY_TILES = (EMPTY)
+    PLAYER__EMPTY_TILES = (EMPTY)
 
 class FloorPlan:
 
     def __init__(self, id : int, plan : list):
+
         self.id = id
-        self.plan = deepcopy(plan)
+        self.height = len(plan)
+        self.width = len(plan[0])
+        self.plan = [[Tiles.EMPTY for x in range(self.height)] for x in range(self.width)]
+        for y in range(0, len(plan)):
+            row = plan[y]
+            for x in range(0, min(self.width, len(row))):
+                self.set_tile(row[x],x,y)
 
     def get_tile(self, x : int, y : int):
-        row = self.plan[y]
-        return row[x]
 
-    @property
-    def width(self):
-        return len(self.plan[0])
+        return self.plan[x][y]
 
-    @property
-    def height(self):
-        return len(self.plan)
+    def set_tile(self, tile_name, x : int, y: int):
+
+        self.plan[x][y] = tile_name
+
 
 class Floor:
 
     def __init__(self, id : int, name : str):
         self.id = id
         self.name = name
-        self.monsters = []
+        self.monsters = {}
         self.traps = []
         self.floor_plan = None
+        self.player = None
 
     def initialise(self, floor_plan : FloorPlan):
+
         self.floor_plan = floor_plan
 
+        for y in range(self.floor_plan.height):
+            for x in range(self.floor_plan.width):
+                tile_name = self.floor_plan.get_tile(x,y)
+
+                if tile_name in Tiles.MONSTERS:
+                    self.floor_plan.set_tile(Tiles.EMPTY, x, y)
+                    self.monsters[(x,y)] = tile_name
+
+
+
     def tick(self):
-        pass
+        self.move_monsters()
+
+    def move_player(self, player : Player,  dx : int, dy : int):
+        new_x = player.x + dx
+        new_y = player.y + dy
+
+        if new_x < 0 or new_x >= self.width or new_y < 0 or new_y >= self.height:
+            print("Hit the boundary!")
+        elif self.get_tile(new_x, new_y) not in Tiles.PLAYER__EMPTY_TILES:
+            print("Square blocked)")
+        else:
+            self.player.x = new_x
+            self.player.y = new_y
+
+    def move_monsters(self):
+
+        new_monsters = {}
+
+        for monster_position in self.monsters.keys():
+            x,y = monster_position
+            monster_type = self.monsters[monster_position]
+
+            # ..look at a random square around the enemy...
+            new_x, new_y = random.choice(((0, 0), (-1, 0), (1, 0), (0, -1), (0, 1)))
+            new_x += x
+            new_y += y
+
+            moved = True
+
+            # If new square is out of bounds...
+            if new_x < 0 or new_x >= self.width or new_y < 0 or new_y >= self.height:
+                print("Hit boundary")
+                moved = False
+
+            # ...if new square is not empty
+            elif self.floor_plan.get_tile(new_x, new_y) not in Tiles.MONSTER_EMPTY_TILES:
+                print("Square blocked")
+                moved = False
+
+            # ...if the new square contains an enemy
+            elif (new_x, new_y) in new_monsters:
+                print("Square occupied")
+                moved = False
+
+            if moved == True:
+                new_monsters[(new_x,new_y)] = monster_type
+            else:
+                new_monsters[(x, y)] = monster_type
+
+        self.monsters = new_monsters
+
 
     def get_tile(self, x : int, y: int):
-        return self.floor_plan.get_tile(x,y)
+        tile = self.floor_plan.get_tile(x,y)
+        if (x,y) in self.monsters.keys():
+            return self.monsters[(x,y)]
+        return tile
 
     def __str__(self):
         string = "Floor {1}: '{0}'".format(self.name, self.id)
@@ -126,12 +202,12 @@ class FloorBuilder:
 
         logging.info("Starting loading floor plans...")
 
-        new_floor_plan = (
+        new_floor_plan = [
 
             '::::::::::::::::::::',
             ':B                B:',
             ':  B               :',
-            ':                  :',
+            ':             3    :',
             ':                  :',
             ':            1     :',
             ':                  :',
@@ -139,7 +215,7 @@ class FloorBuilder:
             'D                  D',
             ':                  :',
             ':         T        :',
-            ':                  :',
+            ':  2               :',
             ':                  :',
             ':     T       1    :',
             ':                  :',
@@ -148,25 +224,25 @@ class FloorBuilder:
             ':                  :',
             ':B                B:',
             '::::::::::::::::::::',
-        )
+        ]
 
         self.floor_plans[1] = FloorPlan(1, deepcopy(new_floor_plan))
 
-        new_floor_plan = (
+        new_floor_plan = [
 
         '::::::::::::::::::::',
         ':                  :',
         ':       1          :',
         ':                  :',
         ':                  :',
-        ':                  :',
+        ':               2  :',
         ':                  :',
         ':                  :',
         '::::            ::::',
         'D                  D',
         '::::            ::::',
         ':                  :',
-        ':                  :',
+        ':      3           :',
         ':                  :',
         ':                  :',
         ':                  :',
@@ -174,11 +250,11 @@ class FloorBuilder:
         ':       1          :',
         ':                  :',
         '::::::::::::::::::::',
-        )
+        ]
 
         self.floor_plans[2] = FloorPlan(2,deepcopy(new_floor_plan))
 
-        new_floor_plan = (
+        new_floor_plan = [
 
         '::::::::::::::::::::',
         ':                  :',
@@ -200,11 +276,11 @@ class FloorBuilder:
         ':       1 :        :',
         ':         :        :',
         '::::::::::::::::::::',
-        )
+        ]
 
         self.floor_plans[3] = FloorPlan(3,deepcopy(new_floor_plan))
 
-        new_floor_plan = (
+        new_floor_plan = [
 
         '::::::::::::::::::::',
         ':                  :',
@@ -213,7 +289,7 @@ class FloorBuilder:
         ':  T               :',
         ':    T T           :',
         ':                  :',
-        ':    T             :',
+        ':    T     1  2  3 :',
         ':                  :',
         'D                  D',
         ':          T T     :',
@@ -226,7 +302,7 @@ class FloorBuilder:
         ':                  :',
         ':                  :',
         '::::::::::::::::::::',
-        )
+        ]
 
         self.floor_plans[100] = FloorPlan(100,deepcopy(new_floor_plan))
 
