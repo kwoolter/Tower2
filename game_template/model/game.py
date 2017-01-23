@@ -51,6 +51,9 @@ class Player():
         self._x = self.old_x
         self._y = self.old_y
 
+    def score(self):
+        return self.kills + self.treasure + (self.trophies * 50)
+
 
 class Game:
 
@@ -60,12 +63,14 @@ class Game:
     PAUSED = "PAUSED"
     GAME_OVER = "GAME OVER"
     END = "END"
+    MONSTER_MOVE_RATE = 3
 
     def __init__(self, name : str):
         self.name = name
         self.players = None
-        self.state = Game.LOADED
+        self._state = Game.LOADED
         self.game_start = None
+        self.tick_count = 0
 
         self.hst = utils.HighScoreTable(self.name)
 
@@ -74,11 +79,18 @@ class Game:
 
 
         self.levels = LevelBuilder()
-        self.current_level_id = 1
-        self.current_floor_id = 1
+
 
 
         ##
+
+    @property
+    def state(self):
+
+        if self._state == Game.PLAYING and self.get_current_player().HP <=0:
+            self.game_over()
+
+        return self._state
 
     def get_current_floor(self):
         return self.levels.get_floor(self.current_floor_id)
@@ -88,7 +100,6 @@ class Game:
 
     def get_current_player(self):
         return self.players[0]
-
 
     def next_floor(self):
 
@@ -103,6 +114,23 @@ class Game:
 
         self.current_floor_id = floor_ids[index]
 
+        self.get_current_floor().add_player(self.get_current_player())
+
+    def previous_floor(self):
+        current_level = self.levels.get_level(self.current_level_id)
+
+        floor_ids = sorted(current_level.floors.keys())
+
+        index = floor_ids.index(self.current_floor_id)
+        index -= 1
+        if index < 0:
+            index = len(floor_ids) - 1
+
+        self.current_floor_id = floor_ids[index]
+
+        self.get_current_floor().add_player(self.get_current_player(), position = Floor.EXIT)
+
+
     def next_level(self):
 
         level_ids = sorted(self.levels.levels.keys())
@@ -115,14 +143,32 @@ class Game:
 
         self.current_floor_id = min(self.get_current_level().floors.keys())
 
+        self.get_current_floor().add_player(self.get_current_player(), position = Floor.ENTRANCE)
+
+    def previous_level(self):
+
+        level_ids = sorted(self.levels.levels.keys())
+        index = level_ids.index(self.current_level_id)
+        index -= 1
+        if index < 0:
+            index = 0
+
+        self.current_level_id = level_ids[index]
+
+        self.current_floor_id = max(self.get_current_level().floors.keys())
+
+        self.get_current_floor().add_player(self.get_current_player(), position = Floor.EXIT)
+
+
     def initialise(self):
 
         logging.info("Initialising {0}...".format(self.name))
 
-        self.state = Game.READY
-
+        self._state = Game.READY
         self.players = []
         self.player_scores = {}
+        self.tick_count = 0
+
 
         self.hst.load()
 
@@ -134,7 +180,8 @@ class Game:
         self.levels = LevelBuilder()
         self.levels.initialise(self.floors)
 
-
+        self.current_level_id = 1
+        self.current_floor_id = min(self.get_current_level().floors.keys())
 
     def add_player(self, new_player : Player):
 
@@ -151,9 +198,73 @@ class Game:
         if self.state != Game.PLAYING:
             return
 
-        self.get_current_floor().player = self.get_current_player()
+        current_floor = self.get_current_floor()
 
-        self.get_current_floor().move_player(dx, dy)
+        current_player = self.get_current_player()
+
+        current_floor.move_player(dx, dy)
+
+        tile = current_floor.get_player_tile()
+
+        if tile == Tiles.KEY:
+            current_player.keys += 1
+            current_floor.set_player_tile(Tiles.EMPTY)
+            print("Found a key!")
+
+        elif tile in Tiles.MONSTERS:
+            current_player.HP -= 1
+            print("Hit a monster!")
+
+        elif tile in Tiles.TRAPS:
+            current_player.HP -= 1
+            current_floor.set_player_tile(Tiles.EMPTY)
+            print("Hit a trap!")
+
+        elif tile in Tiles.PLAYER_DOT_TILES:
+            current_player.HP -= 1
+            print("Stood in something nasty!")
+
+        elif tile == Tiles.RED_POTION:
+            current_player.HP += 1
+            current_floor.set_player_tile(Tiles.EMPTY)
+            print("Some HP restored")
+
+        elif tile in Tiles.SWAP_TILES.keys():
+            current_floor.set_player_tile(Tiles.SWAP_TILES[tile])
+            print("You found a {0} to {1} swappable tile!!".format(tile,Tiles.SWAP_TILES[tile]))
+
+        elif tile == Tiles.TREASURE:
+            current_floor.set_player_tile(Tiles.EMPTY)
+            current_player.treasure += 1
+            print("You found some treasure!")
+
+        elif tile == Tiles.DOOR:
+
+            print("You found a door...")
+            if current_player.keys > 0:
+                current_player.keys -= 1
+                current_floor.set_player_tile(Tiles.EMPTY)
+                print("...and you opened it!")
+            else:
+                current_player.back()
+                print("...but the door is locked!")
+
+        elif tile == Tiles.EXIT:
+            print("You found the exit!")
+            self.next_floor()
+
+        elif tile == Tiles.ENTRANCE:
+            print("You found the entrance!")
+            self.previous_floor()
+
+        elif tile == Tiles.NEXT_LEVEL:
+            print("You found the entrance to the next level!")
+            self.next_level()
+
+        elif tile == Tiles.PREVIOUS_LEVEL:
+            print("You found the entrance to the previous level!")
+            self.previous_level()
+
 
     def start(self):
 
@@ -162,7 +273,9 @@ class Game:
 
         logging.info("Starting {0}...".format(self.name))
 
-        self.state = Game.PLAYING
+        self.get_current_floor().player = self.get_current_player()
+
+        self._state = Game.PLAYING
         self.game_start = time.time()
 
     def pause(self, pause : bool = True):
@@ -171,9 +284,9 @@ class Game:
             raise Exception("Game is in state {0} so can't be paused!".format(self.state))
 
         if self.state == Game.PLAYING:
-            self.state = Game.PAUSED
+            self._state = Game.PAUSED
         else:
-            self.state = Game.PLAYING
+            self._state = Game.PLAYING
 
 
     def tick(self):
@@ -186,7 +299,15 @@ class Game:
 
         logging.info("Ticking {0}...".format(self.name))
 
+        self.tick_count += 1
+
         self.get_current_floor().tick()
+
+        # If the player is on a damage tile then take damage
+        damage_tiles = Tiles.MONSTERS + Tiles.PLAYER_DOT_TILES
+        if self.get_current_floor().get_player_tile() in damage_tiles:
+            self.get_current_player().HP -= 1
+            print("You took some damage")
 
     def get_scores(self):
 
@@ -207,13 +328,13 @@ class Game:
 
         logging.info("Game Over {0}...".format(self.name))
 
-        self.state=Game.GAME_OVER
+        self._state=Game.GAME_OVER
 
     def end(self):
 
         logging.info("Ending {0}...".format(self.name))
 
-        self.state=Game.END
+        self._state=Game.END
 
         self.hst.save()
 
@@ -232,6 +353,8 @@ class Tiles:
     EMPTY = " "
     ENTRANCE = "-"
     EXIT = "+"
+    NEXT_LEVEL = "L"
+    PREVIOUS_LEVEL = "l"
     EXIT_KEY = "%"
     GOAL = "G"
     KEY = "?"
@@ -241,26 +364,42 @@ class Tiles:
     SWITCH = ","
     SWITCH_LIT = "<"
     SWITCH_TILE = "_"
-    TRAP = "^"
+    TRAP1 = "^"
+    TRAP2 = "&"
+    TRAP3 = "("
     TREASURE = "*"
     TREASURE_CHEST = "j"
     TREE = "T"
     WALL = ":"
+    WALL_TL = "/"
+    WALL_TR = "\\"
+    WALL_BL = "("
+    WALL_BR = ")"
     WATER = "W"
     MONSTER1 = "1"
     MONSTER2 = "2"
     MONSTER3 = "3"
     PLAYER = "P"
+    RED_POTION = "R"
+    DOT1 = "!"
+    DOT2 = "£"
+    HEART = "HP"
 
     MONSTERS = (MONSTER1, MONSTER2, MONSTER3)
-    MONSTER_EMPTY_TILES = (EMPTY)
-    PLAYER__EMPTY_TILES = (EMPTY)
+    TRAPS = (TRAP1, TRAP2, TRAP3)
+    MONSTER_EMPTY_TILES = (EMPTY, PLAYER)
+    PLAYER_BLOCK_TILES = (TREE, WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR)
+    PLAYER_DOT_TILES = (DOT1, DOT2)
+    SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
+
 
 class FloorPlan:
 
     def __init__(self, id : int, plan : list):
 
         self.id = id
+        self.entrance = None
+        self.exit = None
         self.height = len(plan)
         self.width = len(plan[0])
         self.plan = [[Tiles.EMPTY for x in range(self.height)] for x in range(self.width)]
@@ -268,6 +407,16 @@ class FloorPlan:
             row = plan[y]
             for x in range(0, min(self.width, len(row))):
                 self.set_tile(row[x],x,y)
+
+        if self.entrance is None:
+                self.entrance = (1, 1)
+
+        # Create safety zones around the entrance and exits
+        if self.entrance is not None:
+            self.safety_zone(self.entrance[0], self.entrance[1], 4, 4)
+
+        if self.exit is not None:
+            self.safety_zone(self.exit[0], self.exit[1], 4, 4)
 
     def get_tile(self, x : int, y : int):
 
@@ -277,20 +426,49 @@ class FloorPlan:
 
         self.plan[x][y] = tile_name
 
+        if tile_name == Tiles.ENTRANCE:
+            self.entrance = (x,y)
+        elif tile_name == Tiles.EXIT:
+            self.exit = (x,y)
+        elif tile_name == Tiles.NEXT_LEVEL and self.exit is None:
+            self.exit = (x,y)
+        elif tile_name == Tiles.PREVIOUS_LEVEL and self.entrance is None:
+            self.entrance = (x,y)
+
+    # Build a safety zone around a specified location
+    def safety_zone(self, x, y, height, width):
+        for dx in range(-1 * int(width / 2), int(width / 2) + 1):
+            for dy in range(-1 * int(height / 2), int(height / 2) + 1):
+                if (x + dx) < self.width and (x + dx) >= 0 and (y + dy) < self.height and (y + dy) >= 0:
+                    if self.plan[x + dx][y + dy] == Tiles.EMPTY:
+                        self.plan[x + dx][y + dy] = Tiles.SAFETY
+
 
 class Floor:
 
-    def __init__(self, id : int, name : str):
+    ENTRANCE = "Entrance"
+    EXIT = "Exit"
+    MONSTER_MOVE_RATE = 4
+
+    def __init__(self, id : int, name : str,
+                 treasure_count : int = 0,
+                 trap_count : int = 0,
+                 monster_count : int = 0):
         self.id = id
         self.name = name
+        self.treasure_count = treasure_count
+        self.trap_count = trap_count
+        self.tick_count = 0
+        self.monster_count = monster_count
         self.monsters = {}
-        self.traps = []
+        #self.traps = []
         self.floor_plan = None
         self.player = None
 
     def initialise(self, floor_plan : FloorPlan):
 
         self.floor_plan = floor_plan
+        self.tick_count = 0
 
         for y in range(self.floor_plan.height):
             for x in range(self.floor_plan.width):
@@ -300,8 +478,47 @@ class Floor:
                     self.floor_plan.set_tile(Tiles.EMPTY, x, y)
                     self.monsters[(x,y)] = tile_name
 
+        print(str(self))
+
+        self.place_tiles(self.treasure_count, Tiles.TREASURE)
+        self.place_tiles(self.trap_count, Tiles.TRAP1)
+
     def tick(self):
-        self.move_monsters()
+
+        self.tick_count += 1
+
+        if self.tick_count % Floor.MONSTER_MOVE_RATE == 0:
+            self.move_monsters()
+
+    def add_player(self, player, position = ENTRANCE):
+        self.player = player
+        if position == Floor.ENTRANCE and self.floor_plan.entrance is not None:
+            x,y = self.floor_plan.entrance
+            self.player.x = x
+            self.player.y = y
+        elif position == Floor.EXIT and self.floor_plan.exit is not None:
+            x,y = self.floor_plan.exit
+            self.player.x = x
+            self.player.y = y
+
+    # Find empty tiles to place items
+    def place_tiles(self, item_count, item_type, tries=20):
+
+        for i in range(0, item_count):
+            attempts = 0
+            while True:
+                x = random.randint(1, self.width - 1)
+                y = random.randint(1, self.height - 1)
+                if self.floor_plan.get_tile(x,y) == Tiles.EMPTY:
+                    self.floor_plan.set_tile(item_type,x,y)
+                    logging.info("Placed a {0} at {1},{2}".format(item_type, x, y))
+                    break
+                attempts += 1
+                # We tried several times to find an empty square, time to give up!
+                if attempts > tries:
+                    print("Can't find an empty tile to place {0} after {1} tries".format(item_type, attempts))
+                    break
+
 
     def move_player(self, dx : int, dy : int):
 
@@ -310,8 +527,8 @@ class Floor:
 
         if new_x < 0 or new_x >= self.width or new_y < 0 or new_y >= self.height:
             print("Hit the boundary!")
-        elif self.get_tile(new_x, new_y) not in Tiles.PLAYER__EMPTY_TILES:
-            print("Square blocked)")
+        elif self.get_tile(new_x, new_y) in Tiles.PLAYER_BLOCK_TILES:
+            print("Square blocked!")
         else:
             self.player.x = new_x
             self.player.y = new_y
@@ -333,17 +550,17 @@ class Floor:
 
             # If new square is out of bounds...
             if new_x < 0 or new_x >= self.width or new_y < 0 or new_y >= self.height:
-                print("Hit boundary")
+                #print("Hit boundary")
                 moved = False
 
             # ...if new square is not empty
             elif self.floor_plan.get_tile(new_x, new_y) not in Tiles.MONSTER_EMPTY_TILES:
-                print("Square blocked")
+                #print("Square blocked")
                 moved = False
 
             # ...if the new square contains an enemy
-            elif (new_x, new_y) in new_monsters:
-                print("Square occupied")
+            elif (new_x, new_y) in new_monsters or (new_x, new_y) in self.monsters:
+                #print("Square occupied")
                 moved = False
 
             if moved == True:
@@ -351,8 +568,11 @@ class Floor:
             else:
                 new_monsters[(x, y)] = monster_type
 
-        self.monsters = new_monsters
+        if len(new_monsters) != len(self.monsters):
+            print("HELLLLP we have lost a monster")
+            raise Exception("We lost a monster x={0},y={1},type={2}".format(x,y,monster_type))
 
+        self.monsters = new_monsters
 
     def get_tile(self, x : int, y: int):
         tile = self.floor_plan.get_tile(x,y)
@@ -360,8 +580,14 @@ class Floor:
             return self.monsters[(x,y)]
         return tile
 
+    def get_player_tile(self):
+        return self.get_tile(self.player.x, self.player.y)
+
+    def set_player_tile(self, new_tile):
+        self.floor_plan.set_tile(new_tile, self.player.x, self.player.y)
+
     def __str__(self):
-        string = "Floor {1}: '{0}'".format(self.name, self.id)
+        string = "Floor {1}: '{0} (treasures:{2}, traps:{3}'".format(self.name, self.id, self.treasure_count, self.trap_count)
         if self.floor_plan is not None:
             string += " ({0}x{1})".format(self.floor_plan.width,self.floor_plan.height)
 
@@ -424,24 +650,24 @@ class FloorBuilder:
         new_floor_plan = [
 
             '::::::::::::::::::::',
-            ':B                B:',
+            ':B        !!!    B(:',
             ':  B               :',
             ':             3    :',
-            ':                  :',
-            ':            1     :',
+            ':         ^^       :',
+            ':      R     1     :',
             ':                  :',
             ':      T           :',
-            'D                  D',
-            ':                  :',
-            ':         T        :',
+            'D   /::::\  *      D',
+            ':   :    :         :',
+            ':   (::::)T        :',
             ':  2               :',
             ':                  :',
             ':     T       1    :',
-            ':                  :',
-            ':                  :',
+            ':        *         :',
+            ':     ?            :',
             ':         T        :',
-            ':                  :',
-            ':B                B:',
+            ':            *     :',
+            ':\      +        B/:',
             '::::::::::::::::::::',
         ]
 
@@ -454,15 +680,15 @@ class FloorBuilder:
         ':       1          :',
         ':                  :',
         ':                  :',
-        ':               2  :',
+        ':  -            2  :',
         ':                  :',
         ':                  :',
-        '::::            ::::',
-        'D                  D',
-        '::::            ::::',
+        '::::\    /\    /::::',
+        'D        ()        D',
+        '::::)          (::::',
         ':                  :',
         ':      3           :',
-        ':                  :',
+        ':                 +:',
         ':                  :',
         ':                  :',
         ':                  :',
@@ -479,17 +705,17 @@ class FloorBuilder:
         ':                  :',
         ':       1          :',
         ':                  :',
-        ':  :::::     ::::  :',
-        ':  :   :     :  :  :',
-        ':  :   :     B  :  :',
+        ':  :::::    :::::  :',
+        ':  :   ;    :   :  :',
+        ':  :   :     B  : L:',
         ':  :   :        :  :',
         ':  :   B        :  :',
         'D  :            :  D',
         '::::            ::::',
         ':       B:::B      :',
+        ':        (:)       :',
         ':         :        :',
-        ':         :        :',
-        ':         : 1  1   :',
+        ': -       : 1  1   :',
         ':         :        :',
         ':         :        :',
         ':       1 :        :',
@@ -502,7 +728,7 @@ class FloorBuilder:
         new_floor_plan = [
 
         '::::::::::::::::::::',
-        ':                  :',
+        ': l                :',
         ':                  :',
         ':      T   T       :',
         ':  T               :',
@@ -517,7 +743,7 @@ class FloorBuilder:
         ':            T     :',
         ':   T              :',
         ': T                :',
-        ':     T            :',
+        ':     T       +    :',
         ':                  :',
         ':                  :',
         '::::::::::::::::::::',
@@ -532,7 +758,7 @@ class FloorBuilder:
         ':       1          :',
         ':                  :',
         ':  :::::     ::::  :',
-        ':  :   :     :  :  :',
+        ':  :   :     : -:  :',
         ':  :   :     B  :  :',
         ':  :   :        :  :',
         ':  :   B        :  :',
@@ -558,7 +784,7 @@ class FloorBuilder:
 
         logging.info("Started loading floor configs...")
 
-        new_floor_data = (1,"Start",2,3,4)
+        new_floor_data = (1,"Start",15,3,4)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (2,"Middle",2,3,4)
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -582,8 +808,8 @@ class FloorBuilder:
             if floor_id in self.floor_plans.keys():
                 floor_plan = self.floor_plans[floor_id]
 
-                id,name,a,b,c = floor_data
-                new_floor = Floor(id = floor_id, name=name)
+                id,name,treasures,traps,c = floor_data
+                new_floor = Floor(id = floor_id, name=name, treasure_count=treasures, trap_count=traps)
                 new_floor.initialise(floor_plan)
                 self.floors[floor_id] = new_floor
 

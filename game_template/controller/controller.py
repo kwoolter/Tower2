@@ -37,7 +37,7 @@ class Controller:
 
         FPSCLOCK = pygame.time.Clock()
 
-        pygame.time.set_timer(USEREVENT + 1, 500)
+        pygame.time.set_timer(USEREVENT + 1, 250)
 
         loop = True
 
@@ -55,16 +55,18 @@ class Controller:
 
                     except Exception as err:
                         print(str(err))
+
                 elif event.type == KEYUP:
 
                     if event.key == Controller.KEY_INITIALISE:
 
                         try:
-                            self.game.initialise()
+                            self.initialise()
                         except Exception as err:
                             print(str(err))
 
                     elif event.key == Controller.KEY_START:
+
                         try:
                             self.game.start()
                         except Exception as err:

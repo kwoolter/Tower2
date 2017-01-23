@@ -3,7 +3,7 @@ import game_template.model as model
 from .colours import Colours
 import os
 import game_template.utils as utils
-import time
+import time, logging
 
 class View:
     def __init__(self):
@@ -25,7 +25,7 @@ class View:
 class MainFrame(View):
 
     TITLE_HEIGHT = 80
-    STATUS_HEIGHT = 30
+    STATUS_HEIGHT = 40
 
     RESOURCES_DIR = os.path.dirname(__file__) + "\\resources\\"
 
@@ -203,8 +203,9 @@ class TitleBar(View):
 
 
 class StatusBar(View):
-    FG_COLOUR = Colours.BLACK
-    BG_COLOUR = Colours.RED
+    FG_COLOUR = Colours.WHITE
+    BG_COLOUR = Colours.GREY
+    ICON_WIDTH = 40
     PADDING = 40
 
     def __init__(self, width: int, height: int):
@@ -215,6 +216,8 @@ class StatusBar(View):
         self.status_messages = []
         self.game = None
 
+        self.image_manager = ImageManager()
+
     def initialise(self, game: model.Game):
 
         super(StatusBar, self).initialise()
@@ -224,6 +227,8 @@ class StatusBar(View):
         self.current_message_number = 0
         for i in range(4):
             self.status_messages.append("Msg {0}".format(i))
+
+        self.image_manager.initialise()
 
     def tick(self):
 
@@ -259,6 +264,37 @@ class StatusBar(View):
                       fg_colour=StatusBar.FG_COLOUR,
                       bg_colour=StatusBar.BG_COLOUR,
                       size=int(pane_rect.height*3/4))
+
+            player = self.game.get_current_player()
+
+            y = pane_rect.top + 4
+            x = int(pane_rect.width*3/4)
+
+            self.draw_icon(self.surface, x=x,y=y,icon_name=model.Tiles.HEART, count=player.HP)
+
+            x += StatusBar.ICON_WIDTH
+            self.draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.KEY, count=player.keys)
+
+            x += StatusBar.ICON_WIDTH
+            self.draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.TREASURE, count=player.treasure)
+
+
+    def draw_icon(self, surface, x, y, icon_name, count=None):
+
+        image = self.image_manager.get_skin_image(tile_name=icon_name, skin_name="default", tick=self.tick_count)
+        iconpos = image.get_rect()
+        iconpos.left = x
+        iconpos.top = y
+        surface.blit(image, iconpos)
+
+        if count is not None:
+            small_font = pygame.font.Font(None, 20)
+            icon_count = small_font.render("{0:>2}".format(count), 1, Colours.BLACK, Colours.WHITE)
+            count_pos = icon_count.get_rect()
+            count_pos.bottom = iconpos.bottom
+            count_pos.right = iconpos.right
+            surface.blit(icon_count, count_pos)
+
 
 
 class HighScoreTableView(View):
@@ -530,13 +566,14 @@ class FloorView(View):
         for y in range(height):
             for x in range (width):
                 tile = self.floor.get_tile(x, y)
-                image = self.image_manager.get_skin_image(skin_name=self.skin_name, tile_name=tile, tick = self.tick_count)
+                image = self.image_manager.get_skin_image(tile_name=tile, skin_name=self.skin_name,
+                                                          tick=self.tick_count)
 
                 if image is not None:
                     self.surface.blit(image,(x * self.tile_width, y * self.tile_height, self.tile_width, self.tile_height))
 
         tile = model.Tiles.PLAYER
-        image = self.image_manager.get_skin_image(skin_name=self.skin_name, tile_name=tile, tick=self.tick_count)
+        image = self.image_manager.get_skin_image(tile_name=tile, skin_name=self.skin_name, tick=self.tick_count)
 
         if self.floor.player is not None and image is not None:
             self.surface.blit(image, (self.floor.player.x * self.tile_width,
@@ -545,6 +582,8 @@ class FloorView(View):
                                       self.tile_height))
 
 class ImageManager:
+
+    DEFAULT_SKIN = "default"
 
     def __init__(self):
         self.image_cache = {}
@@ -573,11 +612,48 @@ class ImageManager:
 
     def load_skins(self):
 
-        new_skin_name = "winter"
-        new_skin = (new_skin_name, {model.Tiles.WALL : "winter_wall.png",
+
+        new_skin_name = ImageManager.DEFAULT_SKIN
+        new_skin = (new_skin_name, {model.Tiles.WALL : "forest_wall.png",
+                                    model.Tiles.SECRET_WALL: "forest_wall.png",
+                                    model.Tiles.WALL: "forest_wall.png",
+                                    model.Tiles.WALL_TR: "forest_wall_tr.png",
+                                    model.Tiles.WALL_TL: "forest_wall_tl.png",
+                                    model.Tiles.WALL_BR: "forest_wall_br.png",
+                                    model.Tiles.WALL_BL: "forest_wall_bl.png",
                                     model.Tiles.EMPTY : None,
+                                    model.Tiles.SAFETY: None,
+                                    model.Tiles.HEART : "heart2.png",
                                     model.Tiles.PLAYER : "player.png",
                                     model.Tiles.DOOR : "winter_door.png",
+                                    model.Tiles.EXIT: "exit.png",
+                                    model.Tiles.ENTRANCE: "entrance.png",
+                                    model.Tiles.NEXT_LEVEL: "next_level.png",
+                                    model.Tiles.PREVIOUS_LEVEL: "previous_level.png",
+                                    model.Tiles.KEY : "key.png",
+                                    model.Tiles.RED_POTION: "red_potion.png",
+                                    model.Tiles.TREASURE: "treasure1.png",
+                                    model.Tiles.TREE: "winter_tree.png",
+                                    model.Tiles.MONSTER1 : ("squirrel1.png","squirrel2.png"),
+                                    model.Tiles.MONSTER2: ("goblin1.png", "goblin2.png"),
+                                    model.Tiles.MONSTER3: ("skeleton1.png", "skeleton2.png"),
+                                    model.Tiles.TRAP1: ("trap.png"),
+                                    model.Tiles.TRAP2: ("trap.png"),
+                                    model.Tiles.TRAP3: ("trap.png"),
+                                    model.Tiles.DOT1: ("lava1.png", "lava2.png","lava3.png", "lava2.png"),
+                                    model.Tiles.DOT2: ("lava.png"),
+                                    model.Tiles.BRAZIER : ("brazier.png", "brazier_lit.png")})
+
+        self.skins[new_skin_name] = new_skin
+
+        new_skin_name = "winter"
+        new_skin = (new_skin_name, {model.Tiles.WALL : "winter_wall.png",
+                                    model.Tiles.SECRET_WALL: "winter_wall.png",
+                                    model.Tiles.PLAYER : "player.png",
+                                    model.Tiles.DOOR : "winter_door.png",
+                                    model.Tiles.KEY : "key.png",
+                                    model.Tiles.TREASURE: "treasure1.png",
+                                    model.Tiles.DOT1: ("ice.png"),
                                     model.Tiles.TREE: "winter_tree.png",
                                     model.Tiles.MONSTER1 : ("squirrel1.png","squirrel2.png"),
                                     model.Tiles.MONSTER2: ("goblin1.png", "goblin2.png"),
@@ -588,9 +664,14 @@ class ImageManager:
 
         new_skin_name = "forest"
         new_skin = (new_skin_name, {model.Tiles.WALL: "forest_wall.png",
-                                    model.Tiles.EMPTY: None,
-                                    model.Tiles.PLAYER: "player.png",
+                                    model.Tiles.WALL_TR: "forest_wall_tr.png",
+                                    model.Tiles.WALL_TL: "forest_wall_tl.png",
+                                    model.Tiles.WALL_BR: "forest_wall_br.png",
+                                    model.Tiles.WALL_BL: "forest_wall_bl.png",
+                                    model.Tiles.SECRET_WALL: "forest_wall.png",
+                                    model.Tiles.PLAYER: ("squirrel1.png","squirrel2.png"),
                                     model.Tiles.DOOR: "door.png",
+                                    model.Tiles.TREASURE: "treasure1.png",
                                     model.Tiles.TREE: "forest_tree.png",
                                     model.Tiles.MONSTER1: ("eye1.png", "eye2.png", "eye3.png", "eye2.png","eye4.png", "eye2.png"),
                                     model.Tiles.MONSTER2: ("goblin1.png", "goblin2.png"),
@@ -601,16 +682,19 @@ class ImageManager:
 
         new_skin_name = "desert"
         new_skin = (new_skin_name, {model.Tiles.WALL: "forest_wall.png",
-                                    model.Tiles.EMPTY: None,
+                                    model.Tiles.SECRET_WALL: "forest_wall.png",
                                     model.Tiles.PLAYER: "player.png",
                                     model.Tiles.DOOR: "door.png",
+                                    model.Tiles.KEY: "key.png",
+                                    model.Tiles.RED_POTION: "red_potion.png",
+                                    model.Tiles.TREASURE: "treasure.png",
                                     model.Tiles.TREE: "forest_tree.png",
                                     model.Tiles.MONSTER1: ("fire1.png", "fire2.png", "fire3.png", "fire4.png"),
                                     model.Tiles.BRAZIER: ("brazier.png", "brazier_lit.png")})
 
         self.skins[new_skin_name] = new_skin
 
-    def get_skin_image(self, skin_name : str, tile_name : str, tick = 0):
+    def get_skin_image(self, tile_name: str, skin_name: str = DEFAULT_SKIN, tick=0):
 
         if skin_name not in self.skins.keys():
             raise Exception("Can't find specified skin {0}".format(skin_name))
@@ -618,7 +702,9 @@ class ImageManager:
         name, tile_map = self.skins[skin_name]
 
         if tile_name not in tile_map.keys():
-            raise Exception("Can't find tile name '{0}' in skin '{1}'!".format(tile_name, skin_name))
+            name, tile_map = self.skins[ImageManager.DEFAULT_SKIN]
+            if tile_name not in tile_map.keys():
+                raise Exception("Can't find tile name '{0}' in skin '{1}'!".format(tile_name, skin_name))
 
         tile_file_names = tile_map[tile_name]
 
