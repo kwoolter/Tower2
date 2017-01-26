@@ -58,17 +58,13 @@ class Controller:
 
                 elif event.type == KEYUP:
 
-                    if event.key == Controller.KEY_INITIALISE:
+                    if event.key == Controller.KEY_START:
 
                         try:
-                            self.initialise()
-                        except Exception as err:
-                            print(str(err))
-
-                    elif event.key == Controller.KEY_START:
-
-                        try:
-                            self.game.start()
+                            if self.game.state == model.Game.READY:
+                                self.game.start()
+                            elif self.game.state == model.Game.GAME_OVER:
+                                self.initialise()
                         except Exception as err:
                             print(str(err))
 
@@ -80,13 +76,15 @@ class Controller:
 
                     elif event.key == K_n:
                         try:
-                            self.game.next_floor()
+                            if self.game.state == model.Game.PLAYING:
+                                self.game.next_floor()
                         except Exception as err:
                             print(str(err))
 
                     elif event.key == K_l:
                         try:
-                            self.game.next_level()
+                            if self.game.state == model.Game.PLAYING:
+                                self.game.next_level()
                         except Exception as err:
                             print(str(err))
 

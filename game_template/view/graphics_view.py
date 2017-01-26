@@ -278,6 +278,9 @@ class StatusBar(View):
             x += StatusBar.ICON_WIDTH
             self.draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.TREASURE, count=player.treasure)
 
+            x += StatusBar.ICON_WIDTH
+            self.draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.TROPHY, count=player.trophies)
+
 
     def draw_icon(self, surface, x, y, icon_name, count=None):
 
@@ -369,9 +372,12 @@ class GameReadyView(View):
 
         self.surface = pygame.Surface((width, height))
 
+        self.image_manager = ImageManager()
+
     def initialise(self, game: model.Game):
         self.game = game
         self.hst.initialise(self.game.hst)
+        self.image_manager.initialise()
 
     def draw(self):
         if self.game is None:
@@ -385,12 +391,32 @@ class GameReadyView(View):
         y = 20
 
         draw_text(self.surface,
-                  msg="G A M E    R E A D Y",
+                  msg="R E A D Y !",
                   x=x,
                   y=y,
                   size=30,
                   fg_colour=GameReadyView.FG_COLOUR,
                   bg_colour=GameReadyView.BG_COLOUR)
+
+
+        image_width = 200
+        image_height = 200
+
+        image = self.image_manager.get_skin_image(model.Tiles.PLAYER, tick=self.tick_count)
+
+        x = pane_rect.centerx - int(image_width/2)
+        y += 40
+        image = pygame.transform.scale(image, (image_width,image_height))
+        self.surface.blit(image,(x,y))
+
+        image = self.image_manager.get_skin_image(model.Tiles.MONSTER2, tick=self.tick_count)
+        image = pygame.transform.scale(image, (image_width,image_height))
+
+        x = int(pane_rect.width*1/5 - image_width/2)
+        self.surface.blit(image,(x,y))
+
+        x = int(pane_rect.width*4/5 - image_width/2)
+        self.surface.blit(image,(x,y))
 
         x = 0
         y = pane_rect.bottom - self.hst.surface.get_height()
@@ -585,8 +611,9 @@ class ImageManager:
 
     DEFAULT_SKIN = "default"
 
+    image_cache = {}
+
     def __init__(self):
-        self.image_cache = {}
         self.skins = {}
 
     def initialise(self):
@@ -595,13 +622,15 @@ class ImageManager:
 
     def get_image(self, image_file_name : str, width : int = 32, height : int =32):
 
-        if image_file_name not in self.image_cache.keys():
+        if image_file_name not in ImageManager.image_cache.keys():
 
             filename = MainFrame.RESOURCES_DIR + image_file_name
             try:
+                logging.info("Loading image {0}...".format(filename))
                 image = pygame.image.load(filename)
                 image = pygame.transform.scale(image, (width, height))
-                self.image_cache[image_file_name] = image
+                ImageManager.image_cache[image_file_name] = image
+                logging.info("Image {0} loaded and cached.".format(filename))
             except Exception as err:
                 print(str(err))
 
@@ -621,17 +650,23 @@ class ImageManager:
                                     model.Tiles.WALL_TL: "forest_wall_tl.png",
                                     model.Tiles.WALL_BR: "forest_wall_br.png",
                                     model.Tiles.WALL_BL: "forest_wall_bl.png",
+                                    model.Tiles.DECORATION1: ("eyes.png", "eyes.png","eyes1.png","eyes.png",
+                                                              "eyes1.png", "eyes3.png", "eyes3.png", "eyes3.png"),
+                                    model.Tiles.DECORATION2: ("pyre1.png","pyre2.png","pyre3.png","pyre4.png"),
                                     model.Tiles.EMPTY : None,
                                     model.Tiles.SAFETY: None,
                                     model.Tiles.HEART : "heart2.png",
-                                    model.Tiles.PLAYER : "player.png",
+                                    model.Tiles.PLAYER : ("player1.png","player.png","player2.png","player.png"),
                                     model.Tiles.DOOR : "winter_door.png",
+                                    model.Tiles.TROPHY: "goal.png",
                                     model.Tiles.EXIT: "exit.png",
                                     model.Tiles.ENTRANCE: "entrance.png",
                                     model.Tiles.NEXT_LEVEL: "next_level.png",
                                     model.Tiles.PREVIOUS_LEVEL: "previous_level.png",
                                     model.Tiles.KEY : "key.png",
                                     model.Tiles.RED_POTION: "red_potion.png",
+                                    model.Tiles.SWITCH: "switch.png",
+                                    model.Tiles.SWITCH_LIT: "switch_lit.png",
                                     model.Tiles.TREASURE: "treasure1.png",
                                     model.Tiles.TREE: "winter_tree.png",
                                     model.Tiles.MONSTER1 : ("squirrel1.png","squirrel2.png"),
@@ -649,15 +684,11 @@ class ImageManager:
         new_skin_name = "winter"
         new_skin = (new_skin_name, {model.Tiles.WALL : "winter_wall.png",
                                     model.Tiles.SECRET_WALL: "winter_wall.png",
-                                    model.Tiles.PLAYER : "player.png",
                                     model.Tiles.DOOR : "winter_door.png",
                                     model.Tiles.KEY : "key.png",
                                     model.Tiles.TREASURE: "treasure1.png",
                                     model.Tiles.DOT1: ("ice.png"),
                                     model.Tiles.TREE: "winter_tree.png",
-                                    model.Tiles.MONSTER1 : ("squirrel1.png","squirrel2.png"),
-                                    model.Tiles.MONSTER2: ("goblin1.png", "goblin2.png"),
-                                    model.Tiles.MONSTER3: ("skeleton1.png", "skeleton2.png"),
                                     model.Tiles.BRAZIER : ("brazier.png", "brazier_lit.png")})
 
         self.skins[new_skin_name] = new_skin
@@ -669,13 +700,10 @@ class ImageManager:
                                     model.Tiles.WALL_BR: "forest_wall_br.png",
                                     model.Tiles.WALL_BL: "forest_wall_bl.png",
                                     model.Tiles.SECRET_WALL: "forest_wall.png",
-                                    model.Tiles.PLAYER: ("squirrel1.png","squirrel2.png"),
                                     model.Tiles.DOOR: "door.png",
-                                    model.Tiles.TREASURE: "treasure1.png",
+                                    model.Tiles.TREASURE: "treasure.png",
                                     model.Tiles.TREE: "forest_tree.png",
                                     model.Tiles.MONSTER1: ("eye1.png", "eye2.png", "eye3.png", "eye2.png","eye4.png", "eye2.png"),
-                                    model.Tiles.MONSTER2: ("goblin1.png", "goblin2.png"),
-                                    model.Tiles.MONSTER3: ("goblin1.png", "goblin2.png"),
                                     model.Tiles.BRAZIER: ("fire1.png", "fire2.png", "fire3.png", "fire4.png")})
 
         self.skins[new_skin_name] = new_skin
@@ -690,6 +718,20 @@ class ImageManager:
                                     model.Tiles.TREASURE: "treasure.png",
                                     model.Tiles.TREE: "forest_tree.png",
                                     model.Tiles.MONSTER1: ("fire1.png", "fire2.png", "fire3.png", "fire4.png"),
+                                    model.Tiles.BRAZIER: ("brazier.png", "brazier_lit.png")})
+
+        self.skins[new_skin_name] = new_skin
+
+        new_skin_name = "squirrel"
+        new_skin = (new_skin_name, {model.Tiles.WALL: "forest_wall.png",
+                                    model.Tiles.SECRET_WALL: "forest_wall.png",
+                                    model.Tiles.PLAYER: "squirrel1.png",
+                                    model.Tiles.DOOR: "door.png",
+                                    model.Tiles.KEY: "key.png",
+                                    model.Tiles.RED_POTION: "red_potion.png",
+                                    model.Tiles.TREASURE: "treasure_nut.png",
+                                    model.Tiles.TREE: "forest_tree.png",
+                                    model.Tiles.MONSTER1: ("devil1.png", "devil2.png"),
                                     model.Tiles.BRAZIER: ("brazier.png", "brazier_lit.png")})
 
         self.skins[new_skin_name] = new_skin

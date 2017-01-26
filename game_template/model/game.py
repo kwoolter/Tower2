@@ -51,6 +51,7 @@ class Player():
         self._x = self.old_x
         self._y = self.old_y
 
+    @property
     def score(self):
         return self.kills + self.treasure + (self.trophies * 50)
 
@@ -78,7 +79,7 @@ class Game:
         ##
 
 
-        self.levels = LevelBuilder()
+        self.level_factory = LevelBuilder()
 
 
 
@@ -92,18 +93,32 @@ class Game:
 
         return self._state
 
+    @property
+    def trophies(self):
+
+        trophy_count = 0
+
+        for level in self.level_factory.levels.values():
+            trophy_count += level.trophies
+
+        return trophy_count
+
+
     def get_current_floor(self):
-        return self.levels.get_floor(self.current_floor_id)
+        return self.level_factory.get_floor(self.current_floor_id)
 
     def get_current_level(self):
-        return self.levels.get_level(self.current_level_id)
+        return self.level_factory.get_level(self.current_level_id)
 
     def get_current_player(self):
-        return self.players[0]
+        if len(self.players) > 0:
+            return self.players[0]
+        else:
+            return None
 
     def next_floor(self):
 
-        current_level = self.levels.get_level(self.current_level_id)
+        current_level = self.level_factory.get_level(self.current_level_id)
 
         floor_ids = sorted(current_level.floors.keys())
 
@@ -117,7 +132,7 @@ class Game:
         self.get_current_floor().add_player(self.get_current_player())
 
     def previous_floor(self):
-        current_level = self.levels.get_level(self.current_level_id)
+        current_level = self.level_factory.get_level(self.current_level_id)
 
         floor_ids = sorted(current_level.floors.keys())
 
@@ -133,7 +148,7 @@ class Game:
 
     def next_level(self):
 
-        level_ids = sorted(self.levels.levels.keys())
+        level_ids = sorted(self.level_factory.levels.keys())
         index = level_ids.index(self.current_level_id)
         index += 1
         if index >= len(level_ids):
@@ -147,7 +162,7 @@ class Game:
 
     def previous_level(self):
 
-        level_ids = sorted(self.levels.levels.keys())
+        level_ids = sorted(self.level_factory.levels.keys())
         index = level_ids.index(self.current_level_id)
         index -= 1
         if index < 0:
@@ -177,8 +192,8 @@ class Game:
         self.floors = FloorBuilder()
         self.floors.initialise()
 
-        self.levels = LevelBuilder()
-        self.levels.initialise(self.floors)
+        self.level_factory = LevelBuilder()
+        self.level_factory.initialise(self.floors)
 
         self.current_level_id = 1
         self.current_floor_id = min(self.get_current_level().floors.keys())
@@ -237,6 +252,14 @@ class Game:
             current_floor.set_player_tile(Tiles.EMPTY)
             current_player.treasure += 1
             print("You found some treasure!")
+
+        elif tile == Tiles.TROPHY:
+            current_floor.set_player_tile(Tiles.EMPTY)
+            current_player.trophies += 1
+            print("You found a trophy!")
+            if current_player.trophies == self.trophies:
+                self.game_over()
+
 
         elif tile == Tiles.DOOR:
 
@@ -327,6 +350,11 @@ class Game:
     def game_over(self):
 
         logging.info("Game Over {0}...".format(self.name))
+        player = self.get_current_player()
+
+        self.player_scores[player.name] = player.score
+
+        self.hst.add(self.get_current_player().name, self.get_current_player().score)
 
         self._state=Game.GAME_OVER
 
@@ -350,13 +378,15 @@ class Tiles:
     BOSS_KEY = "$"
     BRAZIER = "B"
     DOOR = "D"
+    DECORATION1 = "z"
+    DECORATION2 = "Z"
     EMPTY = " "
     ENTRANCE = "-"
     EXIT = "+"
     NEXT_LEVEL = "L"
     PREVIOUS_LEVEL = "l"
     EXIT_KEY = "%"
-    GOAL = "G"
+    TROPHY = "G"
     KEY = "?"
     SAFETY = "8"
     SECRET_WALL = ";"
@@ -388,7 +418,7 @@ class Tiles:
     MONSTERS = (MONSTER1, MONSTER2, MONSTER3)
     TRAPS = (TRAP1, TRAP2, TRAP3)
     MONSTER_EMPTY_TILES = (EMPTY, PLAYER)
-    PLAYER_BLOCK_TILES = (TREE, WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR)
+    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR)
     PLAYER_DOT_TILES = (DOT1, DOT2)
     SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
 
@@ -458,9 +488,10 @@ class Floor:
         self.name = name
         self.treasure_count = treasure_count
         self.trap_count = trap_count
-        self.tick_count = 0
         self.monster_count = monster_count
+        self.tick_count = 0
         self.monsters = {}
+        self.trophies = 0
         #self.traps = []
         self.floor_plan = None
         self.player = None
@@ -478,10 +509,18 @@ class Floor:
                     self.floor_plan.set_tile(Tiles.EMPTY, x, y)
                     self.monsters[(x,y)] = tile_name
 
+                elif tile_name == Tiles.TROPHY:
+                    self.trophies += 1
+
         print(str(self))
 
         self.place_tiles(self.treasure_count, Tiles.TREASURE)
         self.place_tiles(self.trap_count, Tiles.TRAP1)
+
+        m1,m2,m3 = self.monster_count
+        self.place_tiles(m1, Tiles.MONSTER1)
+        self.place_tiles(m2, Tiles.MONSTER2)
+        self.place_tiles(m3, Tiles.MONSTER3)
 
     def tick(self):
 
@@ -510,10 +549,17 @@ class Floor:
                 x = random.randint(1, self.width - 1)
                 y = random.randint(1, self.height - 1)
                 if self.floor_plan.get_tile(x,y) == Tiles.EMPTY:
-                    self.floor_plan.set_tile(item_type,x,y)
+
                     logging.info("Placed a {0} at {1},{2}".format(item_type, x, y))
+
+                    if item_type in Tiles.MONSTERS:
+                        self.monsters[(x, y)] = item_type
+                    else:
+                        self.floor_plan.set_tile(item_type, x, y)
+
                     break
                 attempts += 1
+
                 # We tried several times to find an empty square, time to give up!
                 if attempts > tries:
                     print("Can't find an empty tile to place {0} after {1} tries".format(item_type, attempts))
@@ -614,6 +660,16 @@ class Level:
 
         self.floors = {}
 
+    @property
+    def trophies(self):
+        trophy_count = 0
+
+        for floor in self.floors.values():
+            trophy_count += floor.trophies
+
+        return trophy_count
+
+
     def add_floor(self, new_floor : Floor):
 
         self.floors[new_floor.id] = new_floor
@@ -652,22 +708,22 @@ class FloorBuilder:
             '::::::::::::::::::::',
             ':B        !!!    B(:',
             ':  B               :',
-            ':             3    :',
-            ':         ^^       :',
-            ':      R     1     :',
             ':                  :',
+            ':         ^^     /::',
+            ':      R         :z:',
+            ':                (::',
             ':      T           :',
             'D   /::::\  *      D',
-            ':   :    :         :',
-            ':   (::::)T        :',
-            ':  2               :',
+            ':   :z   :         :',
+            ':   (::::)T   ,    :',
             ':                  :',
-            ':     T       1    :',
-            ':        *         :',
+            ':                  :',
+            ':     T            :',
+            ':        *       , :',
             ':     ?            :',
-            ':         T        :',
+            ':  G      T        :',
             ':            *     :',
-            ':\      +        B/:',
+            ':\  Z   +   Z    B/:',
             '::::::::::::::::::::',
         ]
 
@@ -728,13 +784,13 @@ class FloorBuilder:
         new_floor_plan = [
 
         '::::::::::::::::::::',
-        ': l                :',
+        ':                  :',
         ':                  :',
         ':      T   T       :',
         ':  T               :',
         ':    T T           :',
         ':                  :',
-        ':    T     1  2  3 :',
+        ':    T             :',
         ':                  :',
         'D                  D',
         ':          T T     :',
@@ -750,6 +806,7 @@ class FloorBuilder:
         ]
 
         self.floor_plans[100] = FloorPlan(100,deepcopy(new_floor_plan))
+        self.floor_plans[200] = FloorPlan(100, deepcopy(new_floor_plan))
 
         new_floor_plan = (
 
@@ -771,7 +828,7 @@ class FloorBuilder:
         ':         :        :',
         ':         :        :',
         ':       1 :        :',
-        ':         :        :',
+        ':         : G      :',
         '::::::::::::::::::::',
         )
 
@@ -784,15 +841,20 @@ class FloorBuilder:
 
         logging.info("Started loading floor configs...")
 
-        new_floor_data = (1,"Start",15,3,4)
+        # id,name,treasures,traps,monsters(1,2,3)
+
+        new_floor_data = (1,"Start",15,3,(10,0,0))
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (2,"Middle",2,3,4)
+        new_floor_data = (2,"Middle",2,3,(0,10,0))
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (3, "Zastaross", 2, 3, 4)
+        new_floor_data = (3, "Zastaross", 2, 3, (0,0,10))
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (100,"Home straight",2,3,4)
+        new_floor_data = (100,"Home straight",2,3,(1,1,1))
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (101,"End",2,3,4)
+        new_floor_data = (101,"End",2,3,(1,1,1))
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+
+        new_floor_data = (200, "The Woods",7,4,(7,0,0))
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         logging.info("Finished loading floor configs. {0} floor configs loaded.".format(len(self.floor_configs.keys())))
@@ -808,8 +870,8 @@ class FloorBuilder:
             if floor_id in self.floor_plans.keys():
                 floor_plan = self.floor_plans[floor_id]
 
-                id,name,treasures,traps,c = floor_data
-                new_floor = Floor(id = floor_id, name=name, treasure_count=treasures, trap_count=traps)
+                id,name,treasures,traps,monsters = floor_data
+                new_floor = Floor(id = floor_id, name=name, treasure_count=treasures, trap_count=traps, monster_count=monsters)
                 new_floor.initialise(floor_plan)
                 self.floors[floor_id] = new_floor
 
@@ -840,6 +902,9 @@ class LevelBuilder:
 
         new_level_data = (2, "Winter World", (100,101),"winter")
         self.level_data[2] = new_level_data
+
+        new_level_data = (3, "Squirrel World", (200,200),"squirrel")
+        self.level_data[3] = new_level_data
 
         logging.info("Finished Loading Level Data. {0} levels loaded.".format(len(self.level_data.keys())))
 
