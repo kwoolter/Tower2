@@ -177,30 +177,24 @@ class TitleBar(View):
         pane_rect = self.surface.get_rect()
 
         if self.title_image is not None:
-
             self.surface.blit(self.title_image, (0, 0))
 
+        if self.game.state == model.Game.PLAYING:
             msg = "  {0} - {1}  ".format(self.game.get_current_level().name,
                                              self.game.get_current_floor().name)
-            pane_rect = self.surface.get_rect()
-            draw_text(self.surface,
-                      msg=msg,
-                      x=pane_rect.centerx,
-                      y=int(pane_rect.height / 2),
-                      fg_colour=TitleBar.TEXT_FG_COLOUR,
-                      bg_colour=TitleBar.TEXT_BG_COLOUR,
-                      size=int(pane_rect.height/2))
 
         elif self.title is not None:
+            msg = self.title
 
-            draw_text(self.surface,
-                      msg=self.title,
-                      x=pane_rect.centerx,
-                      y=int(pane_rect.height / 2),
-                      fg_colour=TitleBar.TEXT_FG_COLOUR,
-                      bg_colour=TitleBar.TEXT_BG_COLOUR,
-                      size=pane_rect.height)
 
+        pane_rect = self.surface.get_rect()
+        draw_text(self.surface,
+                  msg=msg,
+                  x=pane_rect.centerx,
+                  y=int(pane_rect.height / 2),
+                  fg_colour=TitleBar.TEXT_FG_COLOUR,
+                  bg_colour=TitleBar.TEXT_BG_COLOUR,
+                  size=int(pane_rect.height/2))
 
 class StatusBar(View):
     FG_COLOUR = Colours.WHITE
@@ -438,10 +432,13 @@ class GameOverView(View):
 
         self.surface = pygame.Surface((width, height))
 
+        self.image_manager = ImageManager()
+
     def initialise(self, game: model.Game):
 
         self.game = game
         self.hst.initialise(self.game.hst)
+        self.image_manager.initialise()
 
     def draw(self):
 
@@ -489,6 +486,27 @@ class GameOverView(View):
                       )
             y += GameOverView.SCORE_TEXT_SIZE
             rank += 1
+
+        image_width = 200
+        image_height = 200
+
+        image = self.image_manager.get_skin_image(model.Tiles.PLAYER, tick=self.tick_count)
+
+        x = pane_rect.centerx - int(image_width/2)
+        y += 5
+        image = pygame.transform.scale(image, (image_width,image_height))
+        self.surface.blit(image,(x,y))
+
+        image = self.image_manager.get_skin_image(model.Tiles.MONSTER2, tick=self.tick_count)
+        image = pygame.transform.scale(image, (image_width,image_height))
+
+        y = 20
+
+        x = int(pane_rect.width*1/5 - image_width/2)
+        self.surface.blit(image,(x,y))
+
+        x = int(pane_rect.width*4/5 - image_width/2)
+        self.surface.blit(image,(x,y))
 
         x = 0
         y = pane_rect.bottom - self.hst.surface.get_height()
@@ -701,9 +719,11 @@ class ImageManager:
                                     model.Tiles.WALL_BL: "forest_wall_bl.png",
                                     model.Tiles.SECRET_WALL: "forest_wall.png",
                                     model.Tiles.DOOR: "door.png",
-                                    model.Tiles.TREASURE: "treasure.png",
+                                    model.Tiles.TREASURE: ("treasure.png","treasure2.png","treasure3.png","treasure2.png"),
                                     model.Tiles.TREE: "forest_tree.png",
-                                    model.Tiles.MONSTER1: ("eye1.png", "eye2.png", "eye3.png", "eye2.png","eye4.png", "eye2.png"),
+                                    model.Tiles.MONSTER1: ("goblin1.png", "goblin2.png"),
+                                    model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png","skeleton1.png","skeleton3.png" ),
+                                    model.Tiles.MONSTER3: ("eye1.png", "eye2.png", "eye3.png", "eye2.png","eye4.png", "eye2.png"),
                                     model.Tiles.BRAZIER: ("fire1.png", "fire2.png", "fire3.png", "fire4.png")})
 
         self.skins[new_skin_name] = new_skin
@@ -723,14 +743,16 @@ class ImageManager:
         self.skins[new_skin_name] = new_skin
 
         new_skin_name = "squirrel"
-        new_skin = (new_skin_name, {model.Tiles.WALL: "forest_wall.png",
+        new_skin = (new_skin_name, {model.Tiles.WALL: "stone_wall.png",
                                     model.Tiles.SECRET_WALL: "forest_wall.png",
                                     model.Tiles.PLAYER: "squirrel1.png",
-                                    model.Tiles.DOOR: "door.png",
+                                    model.Tiles.DOOR: "wooden_door.png",
                                     model.Tiles.KEY: "key.png",
+                                    model.Tiles.DECORATION1: "flower.png",
+                                    model.Tiles.DECORATION2: ("pyre1.png", "pyre2.png", "pyre3.png", "pyre4.png"),
                                     model.Tiles.RED_POTION: "red_potion.png",
                                     model.Tiles.TREASURE: "treasure_nut.png",
-                                    model.Tiles.TREE: "forest_tree.png",
+                                    model.Tiles.TREE: "squirrel_tree.png",
                                     model.Tiles.MONSTER1: ("devil1.png", "devil2.png"),
                                     model.Tiles.BRAZIER: ("brazier.png", "brazier_lit.png")})
 

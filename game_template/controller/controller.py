@@ -28,9 +28,6 @@ class Controller:
         new_player = model.Player("Keith")
         self.game.add_player(new_player)
 
-        new_player = model.Player("Jack")
-        self.game.add_player(new_player)
-
     def run(self):
 
         os.environ["SDL_VIDEO_CENTERED"] = "1"
