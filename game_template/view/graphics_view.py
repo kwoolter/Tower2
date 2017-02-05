@@ -356,7 +356,7 @@ class HighScoreTableView(View):
 class GameReadyView(View):
 
     FG_COLOUR = Colours.GOLD
-    BG_COLOUR = Colours.GREY
+    BG_COLOUR = Colours.DARK_GREY
 
     def __init__(self, width: int, height: int = 500):
         super(GameReadyView, self).__init__()
@@ -418,7 +418,7 @@ class GameReadyView(View):
 class GameOverView(View):
 
     FG_COLOUR = Colours.WHITE
-    BG_COLOUR = Colours.GREY
+    BG_COLOUR = Colours.DARK_GREY
     SCORE_TEXT_SIZE = 20
 
     def __init__(self, width: int, height: int = 500):
@@ -567,7 +567,7 @@ class GameView(View):
 
 class FloorView(View):
 
-    BG_COLOUR = Colours.GREY
+    BG_COLOUR = Colours.DARK_GREY
     TILE_WIDTH = 32
     TILE_HEIGHT = 32
 
@@ -614,12 +614,19 @@ class FloorView(View):
 
 class InventoryView(View):
 
-    BG_COLOUR = Colours.GREY
+    BG_COLOUR = Colours.DARK_GREY
     FG_COLOUR = Colours.WHITE
+
+    SELECTION_BG_COLOUR = Colours.GREY
+    SELECTION_BORDER_COLOUR = Colours.GOLD
 
     ICON_WIDTH = 32
     ICON_HEIGHT = 32
     ICON_PADDING = 6
+
+    ITEMS = (model.Tiles.TREASURE, model.Tiles.KEY, model.Tiles.RED_POTION,
+             model.Tiles.WEAPON, model.Tiles.SHIELD, model.Tiles.BOMB)
+
 
     def __init__(self, width : int, height : int, tile_width : int = ICON_WIDTH, tile_height : int = ICON_HEIGHT):
 
@@ -627,12 +634,24 @@ class InventoryView(View):
 
         self.surface = pygame.Surface((width, height))
         self.player = None
+        self.current_selected_item = -1
 
-    def initialise(self, player : model.Player):
+    def initialise(self, player : model.Player, item_prices : dict = None):
 
         super(InventoryView, self).initialise()
 
         self.player = player
+        self.item_prices = item_prices
+
+    def change_selection(self, delta : int = 0):
+        self.current_selected_item += delta
+        if self.current_selected_item < 0:
+            self.current_selected_item = 0
+        elif self.current_selected_item >= len(InventoryView.ITEMS):
+            self.current_selected_item = len(InventoryView.ITEMS) - 1
+
+    def get_current_selection(self):
+        return InventoryView.ITEMS[self.current_selected_item]
 
     def draw(self):
 
@@ -667,19 +686,62 @@ class InventoryView(View):
         x = int(pane_rect.centerx - InventoryView.ICON_WIDTH/2)
         y += image_height + InventoryView.ICON_PADDING
 
-        draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.TREASURE, count=self.player.treasure)
+        icon_starty = y
 
-        y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
-        draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.KEY, count=self.player.keys)
+        if self.current_selected_item >= 0:
+            selection_rect = pygame.Rect(0,icon_starty + self.current_selected_item*38,pane_rect.width,InventoryView.ICON_HEIGHT + int(InventoryView.ICON_PADDING/2))
+            pygame.draw.rect(self.surface, InventoryView.SELECTION_BG_COLOUR,selection_rect, 0)
+            pygame.draw.rect(self.surface, InventoryView.SELECTION_BORDER_COLOUR,selection_rect, 3)
 
-        y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
-        draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.WEAPON, count=self.player.weapon)
+        item_index = 0
+        item_type = InventoryView.ITEMS[item_index]
 
-        y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
-        draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.SHIELD, count=self.player.shield)
+        draw_icon(self.surface, x=x, y=y, icon_name=item_type, count=self.player.treasure)
+        if self.item_prices is not None and item_type in self.item_prices.keys():
+            item_price = self.item_prices[item_type]
+            draw_icon(self.surface, x=x + 30, y=y, icon_name=model.Tiles.TREASURE, count=item_price)
 
+        item_index += 1
+        item_type = InventoryView.ITEMS[item_index]
         y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
-        draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.BOMB, count=self.player.bombs)
+        draw_icon(self.surface, x=x, y=y, icon_name=item_type, count=self.player.keys)
+        if self.item_prices is not None and item_type in self.item_prices.keys():
+            item_price = self.item_prices[item_type]
+            draw_icon(self.surface, x=x + 30, y=y, icon_name=model.Tiles.TREASURE, count=item_price)
+
+        item_index += 1
+        item_type = InventoryView.ITEMS[item_index]
+        y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
+        draw_icon(self.surface, x=x, y=y, icon_name=item_type, count=self.player.red_potions)
+        if self.item_prices is not None and item_type in self.item_prices.keys():
+            item_price = self.item_prices[item_type]
+            draw_icon(self.surface, x=x + 30, y=y, icon_name=model.Tiles.TREASURE, count=item_price)
+
+        item_index += 1
+        item_type = InventoryView.ITEMS[item_index]
+        y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
+        draw_icon(self.surface, x=x, y=y, icon_name=item_type, count=self.player.weapon)
+        if self.item_prices is not None and item_type in self.item_prices.keys():
+            item_price = self.item_prices[item_type]
+            draw_icon(self.surface, x=x + 30, y=y, icon_name=model.Tiles.TREASURE, count=item_price)
+
+        item_index += 1
+        item_type = InventoryView.ITEMS[item_index]
+        y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
+        draw_icon(self.surface, x=x, y=y, icon_name=item_type, count=self.player.shield)
+        if self.item_prices is not None and item_type in self.item_prices.keys():
+            item_price = self.item_prices[item_type]
+            draw_icon(self.surface, x=x + 30, y=y, icon_name=model.Tiles.TREASURE, count=item_price)
+
+        item_index += 1
+        item_type = InventoryView.ITEMS[item_index]
+        y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
+        draw_icon(self.surface, x=x, y=y, icon_name=item_type, count=self.player.bombs)
+        if self.item_prices is not None and item_type in self.item_prices.keys():
+            item_price = self.item_prices[item_type]
+            draw_icon(self.surface, x=x + 30, y=y, icon_name=model.Tiles.TREASURE, count=item_price)
+
+
 
 
 class ShopView(View):
@@ -699,6 +761,7 @@ class ShopView(View):
 
         self.player_inventory = InventoryView(height=height*3/4,width=width/2)
         self.shop_keeper_inventory = InventoryView(height=height*3/4,width=width/2)
+        self.shop_keeper_inventory.current_selected_item = 0
 
     def initialise(self, game : model.Game):
 
@@ -707,7 +770,7 @@ class ShopView(View):
         self.game = game
 
         self.player_inventory.initialise(self.game.get_current_player())
-        self.shop_keeper_inventory.initialise(self.game.current_shop_keeper)
+        self.shop_keeper_inventory.initialise(self.game.shop.current_shop_keeper, game.shop.item_prices)
 
     def draw(self):
 
@@ -722,7 +785,7 @@ class ShopView(View):
         x = pane_rect.centerx
 
         draw_text(self.surface,
-                  msg="{0}'s Shop".format(self.game.current_shop_keeper.name),
+                  msg="{0}'s Shop".format(self.game.shop.current_shop_keeper.name),
                   x=x,
                   y=y,
                   size=30,
@@ -740,6 +803,7 @@ class ShopView(View):
         x=int(pane_rect.width/2)
 
         self.surface.blit(self.shop_keeper_inventory.surface, (x, y))
+
 
 
 

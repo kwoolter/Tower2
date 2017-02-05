@@ -153,11 +153,25 @@ class Controller:
                             except Exception as err:
                                 print(str(err))
 
+                        elif event.key in (K_UP, K_w):
+                            self.view.inventory_manager.change_selection(-1)
+                        elif event.key in (K_DOWN, K_s):
+                            self.view.inventory_manager.change_selection(1)
+
                     # If we are in Shop mode...
                     elif self.mode == Controller.SHOP:
                         if event.key in (Controller.KEY_SHOP, K_ESCAPE):
                             try:
                                 self.toggle_shop_mode()
+                            except Exception as err:
+                                print(str(err))
+                        elif event.key in (K_UP, K_w):
+                            self.view.shop_view.shop_keeper_inventory.change_selection(-1)
+                        elif event.key in (K_DOWN, K_s):
+                            self.view.shop_view.shop_keeper_inventory.change_selection(1)
+                        elif event.key == K_RETURN:
+                            try:
+                                self.game.shop.buy_item(self.view.shop_view.shop_keeper_inventory.get_current_selection(), self.game.get_current_player())
                             except Exception as err:
                                 print(str(err))
 

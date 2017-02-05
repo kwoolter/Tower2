@@ -179,7 +179,10 @@ class Game:
 
     def enter_shop(self):
         self._state = Game.SHOPPING
-        self.current_shop_keeper = self.shop.get_shop_keeper()
+        self.shop.get_random_shop_keeper()
+
+    def get_current_shop_keeper(self):
+        return self.shop.current_shop_keeper
 
     def exit_shop(self):
         self._state = Game.PLAYING
@@ -409,13 +412,57 @@ class Shop:
 
     def __init__(self):
         self.shop_keepers = {}
+        self.current_shop_keeper = None
+        self.item_prices = {}
 
     def initialise(self):
         self.load_shop_keepers()
+        self.load_item_prices()
 
-    def get_shop_keeper(self):
+    def get_random_shop_keeper(self):
         shop_keeper_name = random.choice(list(self.shop_keepers.keys()))
-        return self.shop_keepers[shop_keeper_name]
+        self.current_shop_keeper =  self.shop_keepers[shop_keeper_name]
+        return self.current_shop_keeper
+
+    def buy_item(self, item_type, player : Player):
+
+        if item_type not in self.item_prices.keys():
+            raise Exception("Item {0} not in stock!".format(item_type))
+
+        item_price = self.item_prices[item_type]
+
+        if self.item_prices[item_type] > player.treasure:
+            raise Exception("Player {0} does not have enough money to buy {1} at {2}".format(player.name,item_type,item_price))
+
+        if item_type == Tiles.BOMB and self.current_shop_keeper.bombs > 0:
+            player.bombs += 1
+            player.treasure -= item_price
+            self.current_shop_keeper.bombs -=1
+            self.current_shop_keeper.treasure += item_price
+
+        elif item_type == Tiles.KEY and self.current_shop_keeper.keys > 0:
+            player.keys += 1
+            player.treasure -= item_price
+            self.current_shop_keeper.keys -=1
+            self.current_shop_keeper.treasure += item_price
+
+        elif item_type == Tiles.RED_POTION and self.current_shop_keeper.red_potions > 0:
+            player.red_potions += 1
+            player.treasure -= item_price
+            self.current_shop_keeper.red_potions -=1
+            self.current_shop_keeper.treasure += item_price
+
+        elif item_type == Tiles.WEAPON and self.current_shop_keeper.weapon > 0:
+            player.weapon += 1
+            player.treasure -= item_price
+            self.current_shop_keeper.weapon -=1
+            self.current_shop_keeper.treasure += item_price
+
+        elif item_type == Tiles.SHIELD and self.current_shop_keeper.shield > 0:
+            player.shield += 1
+            player.treasure -= item_price
+            self.current_shop_keeper.shield -=1
+            self.current_shop_keeper.treasure += item_price
 
     def load_shop_keepers(self):
 
@@ -430,6 +477,13 @@ class Shop:
         shop_keeper = Player("Fenix")
         self.load_store_items(shop_keeper)
         self.shop_keepers[shop_keeper.name] = shop_keeper
+
+    def load_item_prices(self):
+        self.item_prices[Tiles.KEY] = random.randint(5,10)
+        self.item_prices[Tiles.RED_POTION] = random.randint(5, 10)
+        self.item_prices[Tiles.BOMB] = random.randint(5, 10)
+        self.item_prices[Tiles.WEAPON] = random.randint(5, 10)
+        self.item_prices[Tiles.SHIELD] = random.randint(5, 10)
 
     def load_store_items(self, shop_keeper : Player):
 
