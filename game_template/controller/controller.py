@@ -20,6 +20,10 @@ class Controller:
     KEY_END = K_x
     KEY_INVENTORY = K_i
     KEY_SHOP = K_HOME
+    KEY_ITEM1 = K_1
+    KEY_ITEM2 = K_2
+    KEY_ITEM3 = K_3
+    KEY_ITEM4 = K_4
 
     def __init__(self):
         self.game = None
@@ -120,6 +124,30 @@ class Controller:
                             try:
                                 self.toggle_shop_mode()
 
+                            except Exception as err:
+                                print(str(err))
+
+                        elif event.key == Controller.KEY_ITEM1:
+                            try:
+                                self.game.use_item(self.game.get_current_player().equipment_slots[0])
+                            except Exception as err:
+                                print(str(err))
+
+                        elif event.key == Controller.KEY_ITEM2:
+                            try:
+                                self.game.use_item(self.game.get_current_player().equipment_slots[1])
+                            except Exception as err:
+                                print(str(err))
+
+                        elif event.key == Controller.KEY_ITEM3:
+                            try:
+                                self.game.use_item(self.game.get_current_player().equipment_slots[2])
+                            except Exception as err:
+                                print(str(err))
+
+                        elif event.key == Controller.KEY_ITEM4:
+                            try:
+                                self.game.use_item(self.game.get_current_player().equipment_slots[3])
                             except Exception as err:
                                 print(str(err))
 

@@ -268,14 +268,15 @@ class StatusBar(View):
                   size=pane_rect.height)
 
         if self.game.state == model.Game.PLAYING:
-            draw_text(self.surface,
-                      msg=time.strftime("%H:%M:%S", self.game.elapsed_time),
-                      x=StatusBar.PADDING, y=int(pane_rect.height / 2),
-                      fg_colour=StatusBar.FG_COLOUR,
-                      bg_colour=StatusBar.BG_COLOUR,
-                      size=int(pane_rect.height*3/4))
 
             player = self.game.get_current_player()
+
+
+            y = pane_rect.top + 4
+            x = 0
+            for equipped_item in player.equipment_slots:
+                draw_icon(self.surface, x=x, y=y, icon_name=equipped_item)
+                x += StatusBar.ICON_WIDTH
 
             y = pane_rect.top + 4
             x = int(pane_rect.width*3/4)

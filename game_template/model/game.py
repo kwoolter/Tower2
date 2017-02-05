@@ -26,6 +26,12 @@ class Player():
         self.weapon = 0
         self.shield = 0
         self.bombs = 0
+        self.equipment_slots=[]
+        self.equipment_slots.append(Tiles.RED_POTION)
+        self.equipment_slots.append(Tiles.WEAPON)
+        self.equipment_slots.append(Tiles.SHIELD)
+        self.equipment_slots.append(Tiles.BOMB)
+        self.effects = {}
 
     @property
     def x(self):
@@ -196,6 +202,7 @@ class Game:
         self._state = Game.READY
         self.players = []
         self.player_scores = {}
+        self.effects = {}
         self.tick_count = 0
 
 
@@ -258,7 +265,7 @@ class Game:
             print("Stood in something nasty!")
 
         elif tile == Tiles.RED_POTION:
-            current_player.HP += 1
+            self.use_item(tile, decrement = False)
             current_floor.set_player_tile(Tiles.EMPTY)
             print("Some HP restored")
 
@@ -269,6 +276,11 @@ class Game:
         elif tile == Tiles.TREASURE:
             current_floor.set_player_tile(Tiles.EMPTY)
             current_player.treasure += 1
+            print("You found some treasure!")
+
+        elif tile == Tiles.TREASURE_CHEST:
+            current_floor.set_player_tile(Tiles.EMPTY)
+            current_player.treasure += 15
             print("You found some treasure!")
 
         elif tile == Tiles.WEAPON:
@@ -323,6 +335,51 @@ class Game:
         elif tile == Tiles.SHOP:
             self.enter_shop()
 
+    def use_item(self, item_type, decrement : bool = True):
+
+        player = self.get_current_player()
+        current_tile = self.get_current_floor().get_player_tile()
+
+        print("Player {0} using item {1}".format(player.name, item_type))
+
+        if item_type == Tiles.RED_POTION:
+            if decrement is True and player.red_potions > 0:
+                player.red_potions -=1
+                player.HP += 1
+            elif decrement is False:
+                player.HP += 1
+
+        elif item_type == Tiles.BOMB:
+            if current_tile == Tiles.EMPTY and decrement is True and player.bombs > 0:
+                player.bombs -= 1
+                self.get_current_floor().set_player_tile(Tiles.BOMB_LIT)
+            elif decrement is False:
+                self.get_current_floor().set_player_tile(Tiles.BOMB_LIT)
+
+        elif item_type == Tiles.WEAPON:
+            if decrement is True and player.weapon > 0:
+                self.add_effect(item_type)
+                player.weapon -= 1
+            elif decrement is False:
+                self.get_current_floor().set_player_tile(Tiles.EMPTY)
+                self.add_effect(item_type)
+
+        elif item_type == Tiles.SHIELD:
+            if decrement is True and player.shield > 0:
+                self.add_effect(item_type)
+                player.shield -= 1
+            elif decrement is False:
+                self.get_current_floor().set_player_tile(Tiles.EMPTY)
+                self.add_effect(item_type)
+
+    def add_effect(self, effect_type, effect_count = 20):
+        print("Starting effect {0} for {1} ticks".format(effect_type, effect_count))
+
+        if effect_type in self.effects.keys():
+            raise Exception("Effect {0} already active for another {1} ticks.".format(effect_type, self.effects[effect_type]))
+
+        self.effects[effect_type] = effect_count
+
     def start(self):
 
         if self.state != Game.READY:
@@ -365,6 +422,17 @@ class Game:
         if self.get_current_floor().get_player_tile() in damage_tiles:
             self.get_current_player().HP -= 1
             print("You took some damage")
+
+        expired_effects = []
+        for effect in self.effects.keys():
+            if self.effects[effect] > 0:
+                self.effects[effect] -= 1
+            elif self.effects[effect] == 0:
+                print("Stopping %s effect." % effect)
+                expired_effects.append(effect)
+
+        for effect in expired_effects:
+            del self.effects[effect]
 
     def get_scores(self):
 
@@ -464,19 +532,16 @@ class Shop:
             self.current_shop_keeper.shield -=1
             self.current_shop_keeper.treasure += item_price
 
+
     def load_shop_keepers(self):
 
-        shop_keeper = Player("Zordo")
-        self.load_store_items(shop_keeper)
-        self.shop_keepers[shop_keeper.name] = shop_keeper
+        shop_keeper_names = ("Zordo", "Bylur", "Fenix", "Thof", "Korgul")
 
-        shop_keeper = Player("Baylur")
-        self.load_store_items(shop_keeper)
-        self.shop_keepers[shop_keeper.name] = shop_keeper
+        for shop_keeper_name in shop_keeper_names:
 
-        shop_keeper = Player("Fenix")
-        self.load_store_items(shop_keeper)
-        self.shop_keepers[shop_keeper.name] = shop_keeper
+            shop_keeper = Player(shop_keeper_name)
+            self.load_store_items(shop_keeper)
+            self.shop_keepers[shop_keeper.name] = shop_keeper
 
     def load_item_prices(self):
         self.item_prices[Tiles.KEY] = random.randint(5,10)
@@ -549,6 +614,7 @@ class Tiles:
     MONSTER_EMPTY_TILES = (EMPTY, PLAYER)
     PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, BRAZIER)
     PLAYER_DOT_TILES = (DOT1, DOT2)
+    PLAYER_EQUIPABLE_ITEMS = (WEAPON, SHIELD, RED_POTION, BOMB)
     SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
 
 
@@ -848,7 +914,7 @@ class FloorBuilder:
             ' T           T   :S:',
             '     T /:D:\   T B8B',
             'T      :) (:     888',
-            '   T   : ? : T      ',
+            '   T   : ? : T   jjj',
             '       :   :      T ',
             '      /:B B:\       ',
             'T /::::)   (::::\   ',

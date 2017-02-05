@@ -82,6 +82,7 @@ class ImageManager:
                                     model.Tiles.SWITCH: "switch.png",
                                     model.Tiles.SWITCH_LIT: "switch_lit.png",
                                     model.Tiles.TREASURE: "treasure.png",
+                                    model.Tiles.TREASURE_CHEST: "treasure_chest.png",
                                     model.Tiles.TREE: "winter_tree.png",
                                     model.Tiles.MONSTER1: ("skeleton1.png", "skeleton2.png","skeleton1.png","skeleton3.png" ),
                                     model.Tiles.MONSTER2: ("goblin1.png", "goblin2.png"),
