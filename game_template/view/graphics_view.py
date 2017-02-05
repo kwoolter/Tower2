@@ -220,7 +220,7 @@ class TitleBar(View):
 
 class StatusBar(View):
     FG_COLOUR = Colours.WHITE
-    BG_COLOUR = Colours.GREY
+    BG_COLOUR = Colours.BLACK
     ICON_WIDTH = 40
     PADDING = 40
 
@@ -567,21 +567,6 @@ class GameView(View):
 
         super(GameView, self).end()
 
-
-def draw_text(surface, msg, x, y, size=32, fg_colour=Colours.WHITE, bg_colour=Colours.BLACK, alpha : int = 255):
-
-    font = pygame.font.Font(None, size)
-    if bg_colour is not None:
-        text = font.render(msg, 1, fg_colour, bg_colour)
-    else:
-        text = font.render(msg, 1, fg_colour)
-    textpos = text.get_rect()
-    textpos.centerx = x
-    textpos.centery = y
-    surface.blit(text, textpos)
-    surface.set_alpha(alpha)
-
-
 class FloorView(View):
 
     BG_COLOUR = Colours.GREY
@@ -631,7 +616,7 @@ class FloorView(View):
 
 class InventoryView(View):
 
-    BG_COLOUR = Colours.BROWN
+    BG_COLOUR = Colours.GREY
     FG_COLOUR = Colours.WHITE
 
     TILE_WIDTH = 32
@@ -669,6 +654,16 @@ class InventoryView(View):
                   size=30,
                   fg_colour=InventoryView.FG_COLOUR,
                   bg_colour=InventoryView.BG_COLOUR)
+
+        image_width = 200
+        image_height = 200
+
+        image = View.image_manager.get_skin_image(model.Tiles.PLAYER, tick=1)
+
+        x = pane_rect.centerx - int(image_width/2)
+        y += 40
+        image = pygame.transform.scale(image, (image_width,image_height))
+        self.surface.blit(image,(x,y))
 
 class ShopView(View):
 
