@@ -342,6 +342,9 @@ class Game:
 
         return sorted(scores,key=itemgetter(1, 0), reverse=True)
 
+    def is_high_score(self, score: int):
+        return self.hst.is_high_score(score)
+
     @property
     def elapsed_time(self):
         elapsed_seconds = time.time() - self.game_start
@@ -638,7 +641,7 @@ class Floor:
         self.floor_plan.set_tile(new_tile, self.player.x, self.player.y)
 
     def __str__(self):
-        string = "Floor {1}: '{0} (treasures:{2}, traps:{3}'".format(self.name, self.id, self.treasure_count, self.trap_count)
+        string = "Floor {1}: '{0} (treasures:{2}, traps:{3})'".format(self.name, self.id, self.treasure_count, self.trap_count)
         if self.floor_plan is not None:
             string += " ({0}x{1})".format(self.floor_plan.width,self.floor_plan.height)
 

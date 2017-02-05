@@ -1,6 +1,7 @@
 class Colours:
     # set up the colours
     BLACK = (0, 0, 0)
+    BROWN = (128,64,0)
     WHITE = (255, 255, 255)
     RED = (237, 28, 36)
     GREEN = (34, 177, 76)
