@@ -16,14 +16,16 @@ class Player():
     # Set player's attributes back to starting values
     def initialise(self):
         self.keys = 0
+        self.red_potions = 0
         self.exit_keys = 0
         self.boss_key = False
         self.treasure = 0
         self.trophies = 0
         self.kills = 0
         self.HP = 10
-        self.sword = False
-        self.shield = False
+        self.weapon = 0
+        self.shield = 0
+        self.bombs = 0
 
     @property
     def x(self):
@@ -61,27 +63,28 @@ class Game:
     LOADED = "LOADED"
     READY = "READY"
     PLAYING = "PLAYING"
+    SHOPPING = "SHOPPING"
     PAUSED = "PAUSED"
     GAME_OVER = "GAME OVER"
     END = "END"
     MONSTER_MOVE_RATE = 3
+    SHOP_LEVEL = 999
 
     def __init__(self, name : str):
+
         self.name = name
         self.players = None
         self._state = Game.LOADED
         self.game_start = None
         self.tick_count = 0
+        self.current_shop_keeper = None
 
         self.hst = utils.HighScoreTable(self.name)
 
-        #
         ##
 
-
         self.level_factory = LevelBuilder()
-
-
+        self.shop = Shop()
 
         ##
 
@@ -174,6 +177,14 @@ class Game:
 
         self.get_current_floor().add_player(self.get_current_player(), position = Floor.EXIT)
 
+    def enter_shop(self):
+        self._state = Game.SHOPPING
+        self.current_shop_keeper = self.shop.get_shop_keeper()
+
+    def exit_shop(self):
+        self._state = Game.PLAYING
+        self.get_current_player().y += 1
+
 
     def initialise(self):
 
@@ -189,6 +200,8 @@ class Game:
 
         #
         #
+        self.shop.initialise()
+
         self.floors = FloorBuilder()
         self.floors.initialise()
 
@@ -210,6 +223,7 @@ class Game:
         self.player_scores[new_player.name] = 0
 
     def move_player(self, dx : int, dy : int):
+
         # If in a non-playing state then do nothing
         if self.state != Game.PLAYING:
             return
@@ -254,6 +268,21 @@ class Game:
             current_player.treasure += 1
             print("You found some treasure!")
 
+        elif tile == Tiles.WEAPON:
+            current_floor.set_player_tile(Tiles.EMPTY)
+            current_player.weapon += 1
+            print("You found a weapon!")
+
+        elif tile == Tiles.SHIELD:
+            current_floor.set_player_tile(Tiles.EMPTY)
+            current_player.shield += 1
+            print("You found a shield!")
+
+        elif tile == Tiles.BOMB:
+            current_floor.set_player_tile(Tiles.EMPTY)
+            current_player.bombs += 1
+            print("You found a bomb!")
+
         elif tile == Tiles.TROPHY:
             current_floor.set_player_tile(Tiles.EMPTY)
             current_player.trophies += 1
@@ -288,6 +317,8 @@ class Game:
             print("You found the entrance to the previous level!")
             self.previous_level()
 
+        elif tile == Tiles.SHOP:
+            self.enter_shop()
 
     def start(self):
 
@@ -317,7 +348,7 @@ class Game:
         if self.state != Game.PLAYING:
             raise Exception("Game is in state {0} so can't be ticked!".format(self.state))
 
-        if self.state == Game.PAUSED:
+        if self.state in (Game.PAUSED, Game.SHOPPING):
             return
 
         logging.info("Ticking {0}...".format(self.name))
@@ -374,6 +405,41 @@ class Game:
         print("Printing {0}...".format(self.name))
 
 
+class Shop:
+
+    def __init__(self):
+        self.shop_keepers = {}
+
+    def initialise(self):
+        self.load_shop_keepers()
+
+    def get_shop_keeper(self):
+        shop_keeper_name = random.choice(list(self.shop_keepers.keys()))
+        return self.shop_keepers[shop_keeper_name]
+
+    def load_shop_keepers(self):
+
+        shop_keeper = Player("Zordo")
+        self.load_store_items(shop_keeper)
+        self.shop_keepers[shop_keeper.name] = shop_keeper
+
+        shop_keeper = Player("Baylur")
+        self.load_store_items(shop_keeper)
+        self.shop_keepers[shop_keeper.name] = shop_keeper
+
+        shop_keeper = Player("Fenix")
+        self.load_store_items(shop_keeper)
+        self.shop_keepers[shop_keeper.name] = shop_keeper
+
+    def load_store_items(self, shop_keeper : Player):
+
+        shop_keeper.bombs = random.randint(0,5)
+        shop_keeper.keys = random.randint(0,5)
+        shop_keeper.red_potions = random.randint(0, 5)
+        shop_keeper.weapon = random.randint(0, 5)
+        shop_keeper.shield = random.randint(0, 5)
+
+
 class Tiles:
 
     BEACH = "s"
@@ -394,6 +460,7 @@ class Tiles:
     KEY = "?"
     SAFETY = "8"
     SECRET_WALL = ";"
+    SHOP = "S"
     SKY = "~"
     SWITCH = ","
     SWITCH_LIT = "<"
@@ -410,6 +477,10 @@ class Tiles:
     WALL_BL = "("
     WALL_BR = ")"
     WATER = "W"
+    WEAPON = "|"
+    SHIELD = "O"
+    BOMB = "q"
+    BOMB_LIT = "Q"
     MONSTER1 = "1"
     MONSTER2 = "2"
     MONSTER3 = "3"
@@ -719,10 +790,10 @@ class FloorBuilder:
 
         new_floor_plan = [
 
-            '         =          ',
-            ' T               T  ',
-            '     T /:D:\   T    ',
-            'T      :) (:        ',
+            '         =       :::',
+            ' T           T   :S:',
+            '     T /:D:\   T B8B',
+            'T      :) (:     888',
             '   T   : ? : T      ',
             '       :   :      T ',
             '      /:B B:\       ',
@@ -738,7 +809,7 @@ class FloorBuilder:
             ' T     (:;:)        ',
             '    T         T   T ',
             'T                   ',
-            '        T T      T  ',
+            '   qQ|O T T      T  ',
 
         ]
 

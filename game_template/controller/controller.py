@@ -24,11 +24,11 @@ class Controller:
     def __init__(self):
         self.game = None
         self.view = None
-        self.mode = None
+        self._mode = None
 
     def initialise(self):
 
-        self.mode = Controller.PLAYING
+        self._mode = Controller.PLAYING
 
         self.game = model.Game("Adventure World")
         self.view = view.MainFrame(width=20*32, height=730)
@@ -38,6 +38,16 @@ class Controller:
 
         new_player = model.Player("Keith")
         self.game.add_player(new_player)
+
+    @property
+    def mode(self):
+        controller_mode = self._mode
+
+        if self.game.state == model.Game.SHOPPING:
+            controller_mode = Controller.SHOP
+
+        return controller_mode
+
 
     def run(self):
 
@@ -102,16 +112,14 @@ class Controller:
                         elif event.key == Controller.KEY_INVENTORY:
                             try:
                                 self.toggle_inventory_mode()
-                                self.game.pause()
-                                self.view.toggle_inventory_view()
+
                             except Exception as err:
                                 print(str(err))
 
                         elif event.key == Controller.KEY_SHOP:
                             try:
                                 self.toggle_shop_mode()
-                                self.game.pause()
-                                self.view.toggle_shop_view()
+
                             except Exception as err:
                                 print(str(err))
 
@@ -141,8 +149,7 @@ class Controller:
                         if event.key in (Controller.KEY_INVENTORY, K_ESCAPE):
                             try:
                                 self.toggle_inventory_mode()
-                                self.game.pause()
-                                self.view.toggle_inventory_view()
+
                             except Exception as err:
                                 print(str(err))
 
@@ -151,18 +158,15 @@ class Controller:
                         if event.key in (Controller.KEY_SHOP, K_ESCAPE):
                             try:
                                 self.toggle_shop_mode()
-                                self.game.pause()
-                                self.view.toggle_shop_view()
                             except Exception as err:
                                 print(str(err))
-
-
-
 
             FPSCLOCK.tick(30)
 
             self.view.draw()
             self.view.update()
+
+        #Finish main game loop
 
         self.end()
 
@@ -170,16 +174,23 @@ class Controller:
         sys.exit()
 
     def toggle_inventory_mode(self):
+
         if self.mode == Controller.PLAYING:
-            self.mode = Controller.INVENTORY
+            self._mode = Controller.INVENTORY
         elif self.mode == Controller.INVENTORY:
-            self.mode = Controller.PLAYING
+            self._mode = Controller.PLAYING
+
+        self.game.pause()
+        self.view.toggle_inventory_view(self.game.get_current_player())
 
     def toggle_shop_mode(self):
-        if self.mode == Controller.PLAYING:
-            self.mode = Controller.SHOP
-        elif self.mode == Controller.SHOP:
-            self.mode = Controller.PLAYING
+
+        if self.game.state == model.Game.PLAYING:
+            self.game.enter_shop()
+
+        elif self.game.state == model.Game.SHOPPING:
+            self.game.exit_shop()
+
 
     def end(self):
         self.view.end()

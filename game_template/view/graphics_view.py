@@ -13,7 +13,7 @@ class MainFrame(View):
 
     INVENTORY = "Inventory"
     PLAYING = "Playing"
-    SHOP = "SHOP"
+    SHOPPING = "Shopping"
 
     RESOURCES_DIR = os.path.dirname(__file__) + "\\resources\\"
 
@@ -63,21 +63,15 @@ class MainFrame(View):
         self.game_view.initialise(self.game)
         self.game_ready.initialise(self.game)
         self.game_over.initialise(self.game)
-        self.inventory_manager.initialise(self.game)
+        self.inventory_manager.initialise(self.game.get_current_player())
         self.shop_view.initialise(self.game)
 
-    def toggle_inventory_view(self):
+    def toggle_inventory_view(self, player : model.Player = None):
 
         if self.state == MainFrame.PLAYING:
+            self.inventory_manager.player = player
             self.state = MainFrame.INVENTORY
         elif self.state == MainFrame.INVENTORY:
-            self.state = MainFrame.PLAYING
-
-    def toggle_shop_view(self):
-
-        if self.state == MainFrame.PLAYING:
-            self.state = MainFrame.SHOP
-        elif self.state == MainFrame.SHOP:
             self.state = MainFrame.PLAYING
 
     def tick(self):
@@ -126,9 +120,13 @@ class MainFrame(View):
             elif self.state == MainFrame.INVENTORY:
                 self.inventory_manager.draw()
                 self.surface.blit(self.inventory_manager.surface, (x, y))
-            elif self.state == MainFrame.SHOP:
-                self.shop_view.draw()
-                self.surface.blit(self.shop_view.surface, (x, y))
+
+        elif self.game.state == model.Game.SHOPPING:
+            x = 0
+            y = MainFrame.TITLE_HEIGHT
+            self.shop_view.initialise(self.game)
+            self.shop_view.draw()
+            self.surface.blit(self.shop_view.surface, (x, y))
 
         elif self.game.state == model.Game.READY:
 
@@ -619,28 +617,29 @@ class InventoryView(View):
     BG_COLOUR = Colours.GREY
     FG_COLOUR = Colours.WHITE
 
-    TILE_WIDTH = 32
-    TILE_HEIGHT = 32
+    ICON_WIDTH = 32
+    ICON_HEIGHT = 32
+    ICON_PADDING = 6
 
-    def __init__(self, width : int, height : int, tile_width : int = TILE_WIDTH, tile_height : int = TILE_HEIGHT):
+    def __init__(self, width : int, height : int, tile_width : int = ICON_WIDTH, tile_height : int = ICON_HEIGHT):
 
         super(InventoryView, self).__init__()
 
         self.surface = pygame.Surface((width, height))
-        self.game = None
+        self.player = None
 
-    def initialise(self, game : model.Game):
+    def initialise(self, player : model.Player):
 
         super(InventoryView, self).initialise()
 
-        self.game = game
+        self.player = player
 
     def draw(self):
 
         self.surface.fill(InventoryView.BG_COLOUR)
 
-        if self.game is None:
-            raise Exception("No Game to view!")
+        if self.player is None:
+            raise Exception("No Player to view!")
 
         pane_rect = self.surface.get_rect()
 
@@ -648,22 +647,40 @@ class InventoryView(View):
         x = pane_rect.centerx
 
         draw_text(self.surface,
-                  msg="Inventory",
+                  msg="{0}'s Inventory".format(self.player.name),
                   x=x,
                   y=y,
                   size=30,
                   fg_colour=InventoryView.FG_COLOUR,
                   bg_colour=InventoryView.BG_COLOUR)
 
-        image_width = 200
-        image_height = 200
+        image_width = 100
+        image_height = 100
 
         image = View.image_manager.get_skin_image(model.Tiles.PLAYER, tick=1)
 
-        x = pane_rect.centerx - int(image_width/2)
-        y += 40
+        x = int(pane_rect.centerx - image_width/2)
+        y += 20
         image = pygame.transform.scale(image, (image_width,image_height))
         self.surface.blit(image,(x,y))
+
+        x = int(pane_rect.centerx - InventoryView.ICON_WIDTH/2)
+        y += image_height + InventoryView.ICON_PADDING
+
+        draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.TREASURE, count=self.player.treasure)
+
+        y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
+        draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.KEY, count=self.player.keys)
+
+        y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
+        draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.WEAPON, count=self.player.weapon)
+
+        y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
+        draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.SHIELD, count=self.player.shield)
+
+        y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
+        draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.BOMB, count=self.player.bombs)
+
 
 class ShopView(View):
 
@@ -680,11 +697,17 @@ class ShopView(View):
         self.surface = pygame.Surface((width, height))
         self.game = None
 
+        self.player_inventory = InventoryView(height=height*3/4,width=width/2)
+        self.shop_keeper_inventory = InventoryView(height=height*3/4,width=width/2)
+
     def initialise(self, game : model.Game):
 
         super(ShopView, self).initialise()
 
         self.game = game
+
+        self.player_inventory.initialise(self.game.get_current_player())
+        self.shop_keeper_inventory.initialise(self.game.current_shop_keeper)
 
     def draw(self):
 
@@ -699,12 +722,28 @@ class ShopView(View):
         x = pane_rect.centerx
 
         draw_text(self.surface,
-                  msg="Shop",
+                  msg="{0}'s Shop".format(self.game.current_shop_keeper.name),
                   x=x,
                   y=y,
                   size=30,
                   fg_colour=ShopView.FG_COLOUR,
                   bg_colour=ShopView.BG_COLOUR)
+
+        self.player_inventory.draw()
+        self.shop_keeper_inventory.draw()
+
+        y+=20
+        x=0
+
+        self.surface.blit(self.player_inventory.surface, (x, y))
+
+        x=int(pane_rect.width/2)
+
+        self.surface.blit(self.shop_keeper_inventory.surface, (x, y))
+
+
+
+
 
 
 

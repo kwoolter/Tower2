@@ -64,6 +64,7 @@ class ImageManager:
                                     model.Tiles.DECORATION2: ("pyre1.png","pyre2.png","pyre3.png","pyre4.png"),
                                     model.Tiles.EMPTY : None,
                                     model.Tiles.SAFETY: None,
+                                    model.Tiles.SHOP: "wooden_door.png",
                                     model.Tiles.HEART : "heart2.png",
                                     model.Tiles.PLAYER : ("player1.png","player.png","player2.png","player.png"),
                                     model.Tiles.DOOR : "winter_door.png",
@@ -73,10 +74,14 @@ class ImageManager:
                                     model.Tiles.NEXT_LEVEL: "next_level.png",
                                     model.Tiles.PREVIOUS_LEVEL: "previous_level.png",
                                     model.Tiles.KEY : "key.png",
+                                    model.Tiles.WEAPON: "sword.png",
+                                    model.Tiles.SHIELD: "shield.png",
+                                    model.Tiles.BOMB: "bomb.png",
+                                    model.Tiles.BOMB_LIT: ("bomb_lit1.png","bomb_lit2.png"),
                                     model.Tiles.RED_POTION: "red_potion.png",
                                     model.Tiles.SWITCH: "switch.png",
                                     model.Tiles.SWITCH_LIT: "switch_lit.png",
-                                    model.Tiles.TREASURE: "treasure1.png",
+                                    model.Tiles.TREASURE: "treasure.png",
                                     model.Tiles.TREE: "winter_tree.png",
                                     model.Tiles.MONSTER1: ("skeleton1.png", "skeleton2.png","skeleton1.png","skeleton3.png" ),
                                     model.Tiles.MONSTER2: ("goblin1.png", "goblin2.png"),
@@ -212,7 +217,7 @@ def draw_icon(surface, x, y, icon_name, count : int = None, tick : int = 0):
 
     if count is not None:
         small_font = pygame.font.Font(None, 20)
-        icon_count = small_font.render("{0:>2}".format(count), 1, Colours.BLACK, Colours.WHITE)
+        icon_count = small_font.render("{0:^3}".format(count), 1, Colours.BLACK, Colours.WHITE)
         count_pos = icon_count.get_rect()
         count_pos.bottom = iconpos.bottom
         count_pos.right = iconpos.right
