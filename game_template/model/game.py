@@ -923,6 +923,7 @@ class Floor:
         new_explodables = {}
 
         for key,value in self.explodables.items():
+
             x,y = key
             tile, count = value
 

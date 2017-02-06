@@ -613,6 +613,11 @@ class FloorView(View):
                 if image is not None:
                     self.surface.blit(image,(x * self.tile_width, y * self.tile_height, self.tile_width, self.tile_height))
 
+                if tile == model.Tiles.BOMB_LIT:
+                    if (x, y) in self.floor.explodables.keys():
+                        tile, count = self.floor.explodables[(x, y)]
+                        draw_text(self.surface, str(count), (x + 0.5) * self.tile_width, (y + 0.75) * self.tile_height,size=20)
+
         tile = model.Tiles.PLAYER
         image = View.image_manager.get_skin_image(tile_name=tile, skin_name=self.skin_name, tick=self.tick_count)
 
