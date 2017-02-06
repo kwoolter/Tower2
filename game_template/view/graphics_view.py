@@ -274,8 +274,17 @@ class StatusBar(View):
 
             y = pane_rect.top + 4
             x = 0
+
             for equipped_item in player.equipment_slots:
-                draw_icon(self.surface, x=x, y=y, icon_name=equipped_item)
+
+                count = self.game.items_in_inventory(equipped_item)
+                draw_icon(self.surface, x=x, y=y, icon_name=equipped_item, count = count)
+
+                if equipped_item in self.game.effects.keys():
+                    count = self.game.effects[equipped_item]
+                    draw_text(self.surface,msg="{0:^3}".format(count),x=x+4,y=y+4,size=18,
+                              bg_colour=Colours.GOLD, fg_colour=Colours.BLACK)
+
                 x += StatusBar.ICON_WIDTH
 
             y = pane_rect.top + 4

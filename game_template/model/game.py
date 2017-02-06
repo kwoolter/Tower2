@@ -23,14 +23,14 @@ class Player():
         self.trophies = 0
         self.kills = 0
         self.HP = 10
-        self.weapon = 0
-        self.shield = 0
+        self.weapon = 1
+        self.shield = 1
         self.bombs = 0
         self.equipment_slots=[]
         self.equipment_slots.append(Tiles.RED_POTION)
         self.equipment_slots.append(Tiles.WEAPON)
         self.equipment_slots.append(Tiles.SHIELD)
-        self.equipment_slots.append(Tiles.BOMB)
+        self.equipment_slots.append(Tiles.BOMB_LIT)
         self.effects = {}
 
     @property
@@ -73,8 +73,7 @@ class Game:
     PAUSED = "PAUSED"
     GAME_OVER = "GAME OVER"
     END = "END"
-    MONSTER_MOVE_RATE = 3
-    SHOP_LEVEL = 999
+    EFFECT_COUNTDOWN_RATE = 4
 
     def __init__(self, name : str):
 
@@ -232,6 +231,30 @@ class Game:
         self.players.append(new_player)
         self.player_scores[new_player.name] = 0
 
+    def items_in_inventory(self, tile_name):
+
+        count = 0
+        player = self.get_current_player()
+
+        if tile_name == Tiles.BOMB:
+            count =  player.bombs
+        if tile_name == Tiles.BOMB_LIT:
+            count =  player.bombs
+        elif tile_name == Tiles.TREASURE:
+            count =  player.treasure
+        elif tile_name == Tiles.SHIELD:
+            count =  player.shield
+        elif tile_name == Tiles.WEAPON:
+            count = player.weapon
+        elif tile_name == Tiles.KEY:
+            count = player.keys
+        elif tile_name == Tiles.RED_POTION:
+            count = player.red_potions
+        else:
+            logging.warn("Don't know how to find item {0} in a player's inventory.".format(tile_name))
+
+        return count
+
     def move_player(self, dx : int, dy : int):
 
         # If in a non-playing state then do nothing
@@ -252,11 +275,11 @@ class Game:
             print("Found a key!")
 
         elif tile in Tiles.MONSTERS:
-            current_player.HP -= 1
+
             print("Hit a monster!")
 
         elif tile in Tiles.TRAPS:
-            current_player.HP -= 1
+
             current_floor.set_player_tile(Tiles.EMPTY)
             print("Hit a trap!")
 
@@ -335,29 +358,55 @@ class Game:
         elif tile == Tiles.SHOP:
             self.enter_shop()
 
+    def check_collision(self):
+
+        # Check if the player has collided with an enemy?
+        if self.get_current_floor().is_collision() is True:
+
+            print("collision!")
+
+            if Tiles.WEAPON in self.effects.keys():
+                print("You killed an enemy with your sword")
+                self.get_current_player().kills += 1
+                self.get_current_floor().kill_monster()
+
+            elif Tiles.SHIELD in self.effects.keys():
+                print("You defended yourself with your shield")
+
+            else:
+                self.get_current_player().HP -= 1
+                print("HP down to %i" % self.get_current_player().HP)
+
     def use_item(self, item_type, decrement : bool = True):
 
         player = self.get_current_player()
+
+        if self.items_in_inventory(item_type) == 0:
+            logging.info("Player {0} does not have any items of type {1} in their inventory to use!".format(player.name, item_type))
+            return
+
         current_tile = self.get_current_floor().get_player_tile()
 
         print("Player {0} using item {1}".format(player.name, item_type))
 
         if item_type == Tiles.RED_POTION:
-            if decrement is True and player.red_potions > 0:
+            if decrement is True:
                 player.red_potions -=1
                 player.HP += 1
             elif decrement is False:
                 player.HP += 1
 
-        elif item_type == Tiles.BOMB:
-            if current_tile == Tiles.EMPTY and decrement is True and player.bombs > 0:
+        elif item_type in Tiles.EXPLODABLES:
+            if current_tile == Tiles.EMPTY and decrement is True:
                 player.bombs -= 1
-                self.get_current_floor().set_player_tile(Tiles.BOMB_LIT)
+                self.add_expodable(item_type, self.get_current_player().x,
+                                   self.get_current_player().y)
             elif decrement is False:
-                self.get_current_floor().set_player_tile(Tiles.BOMB_LIT)
+                self.add_expodable(item_type, self.get_current_player().x,
+                                   self.get_current_player().y)
 
         elif item_type == Tiles.WEAPON:
-            if decrement is True and player.weapon > 0:
+            if decrement is True:
                 self.add_effect(item_type)
                 player.weapon -= 1
             elif decrement is False:
@@ -365,7 +414,7 @@ class Game:
                 self.add_effect(item_type)
 
         elif item_type == Tiles.SHIELD:
-            if decrement is True and player.shield > 0:
+            if decrement is True:
                 self.add_effect(item_type)
                 player.shield -= 1
             elif decrement is False:
@@ -379,6 +428,9 @@ class Game:
             raise Exception("Effect {0} already active for another {1} ticks.".format(effect_type, self.effects[effect_type]))
 
         self.effects[effect_type] = effect_count
+
+    def add_expodable(self, tile, x, y):
+        self.get_current_floor().add_explodable(tile, x, y)
 
     def start(self):
 
@@ -417,22 +469,17 @@ class Game:
 
         self.get_current_floor().tick()
 
-        # If the player is on a damage tile then take damage
-        damage_tiles = Tiles.MONSTERS + Tiles.PLAYER_DOT_TILES
-        if self.get_current_floor().get_player_tile() in damage_tiles:
-            self.get_current_player().HP -= 1
-            print("You took some damage")
+        if self.tick_count % Game.EFFECT_COUNTDOWN_RATE == 0:
+            expired_effects = []
+            for effect in self.effects.keys():
+                if self.effects[effect] > 0:
+                    self.effects[effect] -= 1
+                elif self.effects[effect] == 0:
+                    print("Stopping %s effect." % effect)
+                    expired_effects.append(effect)
 
-        expired_effects = []
-        for effect in self.effects.keys():
-            if self.effects[effect] > 0:
-                self.effects[effect] -= 1
-            elif self.effects[effect] == 0:
-                print("Stopping %s effect." % effect)
-                expired_effects.append(effect)
-
-        for effect in expired_effects:
-            del self.effects[effect]
+            for effect in expired_effects:
+                del self.effects[effect]
 
     def get_scores(self):
 
@@ -561,6 +608,7 @@ class Shop:
 
 class Tiles:
 
+    BANG = "$"
     BEACH = "s"
     BOSS_DOOR = "d"
     BOSS_KEY = "$"
@@ -610,6 +658,8 @@ class Tiles:
     HEART = "HP"
 
     MONSTERS = (MONSTER1, MONSTER2, MONSTER3)
+    EXPLODABLES = (BOMB_LIT)
+    INDESTRUCTIBLE_ITEMS = (KEY, TREE, TROPHY, EXIT, ENTRANCE)
     TRAPS = (TRAP1, TRAP2, TRAP3)
     MONSTER_EMPTY_TILES = (EMPTY, PLAYER)
     PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, BRAZIER)
@@ -649,6 +699,9 @@ class FloorPlan:
 
     def set_tile(self, tile_name, x : int, y: int):
 
+        if x < 0 or x > self.width or y < 0 or y > self.height:
+            raise Exception("Trying to set tile {0} at ({1},{2}) which is outside of the floorplan!".format(tile_name,x,y))
+
         self.plan[x][y] = tile_name
 
         if tile_name == Tiles.ENTRANCE:
@@ -678,6 +731,8 @@ class Floor:
     ENTRANCE = "Entrance"
     EXIT = "Exit"
     MONSTER_MOVE_RATE = 4
+    EXPLODABLE_COUNTDOWN_RATE = 4
+    EXPLODABLE_COUNTDOWN = 10
 
     def __init__(self, id : int, name : str,
                  treasure_count : int = 0,
@@ -690,6 +745,7 @@ class Floor:
         self.monster_count = monster_count
         self.tick_count = 0
         self.monsters = {}
+        self.explodables = {}
         self.trophies = 0
         self.floor_plan = None
         self.player = None
@@ -707,6 +763,10 @@ class Floor:
                     self.floor_plan.set_tile(Tiles.EMPTY, x, y)
                     self.monsters[(x,y)] = tile_name
 
+                elif tile_name in Tiles.EXPLODABLES:
+                    self.floor_plan.set_tile(Tiles.EMPTY, x, y)
+                    self.add_explodable(tile_name, x, y)
+
                 elif tile_name == Tiles.TROPHY:
                     self.trophies += 1
 
@@ -720,12 +780,23 @@ class Floor:
         self.place_tiles(m2, Tiles.MONSTER2)
         self.place_tiles(m3, Tiles.MONSTER3)
 
+    def is_valid_xy(self, x : int, y : int):
+        result = False
+
+        if x >= 0 and x < self.width and y >= 0 and y < self.height:
+            result = True
+
+        return result
+
     def tick(self):
 
         self.tick_count += 1
 
         if self.tick_count % Floor.MONSTER_MOVE_RATE == 0:
             self.move_monsters()
+
+        if self.tick_count % Floor.EXPLODABLE_COUNTDOWN_RATE == 0:
+            self.tick_explodables()
 
     def add_player(self, player, position = ENTRANCE):
         self.player = player
@@ -738,6 +809,13 @@ class Floor:
             x,y = self.floor_plan.exit
             self.player.x = x
             self.player.y = y
+
+    def add_explodable(self, tile, x : int, y : int):
+
+        if tile not in Tiles.EXPLODABLES:
+            raise Exception("Trying to add explodable {0} that is not a valid explodable {1}!",format(tile, Tiles.EXPLODABLES))
+
+        self.explodables[(x,y)] = (tile, Floor.EXPLODABLE_COUNTDOWN)
 
     # Find empty tiles to place items
     def place_tiles(self, item_count, item_type, tries=20):
@@ -770,13 +848,22 @@ class Floor:
         new_x = self.player.x + dx
         new_y = self.player.y + dy
 
-        if new_x < 0 or new_x >= self.width or new_y < 0 or new_y >= self.height:
+        if self.is_valid_xy(new_x, new_y) is False:
             print("Hit the boundary!")
         elif self.get_tile(new_x, new_y) in Tiles.PLAYER_BLOCK_TILES:
             print("Square blocked!")
         else:
             self.player.x = new_x
             self.player.y = new_y
+
+    def is_collision(self):
+
+        collision_items = list(Tiles.MONSTERS)
+
+        if self.get_tile(self.player.x, self.player.y) in collision_items:
+            return True
+        else:
+            return False
 
     def move_monsters(self):
 
@@ -794,7 +881,7 @@ class Floor:
             moved = True
 
             # If new square is out of bounds...
-            if new_x < 0 or new_x >= self.width or new_y < 0 or new_y >= self.height:
+            if self.is_valid_xy(new_x,new_y) is False:
                 #print("Hit boundary")
                 moved = False
 
@@ -819,10 +906,69 @@ class Floor:
 
         self.monsters = new_monsters
 
-    def get_tile(self, x : int, y: int):
-        tile = self.floor_plan.get_tile(x,y)
+    def kill_monster(self, x : int = None, y : int = None):
+
+        if x is None:
+            x = self.player.x
+
+        if y is None:
+            y = self.player.y
+
         if (x,y) in self.monsters.keys():
-            return self.monsters[(x,y)]
+            del self.monsters[(x,y)]
+            print("You killed a monster at ({0},{1})".format(x,y))
+
+    def tick_explodables(self):
+
+        new_explodables = {}
+
+        for key,value in self.explodables.items():
+            x,y = key
+            tile, count = value
+
+            count -= 1
+            if count > 0:
+                new_explodables[key] = (tile,count)
+
+            else:
+
+                for area_y in range(y - 1, y + 2):
+                    for area_x in range(x - 1, x + 2):
+
+                        if self.is_valid_xy(area_x, area_y):
+
+                            tile = self.floor_plan.get_tile(area_x,area_y)
+
+                            if (area_x, area_y) in self.monsters.keys():
+                                self.player.kills += 1
+                                del self.monsters[(area_x,area_y)]
+                                print("You killed an enemy with a bomb!")
+
+                            elif (self.player.x, self.player.y) == (area_x, area_y):
+                                self.player.HP -= 3
+                                print("You were hit by the bomb blast and lost health!")
+
+                            elif tile not in Tiles.INDESTRUCTIBLE_ITEMS:
+                                self.floor_plan.set_tile(Tiles.EMPTY, area_x, area_y)
+
+        self.explodables = new_explodables
+
+
+    def get_tile(self, x : int, y: int):
+
+        if self.is_valid_xy(x,y)is False:
+            raise Exception("Trying to get a tile outside at {0}{1} which is outside of teh floor plan area!".format(x,y))
+
+        tile = self.floor_plan.get_tile(x,y)
+
+        if (x,y) in self.monsters.keys():
+            tile = self.monsters[(x,y)]
+
+        elif (x,y) in self.explodables.keys():
+            tile, count = self.explodables[(x,y)]
+            if count == 1:
+                tile = Tiles.BANG
+
         return tile
 
     def get_player_tile(self):
@@ -928,8 +1074,8 @@ class FloorBuilder:
             '       :\ /:    T   ',
             ' T     (:;:)        ',
             '    T         T   T ',
-            'T                   ',
-            '   qQ|O T T      T  ',
+            'T  qQ               ',
+            '    Q|O T T      T  ',
 
         ]
 

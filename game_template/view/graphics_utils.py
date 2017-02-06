@@ -76,6 +76,7 @@ class ImageManager:
                                     model.Tiles.KEY : "key.png",
                                     model.Tiles.WEAPON: "sword.png",
                                     model.Tiles.SHIELD: "shield.png",
+                                    model.Tiles.BANG: "bang.png",
                                     model.Tiles.BOMB: "bomb.png",
                                     model.Tiles.BOMB_LIT: ("bomb_lit1.png","bomb_lit2.png"),
                                     model.Tiles.RED_POTION: "red_potion.png",
