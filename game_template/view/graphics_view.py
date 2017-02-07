@@ -38,6 +38,8 @@ class MainFrame(View):
         self.game_over = GameOverView(width=playing_area_width, height=playing_area_height)
         self.inventory_manager = InventoryView(width=playing_area_width, height=playing_area_height)
         self.shop_view = ShopView(width=playing_area_width, height=playing_area_height)
+        self.secret_map_view = TreasureMapView(10,10)
+
 
     def initialise(self, game: model.Game):
 
@@ -65,6 +67,7 @@ class MainFrame(View):
         self.game_over.initialise(self.game)
         self.inventory_manager.initialise(self.game.get_current_player())
         self.shop_view.initialise(self.game)
+
 
     def toggle_inventory_view(self, player : model.Player = None):
 
@@ -117,9 +120,15 @@ class MainFrame(View):
             if self.state == MainFrame.PLAYING:
                 self.game_view.draw()
                 self.surface.blit(self.game_view.surface, (x, y))
+
             elif self.state == MainFrame.INVENTORY:
                 self.inventory_manager.draw()
                 self.surface.blit(self.inventory_manager.surface, (x, y))
+
+                if self.game.get_current_floor().get_treasure_map() is not None:
+                    self.secret_map_view.initialise(self.game.get_current_floor(), skin=self.game.get_current_level().skin_name)
+                    self.secret_map_view.draw()
+                    self.surface.blit(self.secret_map_view.surface, (x, y))
 
         elif self.game.state == model.Game.SHOPPING:
             x = 0
@@ -626,6 +635,72 @@ class FloorView(View):
                                       self.floor.player.y * self.tile_height,
                                       self.tile_width,
                                       self.tile_height))
+
+class TreasureMapView(View):
+
+    BG_COLOUR = Colours.DARK_GREY
+    BORDER_COLOUR = Colours.GOLD
+    BORDER_WIDTH = 4
+    TILE_WIDTH = 16
+    TILE_HEIGHT = 16
+
+    def __init__(self, width : int, height : int, tile_width : int = TILE_WIDTH, tile_height : int = TILE_HEIGHT):
+
+        super(TreasureMapView, self).__init__()
+
+
+        self.floor = None
+        self.map = None
+        self.tile_width = tile_width
+        self.tile_height = tile_height
+        self.skin_name = None
+
+    def initialise(self, floor : model.Floor, skin = "default"):
+        self.floor = floor
+        self.skin = skin
+        map = self.floor.get_treasure_map()
+
+        if map is None:
+            raise Exception("No Secret Map to view!")
+
+        width = len(map[0])
+        height = len(map)
+
+        self.surface = pygame.Surface((width * TreasureMapView.TILE_WIDTH + TreasureMapView.BORDER_WIDTH *2,
+                                       height * TreasureMapView.TILE_HEIGHT + TreasureMapView.BORDER_WIDTH *2))
+
+    def draw(self):
+
+        self.surface.fill(TreasureMapView.BG_COLOUR)
+        pygame.draw.rect(self.surface,
+                         TreasureMapView.BORDER_COLOUR,
+                         self.surface.get_rect(),
+                         TreasureMapView.BORDER_WIDTH)
+
+
+        if self.floor is None:
+            raise Exception("No Floor to view!")
+
+        map = self.floor.get_treasure_map()
+
+        if map is None:
+            raise Exception("No Secret Map to view!")
+
+        width = len(map[0])
+        height = len(map)
+
+        for y in range(height):
+            row = map[y]
+            for x in range(width):
+                tile = row[x]
+                image = View.image_manager.get_skin_image(tile_name=tile, tick=0, skin_name=self.skin)
+
+                if image is not None:
+                    image = pygame.transform.scale(image, (TreasureMapView.TILE_WIDTH, TreasureMapView.TILE_HEIGHT))
+                    self.surface.blit(image,(x * self.tile_width + TreasureMapView.BORDER_WIDTH,
+                                             y * self.tile_height + TreasureMapView.BORDER_WIDTH,
+                                             self.tile_width,
+                                             self.tile_height))
 
 class InventoryView(View):
 

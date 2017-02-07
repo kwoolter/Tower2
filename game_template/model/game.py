@@ -358,6 +358,13 @@ class Game:
         elif tile == Tiles.SHOP:
             self.enter_shop()
 
+        pos = self.get_current_floor().get_treasure_xy()
+        if pos is not None:
+            if pos == (current_player.x,current_player.y):
+                self.get_current_floor().treasure_found()
+                print("You found the secret treasure")
+
+
     def check_collision(self):
 
         # Check if the player has collided with an enemy?
@@ -632,6 +639,7 @@ class Tiles:
     SWITCH = ","
     SWITCH_LIT = "<"
     SWITCH_TILE = "_"
+    SECRET_TREASURE = "J"
     TRAP1 = "^"
     TRAP2 = "&"
     TRAP3 = "("
@@ -675,6 +683,7 @@ class FloorPlan:
         self.id = id
         self.entrance = None
         self.exit = None
+        self.secret = None
         self.height = len(plan)
         self.width = len(plan[0])
         self.plan = [[Tiles.EMPTY for x in range(self.height)] for x in range(self.width)]
@@ -693,13 +702,24 @@ class FloorPlan:
         if self.exit is not None:
             self.safety_zone(self.exit[0], self.exit[1], 4, 4)
 
+    def is_valid_xy(self, x : int, y : int):
+        result = False
+
+        if x >= 0 and x < self.width and y >= 0 and y < self.height:
+            result = True
+
+        return result
+
     def get_tile(self, x : int, y : int):
+
+        if self.is_valid_xy(x,y) is False:
+            raise Exception("Trying to get tile at ({0},{1}) which is outside of the floorplan!".format(x,y))
 
         return self.plan[x][y]
 
     def set_tile(self, tile_name, x : int, y: int):
 
-        if x < 0 or x > self.width or y < 0 or y > self.height:
+        if self.is_valid_xy(x,y) is False:
             raise Exception("Trying to set tile {0} at ({1},{2}) which is outside of the floorplan!".format(tile_name,x,y))
 
         self.plan[x][y] = tile_name
@@ -709,22 +729,45 @@ class FloorPlan:
         elif tile_name == Tiles.START_POSITON and self.entrance is None:
             self.entrance = (x,y)
             self.plan[x][y] = Tiles.EMPTY
-            print("Starting pos at ({0},{1})!!!".format(x,y))
         elif tile_name == Tiles.EXIT:
             self.exit = (x,y)
         elif tile_name == Tiles.NEXT_LEVEL and self.exit is None:
             self.exit = (x,y)
         elif tile_name == Tiles.PREVIOUS_LEVEL and self.entrance is None:
             self.entrance = (x,y)
+        elif tile_name == Tiles.SECRET_TREASURE:
+            self.secret = (x,y)
 
     # Build a safety zone around a specified location
     def safety_zone(self, x, y, height, width):
         for dx in range(-1 * int(width / 2), int(width / 2) + 1):
             for dy in range(-1 * int(height / 2), int(height / 2) + 1):
-                if (x + dx) < self.width and (x + dx) >= 0 and (y + dy) < self.height and (y + dy) >= 0:
+                if self.is_valid_xy(x + dx,y + dy) is True:
                     if self.plan[x + dx][y + dy] == Tiles.EMPTY:
                         self.plan[x + dx][y + dy] = Tiles.SAFETY
 
+
+    def get_secret_map(self, width : int = 5, height : int = 5):
+
+        map = None
+
+        if self.secret is not None:
+            x, y = self.secret
+            map = []
+            row = 0
+            for dy in range(-1 * int(width / 2), int(width / 2) + 1):
+                map.append([])
+                for dx in range(-1 * int(height / 2), int(height / 2) + 1):
+                    if self.is_valid_xy(x + dx, y + dy) is True:
+                        map[row] += self.get_tile(x + dx, y + dy)
+                    else:
+                        map[row] += Tiles.EMPTY
+                row += 1
+
+        return map
+
+    def treasure_found(self):
+        self.secret = None
 
 class Floor:
 
@@ -886,7 +929,7 @@ class Floor:
                 moved = False
 
             # ...if new square is not empty
-            elif self.floor_plan.get_tile(new_x, new_y) not in Tiles.MONSTER_EMPTY_TILES:
+            elif self.get_tile(new_x, new_y) not in Tiles.MONSTER_EMPTY_TILES:
                 #print("Square blocked")
                 moved = False
 
@@ -970,6 +1013,9 @@ class Floor:
             if count == 1:
                 tile = Tiles.BANG
 
+        if tile == Tiles.SECRET_TREASURE:
+            tile = Tiles.EMPTY
+
         return tile
 
     def get_player_tile(self):
@@ -984,6 +1030,15 @@ class Floor:
             string += " ({0}x{1})".format(self.floor_plan.width,self.floor_plan.height)
 
         return string
+
+    def get_treasure_map(self):
+        return self.floor_plan.get_secret_map()
+
+    def get_treasure_xy(self):
+        return self.floor_plan.secret
+
+    def treasure_found(self):
+        self.floor_plan.treasure_found()
 
     @property
     def width(self):
@@ -1065,7 +1120,7 @@ class FloorBuilder:
             '       :   :      T ',
             '      /:B B:\       ',
             'T /::::)   (::::\   ',
-            '  :)  B     B  (:   ',
+            '  :)  B     BJ (:   ',
             '  D      +      D   ',
             '  :\  B     B  /:   ',
             '  (::::\   /::::)   ',
