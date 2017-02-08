@@ -67,6 +67,7 @@ class ImageManager:
                                     model.Tiles.SHOP: "wooden_door.png",
                                     model.Tiles.HEART : "heart2.png",
                                     model.Tiles.PLAYER : ("player1.png","player.png","player2.png","player.png"),
+                                    model.Tiles.SHOP_KEEPER : "shop_keeper.png",
                                     model.Tiles.DOOR : "winter_door.png",
                                     model.Tiles.TROPHY: "goal.png",
                                     model.Tiles.EXIT: "exit.png",
@@ -74,6 +75,7 @@ class ImageManager:
                                     model.Tiles.NEXT_LEVEL: "next_level.png",
                                     model.Tiles.PREVIOUS_LEVEL: "previous_level.png",
                                     model.Tiles.KEY : "key.png",
+                                    model.Tiles.MAP : "treasure_map.png",
                                     model.Tiles.WEAPON: "sword.png",
                                     model.Tiles.SHIELD: "shield.png",
                                     model.Tiles.BANG: ("bang1.png","bang2.png"),
@@ -155,6 +157,15 @@ class ImageManager:
                                     model.Tiles.TREE: "squirrel_tree.png",
                                     model.Tiles.MONSTER1: ("devil1.png", "devil2.png"),
                                     model.Tiles.BRAZIER: ("brazier.png", "brazier_lit.png")})
+
+        ImageManager.skins[new_skin_name] = new_skin
+
+        new_skin_name = "runes"
+        new_skin = (new_skin_name, {model.Tiles.RUNE1: "rune1.png",
+                                    model.Tiles.RUNE2: "rune2.png",
+                                    model.Tiles.RUNE3: "rune3.png",
+                                    model.Tiles.RUNE4: "rune4.png",
+                                    model.Tiles.RUNE5: "rune5.png"})
 
         ImageManager.skins[new_skin_name] = new_skin
 

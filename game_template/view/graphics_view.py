@@ -125,10 +125,17 @@ class MainFrame(View):
                 self.inventory_manager.draw()
                 self.surface.blit(self.inventory_manager.surface, (x, y))
 
-                if self.game.get_current_floor().get_treasure_map() is not None:
-                    self.secret_map_view.initialise(self.game.get_current_floor(), skin=self.game.get_current_level().skin_name)
-                    self.secret_map_view.draw()
-                    self.surface.blit(self.secret_map_view.surface, (x, y))
+                secret_treasures = self.game.get_current_player().treasure_maps
+
+                for level_id, secrets in secret_treasures.items():
+                    for secret in secrets:
+                        floor_id,(a,b) = secret
+
+                        self.secret_map_view.initialise(self.game.get_floor(floor_id), skin=self.game.get_level(level_id).skin_name)
+                        self.secret_map_view.draw()
+                        self.surface.blit(self.secret_map_view.surface, (x, y))
+
+                        y+=self.secret_map_view.surface.get_height()
 
         elif self.game.state == model.Game.SHOPPING:
             x = 0
@@ -716,7 +723,8 @@ class InventoryView(View):
     ICON_PRICE_PADDING = ICON_WIDTH + 20
 
     ITEMS = (model.Tiles.TREASURE, model.Tiles.KEY, model.Tiles.RED_POTION,
-             model.Tiles.WEAPON, model.Tiles.SHIELD, model.Tiles.BOMB)
+             model.Tiles.WEAPON, model.Tiles.SHIELD, model.Tiles.BOMB,
+             model.Tiles.MAP)
 
 
     def __init__(self, width : int, height : int, tile_width : int = ICON_WIDTH, tile_height : int = ICON_HEIGHT):
@@ -832,7 +840,13 @@ class InventoryView(View):
             item_price = self.item_prices[item_type]
             draw_icon(self.surface, x=x + InventoryView.ICON_PRICE_PADDING, y=y, icon_name=model.Tiles.TREASURE, count=item_price)
 
-
+        item_index += 1
+        item_type = InventoryView.ITEMS[item_index]
+        y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
+        draw_icon(self.surface, x=x, y=y, icon_name=item_type, count=self.player.maps)
+        if self.item_prices is not None and item_type in self.item_prices.keys():
+            item_price = self.item_prices[item_type]
+            draw_icon(self.surface, x=x + InventoryView.ICON_PRICE_PADDING, y=y, icon_name=model.Tiles.TREASURE, count=item_price)
 
 
 class ShopView(View):

@@ -26,6 +26,9 @@ class Player():
         self.weapon = 1
         self.shield = 1
         self.bombs = 0
+        self.maps = 0
+        self.treasure_maps = {}
+        self.runes = []
         self.equipment_slots=[]
         self.equipment_slots.append(Tiles.RED_POTION)
         self.equipment_slots.append(Tiles.WEAPON)
@@ -115,8 +118,14 @@ class Game:
     def get_current_floor(self):
         return self.level_factory.get_floor(self.current_floor_id)
 
+    def get_floor(self, floor_id : int):
+        return self.level_factory.get_floor(floor_id)
+
     def get_current_level(self):
         return self.level_factory.get_level(self.current_level_id)
+
+    def get_level(self, level_id : int):
+        return self.level_factory.get_level(level_id)
 
     def get_current_player(self):
         if len(self.players) > 0:
@@ -261,15 +270,18 @@ class Game:
         if self.state != Game.PLAYING:
             return
 
+        current_level = self.get_current_level()
         current_floor = self.get_current_floor()
-
         current_player = self.get_current_player()
 
         current_floor.move_player(dx, dy)
 
         tile = current_floor.get_player_tile()
 
-        if tile == Tiles.KEY:
+        if tile == Tiles.EMPTY:
+            pass
+
+        elif tile == Tiles.KEY:
             current_player.keys += 1
             current_floor.set_player_tile(Tiles.EMPTY)
             print("Found a key!")
@@ -279,7 +291,7 @@ class Game:
             print("Hit a monster!")
 
         elif tile in Tiles.TRAPS:
-
+            current_player.HP -= 1
             current_floor.set_player_tile(Tiles.EMPTY)
             print("Hit a trap!")
 
@@ -302,9 +314,16 @@ class Game:
             print("You found some treasure!")
 
         elif tile == Tiles.TREASURE_CHEST:
-            current_floor.set_player_tile(Tiles.EMPTY)
-            current_player.treasure += 15
-            print("You found some treasure!")
+            print("You found a treasure chest...")
+            if current_player.keys > 0:
+                current_player.keys -= 1
+                current_floor.set_player_tile(random.choice([Tiles.KEY, Tiles.SHIELD, Tiles.WEAPON,
+                                                            Tiles.MAP, Tiles.BOMB, Tiles.RED_POTION]))
+                print("...and you opened it!")
+            else:
+                print("...but you don't have a key to open it!")
+
+            current_player.back()
 
         elif tile == Tiles.WEAPON:
             current_floor.set_player_tile(Tiles.EMPTY)
@@ -357,6 +376,30 @@ class Game:
 
         elif tile == Tiles.SHOP:
             self.enter_shop()
+
+        elif tile == Tiles.MAP:
+            level_secrets = current_level.secrets
+
+            if len(level_secrets) > 0:
+
+                if current_level.id not in current_player.treasure_maps.keys():
+                    current_player.treasure_maps[current_level.id] = []
+
+                found_secrets = current_player.treasure_maps[current_level.id]
+
+                unfound_secrets = set(level_secrets) - set(found_secrets)
+
+                if len(unfound_secrets) > 0:
+
+                    secret = random.choice(list(unfound_secrets))
+                    current_player.treasure_maps[current_level.id].append(secret)
+                    current_floor.set_player_tile(Tiles.EMPTY)
+                    print("You found a secret treasure map!")
+
+                else:
+                    print("No more secrets to find for this level!")
+
+
 
         pos = self.get_current_floor().get_treasure_xy()
         if pos is not None:
@@ -586,6 +629,12 @@ class Shop:
             self.current_shop_keeper.shield -=1
             self.current_shop_keeper.treasure += item_price
 
+        elif item_type == Tiles.MAP and self.current_shop_keeper.maps > 0:
+            player.maps += 1
+            player.treasure -= item_price
+            self.current_shop_keeper.maps -=1
+            self.current_shop_keeper.treasure += item_price
+
 
     def load_shop_keepers(self):
 
@@ -603,6 +652,7 @@ class Shop:
         self.item_prices[Tiles.BOMB] = random.randint(5, 10)
         self.item_prices[Tiles.WEAPON] = random.randint(5, 10)
         self.item_prices[Tiles.SHIELD] = random.randint(5, 10)
+        self.item_prices[Tiles.MAP] = random.randint(5, 10)
 
     def load_store_items(self, shop_keeper : Player):
 
@@ -611,6 +661,7 @@ class Shop:
         shop_keeper.red_potions = random.randint(0, 5)
         shop_keeper.weapon = random.randint(0, 5)
         shop_keeper.shield = random.randint(0, 5)
+        shop_keeper.maps = random.randint(0, 5)
 
 
 class Tiles:
@@ -632,6 +683,7 @@ class Tiles:
     EXIT_KEY = "%"
     TROPHY = "G"
     KEY = "?"
+    MAP = "M"
     SAFETY = "8"
     SECRET_WALL = ";"
     SHOP = "S"
@@ -664,11 +716,18 @@ class Tiles:
     DOT1 = "!"
     DOT2 = "£"
     HEART = "HP"
+    SHOP_KEEPER = "SHOP"
+    RUNE1 = "R1"
+    RUNE2 = "R2"
+    RUNE3 = "R3"
+    RUNE4 = "R4"
+    RUNE5 = "R5"
 
     MONSTERS = (MONSTER1, MONSTER2, MONSTER3)
     EXPLODABLES = (BOMB_LIT)
     INDESTRUCTIBLE_ITEMS = (KEY, TREE, TROPHY, EXIT, ENTRANCE)
     TRAPS = (TRAP1, TRAP2, TRAP3)
+    RUNES = (RUNE1, RUNE2, RUNE3, RUNE4, RUNE5)
     MONSTER_EMPTY_TILES = (EMPTY, PLAYER)
     PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, BRAZIER)
     PLAYER_DOT_TILES = (DOT1, DOT2)
@@ -1071,6 +1130,16 @@ class Level:
         return trophy_count
 
     @property
+    def secrets(self):
+        secrets = []
+        for floor in self.floors.values():
+            secret_pos = floor.get_treasure_xy()
+            if secret_pos is not None:
+                secrets.append((floor.id, secret_pos))
+
+        return secrets
+
+    @property
     def floor1(self):
         return min(self.floors.keys())
 
@@ -1119,14 +1188,14 @@ class FloorBuilder:
             '   T   : ? : T   jjj',
             '       :   :      T ',
             '      /:B B:\       ',
-            'T /::::)   (::::\   ',
+            'T /::::)   (::::\  ?',
             '  :)  B     BJ (:   ',
-            '  D      +      D   ',
+            '  D      +      D  M',
             '  :\  B     B  /:   ',
             '  (::::\   /::::)   ',
             '      (:B B:)      T',
             '       :   :        ',
-            ' T     :   :        ',
+            ' T     :   :   M    ',
             '       :\ /:    T   ',
             ' T     (:;:)        ',
             '    T         T   T ',
@@ -1158,7 +1227,7 @@ class FloorBuilder:
             '                    ',
             '                    ',
             ':\                /:',
-            'z:                :z',
+            'z:J               :z',
 
         ]
 
@@ -1175,7 +1244,7 @@ class FloorBuilder:
             ':         ^^     /::',
             ':      R         :z:',
             ':                (::',
-            ':      T           :',
+            ':      T          J:',
             'D   /::::\  *      D',
             ':   :z   :         :',
             ':   (::::)T   ,    :',
@@ -1218,9 +1287,9 @@ class FloorBuilder:
         '::::::::::::::::::::',
         ]
 
-        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
-
         floor_id += 1
+
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
         new_floor_plan = [
 
@@ -1229,7 +1298,7 @@ class FloorBuilder:
         ':       1          :',
         ':                  :',
         ':  :::::    :::::  :',
-        ':  :   ;    :   :  :',
+        ':  : J ;    :   :  :',
         ':  :   :     B  : L:',
         ':  :   :        :  :',
         ':  :   B        :  :',
@@ -1246,14 +1315,15 @@ class FloorBuilder:
         '::::::::::::::::::::',
         ]
 
-        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
         floor_id += 1
+
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
         new_floor_plan = [
 
         '::::::::::::::::::::',
-        ':                  :',
+        ':        = MMMM    :',
         ':                  :',
         ':      T   T       :',
         ':  T               :',
@@ -1263,7 +1333,7 @@ class FloorBuilder:
         ':::Z      z     Z:::',
         '+ D              D  ',
         ':::Z            Z:::',
-        ':                  :',
+        ':J                 :',
         ': z                :',
         ':            T     :',
         ':   T              :',
@@ -1278,11 +1348,6 @@ class FloorBuilder:
 
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
-        floor_id += 1
-
-
-        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
-
         new_floor_plan = (
 
         '::::::::::::::::::::',
@@ -1290,7 +1355,7 @@ class FloorBuilder:
         ':       1          :',
         ':                  :',
         ':  :::::     ::::  :',
-        ':  :   :     : -:  :',
+        ':  : J :     : -:  :',
         ':  :   :     B  :  :',
         ':  :   :        :  :',
         ':  :   B        :  :',
@@ -1324,6 +1389,10 @@ class FloorBuilder:
         new_floor_data = (2,"Crypts of Eternity",2,3,(0,10,0))
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (3, "Zastaross", 2, 3, (0,0,10))
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (4,"Floor 4",5,3,(0,5,0))
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (5,"Floor 5",5,3,(0,5,0))
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (100,"Home straight",2,3,(1,1,1))
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -1377,13 +1446,13 @@ class LevelBuilder:
 
         logging.info("Starting loading Level Data...")
 
-        new_level_data = (1, "Forest World", (1,2,3),"forest")
+        new_level_data = (1, "Forest World", (1,2,3,4,5),"forest")
         self.level_data[1] = new_level_data
 
         new_level_data = (2, "Winter World", (100,101),"winter")
         self.level_data[2] = new_level_data
 
-        new_level_data = (3, "Squirrel World", (200,200),"squirrel")
+        new_level_data = (3, "Squirrel World", (200,201),"squirrel")
         self.level_data[3] = new_level_data
 
         logging.info("Finished Loading Level Data. {0} levels loaded.".format(len(self.level_data.keys())))
