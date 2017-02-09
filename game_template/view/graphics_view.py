@@ -668,7 +668,7 @@ class TreasureMapView(View):
         map = self.floor.get_treasure_map()
 
         if map is None:
-            raise Exception("No Secret Map to view!")
+            raise Exception("No Secret Map to view for floor {0}!".format(self.floor.id))
 
         width = len(map[0])
         height = len(map)
@@ -759,6 +759,11 @@ class InventoryView(View):
         if self.player is None:
             raise Exception("No Player to view!")
 
+        if self.item_prices is None:
+            is_shop_keeper = False
+        else:
+            is_shop_keeper = True
+
         pane_rect = self.surface.get_rect()
 
         y = 20
@@ -775,7 +780,12 @@ class InventoryView(View):
         image_width = 100
         image_height = 100
 
-        image = View.image_manager.get_skin_image(model.Tiles.PLAYER, tick=1)
+        if is_shop_keeper is True:
+            image_name = model.Tiles.SHOP_KEEPER
+        else:
+            image_name = model.Tiles.PLAYER
+
+        image = View.image_manager.get_skin_image(image_name, tick=self.tick_count)
 
         x = int(pane_rect.centerx - image_width/2)
         y += 20
@@ -787,7 +797,7 @@ class InventoryView(View):
 
         icon_starty = y
 
-        if self.current_selected_item >= 0:
+        if is_shop_keeper is True and self.current_selected_item >= 0:
             selection_rect = pygame.Rect(0,icon_starty + self.current_selected_item*38,pane_rect.width,InventoryView.ICON_HEIGHT + int(InventoryView.ICON_PADDING/2))
             pygame.draw.rect(self.surface, InventoryView.SELECTION_BG_COLOUR,selection_rect, 0)
             pygame.draw.rect(self.surface, InventoryView.SELECTION_BORDER_COLOUR,selection_rect, 3)

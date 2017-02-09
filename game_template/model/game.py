@@ -212,6 +212,7 @@ class Game:
         self.player_scores = {}
         self.effects = {}
         self.tick_count = 0
+        self.hidden_runes = list(Tiles.RUNES)
 
 
         self.hst.load()
@@ -399,14 +400,40 @@ class Game:
                 else:
                     print("No more secrets to find for this level!")
 
+        self.check_secret()
 
 
-        pos = self.get_current_floor().get_treasure_xy()
-        if pos is not None:
-            if pos == (current_player.x,current_player.y):
-                self.get_current_floor().treasure_found()
-                print("You found the secret treasure")
 
+    def check_secret(self):
+
+        current_level = self.get_current_level()
+        current_floor = self.get_current_floor()
+        current_player = self.get_current_player()
+
+        pos = current_floor.get_treasure_xy()
+
+        # If there is a secret treasure on this floor...
+        # ...and the player is currently at the same location..
+        # ...and the player has some treasure maps for this level...
+        if pos is not None and \
+            pos == (current_player.x, current_player.y) \
+            and current_level.id in current_player.treasure_maps.keys():
+
+            # See if the player has the exact map for the secret...
+            # ...and there are stil some runes to find...
+            found_maps = current_player.treasure_maps[current_level.id]
+
+            if (current_floor.id, (pos)) in found_maps and len(self.hidden_runes) > 0:
+
+                found_rune = random.choice(self.hidden_runes)
+                current_player.runes.append(found_rune)
+                self.hidden_runes.remove(found_rune)
+                current_floor.treasure_found()
+                current_player.treasure_maps[current_level.id].remove((current_floor.id, (pos)))
+                print("You found the secret treasure {0} and you have now collected {1}.".format(found_rune,
+                                                                                                 current_player.runes))
+            else:
+                print("You haven't got the map for this secret yet.")
 
     def check_collision(self):
 
@@ -1181,7 +1208,7 @@ class FloorBuilder:
 
         new_floor_plan = [
 
-            '         =       :::',
+            '         =   MMM :::',
             ' T           T   :S:',
             '     T /:D:\   T B8B',
             'T      :) (:     888',
