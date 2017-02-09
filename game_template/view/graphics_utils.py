@@ -85,6 +85,8 @@ class ImageManager:
                                     model.Tiles.SWITCH: "switch.png",
                                     model.Tiles.SWITCH_LIT: "switch_lit.png",
                                     model.Tiles.TREASURE: "treasure.png",
+                                    model.Tiles.TREASURE10: "treasure10.png",
+                                    model.Tiles.TREASURE25: "treasure25.png",
                                     model.Tiles.SECRET_TREASURE: "treasure_chest.png",
                                     model.Tiles.TREASURE_CHEST: "treasure_chest.png",
                                     model.Tiles.TREE: "winter_tree.png",

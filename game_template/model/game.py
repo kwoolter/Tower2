@@ -309,9 +309,14 @@ class Game:
             current_floor.set_player_tile(Tiles.SWAP_TILES[tile])
             print("You found a {0} to {1} swappable tile!!".format(tile,Tiles.SWAP_TILES[tile]))
 
-        elif tile == Tiles.TREASURE:
+        elif tile in (Tiles.TREASURE, Tiles.TREASURE10, Tiles.TREASURE25):
             current_floor.set_player_tile(Tiles.EMPTY)
-            current_player.treasure += 1
+            if tile == Tiles.TREASURE10:
+                current_player.treasure += 10
+            elif tile == Tiles.TREASURE25:
+                current_player.treasure += 25
+            else:
+                current_player.treasure += 1
             print("You found some treasure!")
 
         elif tile == Tiles.TREASURE_CHEST:
@@ -319,7 +324,8 @@ class Game:
             if current_player.keys > 0:
                 current_player.keys -= 1
                 current_floor.set_player_tile(random.choice([Tiles.KEY, Tiles.SHIELD, Tiles.WEAPON,
-                                                            Tiles.MAP, Tiles.BOMB, Tiles.RED_POTION]))
+                                                            Tiles.MAP, Tiles.BOMB, Tiles.RED_POTION,
+                                                             Tiles.TREASURE10, Tiles.TREASURE25]))
                 print("...and you opened it!")
             else:
                 print("...but you don't have a key to open it!")
@@ -723,6 +729,8 @@ class Tiles:
     TRAP2 = "&"
     TRAP3 = "("
     TREASURE = "*"
+    TREASURE10 = "x"
+    TREASURE25 = "X"
     TREASURE_CHEST = "j"
     TREE = "T"
     WALL = ":"
@@ -1208,7 +1216,7 @@ class FloorBuilder:
 
         new_floor_plan = [
 
-            '         =   MMM :::',
+            '   Xx    =   MMM :::',
             ' T           T   :S:',
             '     T /:D:\   T B8B',
             'T      :) (:     888',

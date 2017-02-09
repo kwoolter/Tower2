@@ -38,7 +38,7 @@ class MainFrame(View):
         self.game_over = GameOverView(width=playing_area_width, height=playing_area_height)
         self.inventory_manager = InventoryView(width=playing_area_width, height=playing_area_height)
         self.shop_view = ShopView(width=playing_area_width, height=playing_area_height)
-        self.secret_map_view = TreasureMapView(10,10)
+        self.character_view = CharacterView(width=playing_area_width, height=playing_area_height)
 
 
     def initialise(self, game: model.Game):
@@ -65,7 +65,7 @@ class MainFrame(View):
         self.game_view.initialise(self.game)
         self.game_ready.initialise(self.game)
         self.game_over.initialise(self.game)
-        self.inventory_manager.initialise(self.game.get_current_player())
+        self.character_view.initialise(self.game)
         self.shop_view.initialise(self.game)
 
 
@@ -122,20 +122,9 @@ class MainFrame(View):
                 self.surface.blit(self.game_view.surface, (x, y))
 
             elif self.state == MainFrame.INVENTORY:
-                self.inventory_manager.draw()
-                self.surface.blit(self.inventory_manager.surface, (x, y))
-
-                secret_treasures = self.game.get_current_player().treasure_maps
-
-                for level_id, secrets in secret_treasures.items():
-                    for secret in secrets:
-                        floor_id,(a,b) = secret
-
-                        self.secret_map_view.initialise(self.game.get_floor(floor_id), skin=self.game.get_level(level_id).skin_name)
-                        self.secret_map_view.draw()
-                        self.surface.blit(self.secret_map_view.surface, (x, y))
-
-                        y+=self.secret_map_view.surface.get_height()
+                self.character_view.initialise(self.game)
+                self.character_view.draw()
+                self.surface.blit(self.character_view.surface, (x, y))
 
         elif self.game.state == model.Game.SHOPPING:
             x = 0
@@ -661,6 +650,7 @@ class TreasureMapView(View):
         self.tile_width = tile_width
         self.tile_height = tile_height
         self.skin_name = None
+        self.surface = None
 
     def initialise(self, floor : model.Floor, skin = "default"):
         self.floor = floor
@@ -726,7 +716,6 @@ class InventoryView(View):
              model.Tiles.WEAPON, model.Tiles.SHIELD, model.Tiles.BOMB,
              model.Tiles.MAP)
 
-
     def __init__(self, width : int, height : int, tile_width : int = ICON_WIDTH, tile_height : int = ICON_HEIGHT):
 
         super(InventoryView, self).__init__()
@@ -759,10 +748,13 @@ class InventoryView(View):
         if self.player is None:
             raise Exception("No Player to view!")
 
+        name = self.player.name
+
         if self.item_prices is None:
             is_shop_keeper = False
         else:
             is_shop_keeper = True
+            name = "Shopkeeper " + name
 
         pane_rect = self.surface.get_rect()
 
@@ -770,7 +762,7 @@ class InventoryView(View):
         x = pane_rect.centerx
 
         draw_text(self.surface,
-                  msg="{0}'s Inventory".format(self.player.name),
+                  msg="{0}'s Inventory".format(name),
                   x=x,
                   y=y,
                   size=30,
@@ -857,6 +849,125 @@ class InventoryView(View):
         if self.item_prices is not None and item_type in self.item_prices.keys():
             item_price = self.item_prices[item_type]
             draw_icon(self.surface, x=x + InventoryView.ICON_PRICE_PADDING, y=y, icon_name=model.Tiles.TREASURE, count=item_price)
+
+
+class CharacterView(View):
+
+    BG_COLOUR = Colours.DARK_GREY
+    FG_COLOUR = Colours.WHITE
+
+    ICON_WIDTH = 32
+    ICON_HEIGHT = 32
+    ICON_PADDING = 6
+
+    MAP_PADDING = 6
+
+    def __init__(self, width : int, height : int, tile_width : int = ICON_WIDTH, tile_height : int = ICON_HEIGHT):
+
+        super(CharacterView, self).__init__()
+
+        self.surface = pygame.Surface((width, height))
+        self.player = None
+
+        self.width = width
+        self.height = height
+
+        self.surface = pygame.Surface((width, height))
+
+        self.inventory_view = InventoryView(width = self.width, height=(self.height*3/5))
+        self.secret_map_view = TreasureMapView(10, 10)
+
+
+    def initialise(self, game : model.Game):
+
+        super(CharacterView, self).initialise()
+
+        self.game = game
+        self.player = self.game.get_current_player()
+
+        self.inventory_view.initialise(self.player)
+
+    def draw(self):
+
+        self.surface.fill(CharacterView.BG_COLOUR)
+
+        if self.player is None:
+            raise Exception("No Player to view!")
+
+        pane_rect = self.surface.get_rect()
+
+        x = pane_rect.centerx
+        y = 20
+
+        draw_text(self.surface,
+                  msg="Character View",
+                  x=x,
+                  y=y,
+                  size=30,
+                  fg_colour=CharacterView.FG_COLOUR,
+                  bg_colour=CharacterView.BG_COLOUR)
+
+        y+=20
+        x = 0
+
+        self.inventory_view.draw()
+        self.surface.blit(self.inventory_view.surface, (x, y))
+
+        x=pane_rect.centerx
+        y+=self.inventory_view.surface.get_height()
+        y+=20
+
+        draw_text(self.surface,
+                  msg="Secret Maps",
+                  x=x,
+                  y=y,
+                  size=30,
+                  fg_colour=CharacterView.FG_COLOUR,
+                  bg_colour=CharacterView.BG_COLOUR)
+
+        number_of_maps_found = 0
+        for maps in self.player.treasure_maps.values():
+            number_of_maps_found += len(maps)
+
+        x = pane_rect.centerx - int(number_of_maps_found*80 + CharacterView.MAP_PADDING)/2
+        y+=14
+
+        secret_treasures = self.player.treasure_maps
+
+        for level_id, secrets in secret_treasures.items():
+            for secret in secrets:
+                floor_id, (a, b) = secret
+
+                self.secret_map_view.initialise(self.game.get_floor(floor_id),
+                                                skin=self.game.get_level(level_id).skin_name)
+                self.secret_map_view.draw()
+                self.surface.blit(self.secret_map_view.surface, (x, y))
+
+                x += self.secret_map_view.surface.get_width() + CharacterView.MAP_PADDING
+
+        x = pane_rect.centerx
+        y+=104
+
+        draw_text(self.surface,
+                  msg="Runes Collected",
+                  x=x,
+                  y=y,
+                  size=30,
+                  fg_colour=CharacterView.FG_COLOUR,
+                  bg_colour=CharacterView.BG_COLOUR)
+
+
+        y+=20
+        x = pane_rect.centerx - int(len(self.player.runes)*(CharacterView.ICON_WIDTH + CharacterView.ICON_PADDING))/2
+
+        for rune in self.player.runes:
+            image = self.image_manager.get_skin_image(rune, skin_name="runes")
+            self.surface.blit(image, (x, y))
+
+            x += CharacterView.ICON_WIDTH + CharacterView.ICON_PADDING
+
+
+
 
 
 class ShopView(View):
