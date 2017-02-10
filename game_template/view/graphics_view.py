@@ -748,13 +748,12 @@ class InventoryView(View):
         if self.player is None:
             raise Exception("No Player to view!")
 
-        name = self.player.name
-
         if self.item_prices is None:
             is_shop_keeper = False
+            name = self.player.name + "'s Inventory"
         else:
             is_shop_keeper = True
-            name = "Shopkeeper " + name
+            name = "Shopkeeper " + self.player.name
 
         pane_rect = self.surface.get_rect()
 
@@ -762,7 +761,7 @@ class InventoryView(View):
         x = pane_rect.centerx
 
         draw_text(self.surface,
-                  msg="{0}'s Inventory".format(name),
+                  msg="{0}".format(name),
                   x=x,
                   y=y,
                   size=30,
@@ -917,29 +916,31 @@ class CharacterView(View):
         y+=self.inventory_view.surface.get_height()
         y+=20
 
+
+        current_level = self.game.get_current_level()
         draw_text(self.surface,
-                  msg="Secret Maps",
+                  msg="{0} - Secret Maps".format(current_level.name),
                   x=x,
                   y=y,
                   size=30,
                   fg_colour=CharacterView.FG_COLOUR,
                   bg_colour=CharacterView.BG_COLOUR)
 
-        number_of_maps_found = 0
-        for maps in self.player.treasure_maps.values():
-            number_of_maps_found += len(maps)
+        y += 14
 
-        x = pane_rect.centerx - int(number_of_maps_found*80 + CharacterView.MAP_PADDING)/2
-        y+=14
+        if current_level.id in self.player.treasure_maps.keys() and len(self.player.treasure_maps[current_level.id]) > 0:
 
-        secret_treasures = self.player.treasure_maps
+            number_of_maps_found = len(self.player.treasure_maps[current_level.id])
+            secret_treasures = self.player.treasure_maps[current_level.id]
 
-        for level_id, secrets in secret_treasures.items():
-            for secret in secrets:
+            x = pane_rect.centerx - int(number_of_maps_found*80 + CharacterView.MAP_PADDING)/2
+
+            for secret in secret_treasures:
+
                 floor_id, (a, b) = secret
 
                 self.secret_map_view.initialise(self.game.get_floor(floor_id),
-                                                skin=self.game.get_level(level_id).skin_name)
+                                                skin=self.game.get_level(current_level.id).skin_name)
                 self.secret_map_view.draw()
                 self.surface.blit(self.secret_map_view.surface, (x, y))
 

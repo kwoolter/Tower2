@@ -408,8 +408,6 @@ class Game:
 
         self.check_secret()
 
-
-
     def check_secret(self):
 
         current_level = self.get_current_level()
@@ -433,6 +431,8 @@ class Game:
 
                 found_rune = random.choice(self.hidden_runes)
                 current_player.runes.append(found_rune)
+                current_floor.set_player_tile(Tiles.RUNE)
+                current_player.back()
                 self.hidden_runes.remove(found_rune)
                 current_floor.treasure_found()
                 current_player.treasure_maps[current_level.id].remove((current_floor.id, (pos)))
@@ -752,6 +752,7 @@ class Tiles:
     DOT2 = "£"
     HEART = "HP"
     SHOP_KEEPER = "SHOP"
+    RUNE = "u"
     RUNE1 = "R1"
     RUNE2 = "R2"
     RUNE3 = "R3"
@@ -831,6 +832,7 @@ class FloorPlan:
             self.entrance = (x,y)
         elif tile_name == Tiles.SECRET_TREASURE:
             self.secret = (x,y)
+            print("Floor Plan {2} - set secret at {0},{1}".format(x,y, self.id))
 
     # Build a safety zone around a specified location
     def safety_zone(self, x, y, height, width):
@@ -874,12 +876,14 @@ class Floor:
     def __init__(self, id : int, name : str,
                  treasure_count : int = 0,
                  trap_count : int = 0,
-                 monster_count : int = 0):
+                 monster_count : tuple = (0,0,0),
+                 secret_count : int = 0):
         self.id = id
         self.name = name
         self.treasure_count = treasure_count
         self.trap_count = trap_count
         self.monster_count = monster_count
+        self.secret_count = secret_count
         self.tick_count = 0
         self.monsters = {}
         self.explodables = {}
@@ -891,6 +895,15 @@ class Floor:
 
         self.floor_plan = floor_plan
         self.tick_count = 0
+
+        self.place_tiles(self.secret_count, Tiles.SECRET_TREASURE)
+        self.place_tiles(self.treasure_count, Tiles.TREASURE)
+        self.place_tiles(self.trap_count, Tiles.TRAP1)
+
+        m1,m2,m3 = self.monster_count
+        self.place_tiles(m1, Tiles.MONSTER1)
+        self.place_tiles(m2, Tiles.MONSTER2)
+        self.place_tiles(m3, Tiles.MONSTER3)
 
         for y in range(self.floor_plan.height):
             for x in range(self.floor_plan.width):
@@ -909,13 +922,6 @@ class Floor:
 
         print(str(self))
 
-        self.place_tiles(self.treasure_count, Tiles.TREASURE)
-        self.place_tiles(self.trap_count, Tiles.TRAP1)
-
-        m1,m2,m3 = self.monster_count
-        self.place_tiles(m1, Tiles.MONSTER1)
-        self.place_tiles(m2, Tiles.MONSTER2)
-        self.place_tiles(m3, Tiles.MONSTER3)
 
     def is_valid_xy(self, x : int, y : int):
         result = False
@@ -966,10 +972,12 @@ class Floor:
 
                     logging.info("Placed a {0} at {1},{2}".format(item_type, x, y))
 
-                    if item_type in Tiles.MONSTERS:
-                        self.monsters[(x, y)] = item_type
-                    else:
-                        self.floor_plan.set_tile(item_type, x, y)
+                    # if item_type in Tiles.MONSTERS:
+                    #     self.monsters[(x, y)] = item_type
+                    # else:
+                    #     self.floor_plan.set_tile(item_type, x, y)
+
+                    self.floor_plan.set_tile(item_type, x, y)
 
                     break
                 attempts += 1
@@ -1224,7 +1232,7 @@ class FloorBuilder:
             '       :   :      T ',
             '      /:B B:\       ',
             'T /::::)   (::::\  ?',
-            '  :)  B     BJ (:   ',
+            '  :)  B     B  (:   ',
             '  D      +      D  M',
             '  :\  B     B  /:   ',
             '  (::::\   /::::)   ',
@@ -1262,7 +1270,7 @@ class FloorBuilder:
             '                    ',
             '                    ',
             ':\                /:',
-            'z:J               :z',
+            'z:                :z',
 
         ]
 
@@ -1273,13 +1281,13 @@ class FloorBuilder:
         new_floor_plan = [
 
             '::::::::::::::::::::',
-            ':B        !!!    B(:',
+            ':B     -  !!!    B(:',
             ':  B               :',
             ':                  :',
             ':         ^^     /::',
             ':      R         :z:',
             ':                (::',
-            ':      T          J:',
+            ':      T           :',
             'D   /::::\  *      D',
             ':   :z   :         :',
             ':   (::::)T   ,    :',
@@ -1333,7 +1341,7 @@ class FloorBuilder:
         ':       1          :',
         ':                  :',
         ':  :::::    :::::  :',
-        ':  : J ;    :   :  :',
+        ':  :   ;    :   :  :',
         ':  :   :     B  : L:',
         ':  :   :        :  :',
         ':  :   B        :  :',
@@ -1368,7 +1376,7 @@ class FloorBuilder:
         ':::Z      z     Z:::',
         '+ D              D  ',
         ':::Z            Z:::',
-        ':J                 :',
+        ':                  :',
         ': z                :',
         ':            T     :',
         ':   T              :',
@@ -1390,7 +1398,7 @@ class FloorBuilder:
         ':       1          :',
         ':                  :',
         ':  :::::     ::::  :',
-        ':  : J :     : -:  :',
+        ':  :   :     : -:  :',
         ':  :   :     B  :  :',
         ':  :   :        :  :',
         ':  :   B        :  :',
@@ -1408,8 +1416,14 @@ class FloorBuilder:
         )
 
         floor_id += 1
-
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        floor_id = 200
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
 
         logging.info("Finished loading floor plans. {0} floor plans loaded.".format(len(self.floor_plans.keys())))
 
@@ -1417,24 +1431,25 @@ class FloorBuilder:
 
         logging.info("Started loading floor configs...")
 
-        # id,name,treasures,traps,monsters(1,2,3)
+        # id,name,treasures,traps,monsters(1,2,3),secrets
 
-        new_floor_data = (1,"Chapel of the Damned",5,3,(0,5,0))
+        new_floor_data = (1,"Chapel of the Damned",5,3,(0,5,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (2,"Crypts of Eternity",2,3,(0,10,0))
+        new_floor_data = (2,"Crypts of Eternity",2,3,(0,10,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (3, "Zastaross", 2, 3, (0,0,10))
+        new_floor_data = (3, "Zastaross", 2, 3, (0,0,10),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (4,"Floor 4",5,3,(0,5,0))
+        new_floor_data = (4,"Floor 4",5,3,(0,5,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (5,"Floor 5",5,3,(0,5,0))
+        new_floor_data = (5,"Floor 5",5,3,(0,5,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (100,"Home straight",2,3,(1,1,1))
+        new_floor_data = (100,"Home straight",2,3,(1,1,1),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (101,"End",2,3,(1,1,1))
+        new_floor_data = (101,"End",2,3,(1,1,1),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-
-        new_floor_data = (200, "The Woods",7,4,(7,0,0))
+        new_floor_data = (200, "The Woods",7,4,(7,0,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (201, "The Copese",7,4,(2,7,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         logging.info("Finished loading floor configs. {0} floor configs loaded.".format(len(self.floor_configs.keys())))
@@ -1450,8 +1465,9 @@ class FloorBuilder:
             if floor_id in self.floor_plans.keys():
                 floor_plan = self.floor_plans[floor_id]
 
-                id,name,treasures,traps,monsters = floor_data
-                new_floor = Floor(id = floor_id, name=name, treasure_count=treasures, trap_count=traps, monster_count=monsters)
+                id,name,treasures,traps,monsters,secrets = floor_data
+                new_floor = Floor(id = floor_id, name=name, treasure_count=treasures,
+                                  trap_count=traps, monster_count=monsters, secret_count=secrets)
                 new_floor.initialise(floor_plan)
                 self.floors[floor_id] = new_floor
 

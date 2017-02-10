@@ -82,6 +82,7 @@ class ImageManager:
                                     model.Tiles.BOMB: "bomb.png",
                                     model.Tiles.BOMB_LIT: ("bomb_lit1.png","bomb_lit2.png"),
                                     model.Tiles.RED_POTION: "red_potion.png",
+                                    model.Tiles.RUNE: "rune.png",
                                     model.Tiles.SWITCH: "switch.png",
                                     model.Tiles.SWITCH_LIT: "switch_lit.png",
                                     model.Tiles.TREASURE: "treasure.png",
