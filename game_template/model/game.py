@@ -765,7 +765,7 @@ class Tiles:
     TRAPS = (TRAP1, TRAP2, TRAP3)
     RUNES = (RUNE1, RUNE2, RUNE3, RUNE4, RUNE5)
     MONSTER_EMPTY_TILES = (EMPTY, PLAYER)
-    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, BRAZIER)
+    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, BRAZIER, RUNE)
     PLAYER_DOT_TILES = (DOT1, DOT2)
     PLAYER_EQUIPABLE_ITEMS = (WEAPON, SHIELD, RED_POTION, BOMB)
     SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
@@ -872,6 +872,7 @@ class Floor:
     MONSTER_MOVE_RATE = 4
     EXPLODABLE_COUNTDOWN_RATE = 4
     EXPLODABLE_COUNTDOWN = 10
+    SECRET_COUNTDOWN = 10
 
     def __init__(self, id : int, name : str,
                  treasure_count : int = 0,
@@ -940,6 +941,9 @@ class Floor:
 
         if self.tick_count % Floor.EXPLODABLE_COUNTDOWN_RATE == 0:
             self.tick_explodables()
+
+        if self.tick_count % Floor.SECRET_COUNTDOWN == 0:
+            pass
 
     def add_player(self, player, position = ENTRANCE):
         self.player = player
