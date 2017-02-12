@@ -1559,7 +1559,38 @@ class FloorBuilder:
             '                    ',
 
         )
+
+
+
         floor_id = 20
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # The Colonnade
+        new_floor_plan = (
+            '::::::::::::::::::::',
+            ':                /::',
+            ':               /) :',
+            ': /:\  /:\  /:\/)  :',
+            ': :z:  :z:  :z:)   :',
+            ': (::  (:)  (:)    :',
+            ':   :   :         /:',
+            ':   :  B:B       /::',
+            ':   :   :        :) ',
+            ':\M/:  /:\  /:\     ',
+            ':::::  :z:  :z:    E',
+            ': (:)  (:)  (:)     ',
+            'W  D         :   :\ ',
+            ': /:\        :   (::',
+            ':::::  /:\  /:\   (:',
+            ':ww::  :z::::z:    :',
+            ':www:\ (:)  (:)    :',
+            ':wwww:             :',
+            ':wwww:             :',
+            '::::::::::::::::::::',
+
+        )
+
+        floor_id += 1
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
         # The Ruins
@@ -1764,6 +1795,8 @@ class FloorBuilder:
 
         # The Temple
         new_floor_data = (20,"The Forest Temple",0,0,1,(6,0,0),0)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (21,"The Colonnade",0,4,1,(6,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         # The Ruins
