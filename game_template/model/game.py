@@ -1755,7 +1755,7 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (2,"Crypts of Eternity",5,3,0,(0,7,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (3, "Library",2,3,0,(4,0,0),1)
+        new_floor_data = (3, "Library of Zastaross",2,3,2,(4,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (4,"Floor 4",5,3,0,(0,5,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -1763,11 +1763,11 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         # The Temple
-        new_floor_data = (20,"The Forest Temple",0,0,1,(0,5,0),0)
+        new_floor_data = (20,"The Forest Temple",0,0,1,(6,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         # The Ruins
-        new_floor_data = (30,"The Ruins",0,0,0,(0,5,0),0)
+        new_floor_data = (30,"The Ruins",4,5,0,(0,5,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         # The Old Tower

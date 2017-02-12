@@ -71,11 +71,11 @@ class ImageManager:
                                     model.Tiles.WATER: ("water.png","water2.png","water3.png","water4.png"),
                                     model.Tiles.SKY: "sky.png",
                                     model.Tiles.CLOUD: "cloud.png",
-                                    model.Tiles.SHOP: "wooden_door.png",
+                                    model.Tiles.SHOP: "door.png",
                                     model.Tiles.HEART : "heart2.png",
                                     model.Tiles.PLAYER : ("player1.png","player.png","player2.png","player.png"),
-                                    model.Tiles.SHOP_KEEPER : "door.png",
-                                    model.Tiles.DOOR : "winter_door.png",
+                                    model.Tiles.SHOP_KEEPER : "shop_keeper.png",
+                                    model.Tiles.DOOR : "door.png",
                                     model.Tiles.TROPHY: "goal.png",
                                     model.Tiles.UP: "exit.png",
                                     model.Tiles.DOWN: "entrance.png",
@@ -107,7 +107,7 @@ class ImageManager:
                                     model.Tiles.TRAP3: ("trap.png"),
                                     model.Tiles.DOT1: ("lava1.png", "lava2.png","lava3.png", "lava2.png"),
                                     model.Tiles.DOT2: ("lava.png"),
-                                    model.Tiles.BRAZIER : ("brazier.png", "brazier_lit.png")})
+                                    model.Tiles.BRAZIER: ("fire1.png", "fire2.png", "fire3.png", "fire4.png")})
 
         ImageManager.skins[new_skin_name] = new_skin
 
@@ -118,8 +118,8 @@ class ImageManager:
                                     model.Tiles.KEY : "key.png",
                                     model.Tiles.TREASURE: "treasure1.png",
                                     model.Tiles.DOT1: ("ice.png"),
-                                    model.Tiles.TREE: "winter_tree.png",
-                                    model.Tiles.BRAZIER : ("brazier.png", "brazier_lit.png")})
+                                    model.Tiles.TREE: "winter_tree.png"
+                                    })
 
         ImageManager.skins[new_skin_name] = new_skin
 
@@ -136,7 +136,7 @@ class ImageManager:
                                     model.Tiles.MONSTER1: ("goblin1.png", "goblin2.png"),
                                     model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png","skeleton1.png","skeleton3.png" ),
                                     model.Tiles.MONSTER3: ("eye1.png", "eye2.png", "eye3.png", "eye2.png","eye4.png", "eye2.png"),
-                                    model.Tiles.BRAZIER: ("fire1.png", "fire2.png", "fire3.png", "fire4.png")})
+                                    })
 
         ImageManager.skins[new_skin_name] = new_skin
 
