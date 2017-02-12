@@ -295,21 +295,15 @@ class Game:
         if tile == Tiles.EMPTY:
             pass
 
-
         elif tile in FloorPlan.EXIT_TO_DIRECTION.keys():
 
             print("You found the exit {}!".format(FloorPlan.EXIT_TO_DIRECTION[tile]))
 
             try:
-
                 self.check_exit(FloorPlan.EXIT_TO_DIRECTION[tile])
-
             except Exception as err:
-
                 print(err)
-
                 self.get_current_player().back()
-
 
         elif tile == Tiles.KEY:
             current_player.keys += 1
@@ -317,7 +311,6 @@ class Game:
             print("Found a key!")
 
         elif tile in Tiles.MONSTERS:
-
             print("Hit a monster!")
 
         elif tile in Tiles.TRAPS:
@@ -384,7 +377,6 @@ class Game:
                 self.game_over()
 
         elif tile == Tiles.DOOR:
-
             print("You found a door...")
             if current_player.keys > 0:
                 current_player.keys -= 1
@@ -393,14 +385,6 @@ class Game:
             else:
                 current_player.back()
                 print("...but the door is locked!")
-
-        elif tile == Tiles.EXIT:
-            print("You found the exit!")
-            self.next_floor()
-
-        elif tile == Tiles.ENTRANCE:
-            print("You found the entrance!")
-            self.previous_floor()
 
         elif tile == Tiles.NEXT_LEVEL:
             print("You found the entrance to the next level!")
@@ -757,80 +741,79 @@ class Shop:
 
 class Tiles:
 
-    BANG = "$"
-    BEACH = "s"
-    BOSS_DOOR = "d"
-    BOSS_KEY = "$"
-    BRAZIER = "B"
-    DOOR = "D"
-    DECORATION1 = "z"
-    DECORATION2 = "Z"
-    EMPTY = " "
-    ENTRANCE = "-"
-    START_POSITON = "="
-    EXIT = "+"
-    NEXT_LEVEL = "L"
-    PREVIOUS_LEVEL = "l"
-    EXIT_KEY = "%"
-    TROPHY = "G"
-    KEY = "?"
-    MAP = "M"
-    SAFETY = "8"
-    SECRET_WALL = ";"
-    SHOP = "s"
-    SKY = "~"
-    CLOUD = "."
-    SWITCH = ","
-    SWITCH_LIT = "<"
-    SWITCH_TILE = "_"
-    SECRET_TREASURE = "J"
-    TRAP1 = "^"
-    TRAP2 = "&"
-    TRAP3 = "("
-    TREASURE = "*"
-    TREASURE10 = "x"
-    TREASURE25 = "X"
-    TREASURE_CHEST = "j"
-    TREE = "T"
-    WALL = ":"
-    WALL_TL = "/"
-    WALL_TR = "\\"
-    WALL_BL = "("
-    WALL_BR = ")"
-    WATER = "W"
-    WEAPON = "|"
-    SHIELD = "O"
-    BOMB = "q"
-    BOMB_LIT = "Q"
-    MONSTER1 = "1"
-    MONSTER2 = "2"
-    MONSTER3 = "3"
-    PLAYER = "P"
-    RED_POTION = "R"
-    DOT1 = "!"
-    DOT2 = "£"
-    HEART = "HP"
-    SHOP_KEEPER = "SHOP"
-    RUNE = "u"
-    RUNE1 = "R1"
-    RUNE2 = "R2"
-    RUNE3 = "R3"
-    RUNE4 = "R4"
-    RUNE5 = "R5"
-    NORTH = "N"
-    SOUTH = "S"
-    UP = "+"
-    DOWN = "-"
-    EAST = "E"
-    WEST = "W"
+    # Define Tiles
+    # Cut and Paste
+    BANG = '$'
+    BEACH = 'b'
+    BOMB = 'q'
+    BOMB_LIT = 'Q'
+    BOSS_DOOR = 'd'
+    BRAZIER = 'B'
+    CLOUD = '.'
+    DECORATION1 = 'z'
+    DECORATION2 = 'Z'
+    DOOR = 'D'
+    DOT1 = '!'
+    DOT2 = '£'
+    DOWN = '-'
+    EAST = 'E'
+    EMPTY = ' '
+    EXIT_KEY = '%'
+    HEART = 'HP'
+    KEY = '?'
+    MAP = 'M'
+    MONSTER1 = '1'
+    MONSTER2 = '2'
+    MONSTER3 = '3'
+    NEXT_LEVEL = 'L'
+    NORTH = 'N'
+    PLAYER = 'P'
+    PREVIOUS_LEVEL = 'l'
+    RED_POTION = 'R'
+    RUNE = 'u'
+    RUNE1 = 'R1'
+    RUNE2 = 'R2'
+    RUNE3 = 'R3'
+    RUNE4 = 'R4'
+    RUNE5 = 'R5'
+    SAFETY = '8'
+    SECRET_TREASURE = 'J'
+    SECRET_WALL = ';'
+    SHIELD = 'O'
+    SHOP = 's'
+    SHOP_KEEPER = 'SHOP'
+    SKY = '~'
+    SOUTH = 'S'
+    START_POSITON = '='
+    SWITCH = ','
+    SWITCH_LIT = '<'
+    SWITCH_TILE = '_'
+    TRAP1 = '^'
+    TRAP2 = '&'
+    TRAP3 = '['
+    TREASURE = '*'
+    TREASURE_CHEST = 'j'
+    TREASURE10 = 'x'
+    TREASURE25 = 'X'
+    TREE = 'T'
+    TROPHY = 'G'
+    UP = '+'
+    WALL = ':'
+    WALL_BL = '('
+    WALL_BR = ')'
+    WALL_TL = '/'
+    WALL_TR = '\\'
+    WATER = 'w'
+    WEAPON = '|'
+    WEST = 'W'
 
     MONSTERS = (MONSTER1, MONSTER2, MONSTER3)
     EXPLODABLES = (BOMB_LIT)
-    INDESTRUCTIBLE_ITEMS = (KEY, TREE, TROPHY, EXIT, ENTRANCE)
+    INDESTRUCTIBLE_ITEMS = (KEY, TREE, TROPHY, NORTH, SOUTH, EAST, WEST, UP, DOWN, SHOP)
     TRAPS = (TRAP1, TRAP2, TRAP3)
     RUNES = (RUNE1, RUNE2, RUNE3, RUNE4, RUNE5)
     MONSTER_EMPTY_TILES = (EMPTY, PLAYER)
-    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, BRAZIER, RUNE)
+    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WATER, BRAZIER, RUNE)
     PLAYER_DOT_TILES = (DOT1, DOT2)
     PLAYER_EQUIPABLE_ITEMS = (WEAPON, SHIELD, RED_POTION, BOMB)
     SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
@@ -916,13 +899,9 @@ class FloorPlan:
         if tile_name in FloorPlan.EXIT_TO_DIRECTION.keys():
             self.exits[FloorPlan.EXIT_TO_DIRECTION[tile_name]] = (x, y)
             print("Floor Plan {0} - set {1} exit at ({2},{3}).".format(self.id, FloorPlan.EXIT_TO_DIRECTION[tile_name], x,y))
-        elif tile_name == Tiles.ENTRANCE:
-            self.entrance = (x,y)
         elif tile_name == Tiles.START_POSITON and self.entrance is None:
             self.entrance = (x,y)
             self.plan[x][y] = Tiles.EMPTY
-        elif tile_name == Tiles.EXIT:
-            self.exit = (x,y)
         elif tile_name == Tiles.NEXT_LEVEL and self.exit is None:
             self.exit = (x,y)
         elif tile_name == Tiles.PREVIOUS_LEVEL and self.entrance is None:
@@ -978,6 +957,7 @@ class Floor:
     def __init__(self, id : int, name : str,
                  treasure_count : int = 0,
                  trap_count : int = 0,
+                 key_count = 0,
                  monster_count : tuple = (0,0,0),
                  secret_count : int = 0):
         self.id = id
@@ -985,6 +965,7 @@ class Floor:
         self.treasure_count = treasure_count
         self.trap_count = trap_count
         self.monster_count = monster_count
+        self.key_count = key_count
         self.secret_count = secret_count
         self.tick_count = 0
         self.monsters = {}
@@ -1001,6 +982,7 @@ class Floor:
         self.tick_count = 0
 
         self.place_tiles(self.secret_count, Tiles.SECRET_TREASURE)
+        self.place_tiles(self.key_count, Tiles.KEY)
         self.place_tiles(self.treasure_count, Tiles.TREASURE)
         self.place_tiles(self.trap_count, Tiles.TRAP1)
 
@@ -1356,17 +1338,17 @@ class FloorBuilder:
 
 
         new_floor_plan = [
-            '                    ',
+            '         N          ',
             '                    ',
             '    T       T       ',
             ' T      T           ',
             '                T   ',
             '    T               ',
             '  T      T          ',
-            '                    ',
+            'W                   ',
             '            T     T ',
             'T                   ',
-            '    T    =     L   E',
+            '    T    =         E',
             '                    ',
             '               T    ',
             ' T /:\              ',
@@ -1378,6 +1360,7 @@ class FloorBuilder:
             '         S          ',
 
         ]
+
         floor_id = 0
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
         floor_id = 100
@@ -1552,10 +1535,62 @@ class FloorBuilder:
         ':                  :',
         '::::::::::::::::::::',
         ]
+        # The Forest Temple
+        new_floor_plan = (
+            '             T      ',
+            ' T   wwwww      T T ',
+            '   wwwwwwwwww       ',
+            'T ww::::::::w  T    ',
+            ' ww:)     (:w      ',
+            'ww:)       :ww /\   ',
+            'ww:        :wwww:B  ',
+            'w::\    :  ::www::  ',
+            '::::::  :  (:::::)  ',
+            'W    :  :          E',
+            'M    :  (\          ',
+            '::::D:   (:::::::\  ',
+            'w::) (\   (::www::  ',
+            'ww:   (:   :wwww:B  ',
+            ' w:\       :ww ()   ',
+            'Tww:\     /:w T     ',
+            '  ww::::::::w   T   ',
+            '   wwwwwwwwww       ',
+            ' T    wwww        T ',
+            '                    ',
 
+        )
+        floor_id = 20
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
+        # The Ruins
+        new_floor_plan = (
+            '                    ',
+            '                :   ',
+            '  T        T   :::\ ',
+            '      ::\        (: ',
+            '  T    -:   :T  T : ',
+            ' T      :::::     : ',
+            '\     /:) :w:     : ',
+            ':     :   :w:       ',
+            ':ww\  :     )     T ',
+            '::::  (: T    /:\   ',
+            ':  :\         :     ',
+            ')  ::         :     ',
+            '        /  \  (\    ',
+            'T       :ww:   (:   ',
+            '     /:::::::       ',
+            '  T  :)         T   ',
+            '     :              ',
+            'T    (       T      ',
+            '                 T  ',
+            '         S          ',
 
-        # The Ancient Tower
+        )
+
+        floor_id = 30
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # The old Tower
         new_floor_plan = (
             ' T  T  T T   TT  TT ',
             'T TT TT T TT T TT  T',
@@ -1711,34 +1746,50 @@ class FloorBuilder:
 
         logging.info("Started loading floor configs...")
 
-        # id,name,treasures,traps,monsters(1,2,3),secrets
-        new_floor_data = (0,"Ancient Woods",5,0,(0,5,0),0)
+        # id,name,treasures,traps,keys,monsters(1,2,3),secrets
+        new_floor_data = (0,"Ancient Woods",5,0,0,(0,5,0),0)
+
+        # The Chapel
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (1,"Chapel of the Damned",5,5,(0,5,0),1)
+        new_floor_data = (1,"Chapel of the Damned",5,5,0,(0,5,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (2,"Crypts of Eternity",5,3,(0,7,0),1)
+        new_floor_data = (2,"Crypts of Eternity",5,3,0,(0,7,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (3, "Library", 2, 3, (4,0,0),1)
+        new_floor_data = (3, "Library",2,3,0,(4,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (4,"Floor 4",5,3,(0,5,0),1)
+        new_floor_data = (4,"Floor 4",5,3,0,(0,5,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (5,"Floor 5",5,3,(0,5,0),1)
+        new_floor_data = (5,"Floor 5",5,3,0,(0,5,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (50,"The Ancient Tower",0,0,(2,0,0),0)
+
+        # The Temple
+        new_floor_data = (20,"The Forest Temple",0,0,1,(0,5,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (51,"Back and Forth",3,3,(5,0,0),0)
+
+        # The Ruins
+        new_floor_data = (30,"The Ruins",0,0,0,(0,5,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (52,"The Maze",3,3,(5,0,0),1)
+
+        # The Old Tower
+        new_floor_data = (50,"The Old Tower",0,0,0,(2,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (53,"The Guard House",3,3,(5,0,0),1)
+        new_floor_data = (51,"Back and Forth",3,3,0,(5,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (100,"Home straight",2,3,(1,1,1),1)
+        new_floor_data = (52,"The Maze",3,3,0,(5,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (101,"End",2,3,(1,1,1),1)
+        new_floor_data = (53,"The Guard House",3,3,0,(5,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (200, "The Woods",7,4,(7,0,0),1)
+
+
+        new_floor_data = (100,"Home straight",2,3,0,(1,1,1),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (201, "The Copese",7,4,(2,7,0),1)
+        new_floor_data = (101,"End",2,3,0,(1,1,1),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+
+
+        new_floor_data = (200, "The Woods",7,4,0,(7,0,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (201, "The Copse",7,4,0,(2,7,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         logging.info("Finished loading floor configs. {0} floor configs loaded.".format(len(self.floor_configs.keys())))
@@ -1754,8 +1805,8 @@ class FloorBuilder:
             if floor_id in self.floor_plans.keys():
                 floor_plan = self.floor_plans[floor_id]
 
-                id,name,treasures,traps,monsters,secrets = floor_data
-                new_floor = Floor(id = floor_id, name=name, treasure_count=treasures,
+                id,name,treasures,traps,keys,monsters,secrets = floor_data
+                new_floor = Floor(id = floor_id, name=name, treasure_count=treasures, key_count=keys,
                                   trap_count=traps, monster_count=monsters, secret_count=secrets)
                 new_floor.initialise(floor_plan)
                 self.floors[floor_id] = new_floor
@@ -1786,7 +1837,7 @@ class LevelBuilder:
 
         logging.info("Starting loading Level Data...")
 
-        new_level_data = (1, "Forest World", (0,1,2,3,4,5,50,51,52,53),"forest")
+        new_level_data = (1, "Forest World", (0,1,2,3,4,5,20,30,50,51,52,53),"forest")
         self.level_data[1] = new_level_data
 
         new_level_data = (2, "Winter World", (100,101),"winter")
