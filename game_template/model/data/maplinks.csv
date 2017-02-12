@@ -1,0 +1,10 @@
+FromID,ToID,Direction,Description,Lockable,Locked,LockedDescription,Reversible,Hidden
+0,1,SOUTH,along a path,,,,,
+0,50,EAST,through the trees,,,,,
+1,2,DOWN,some stone steps,,,,,
+2,3,NORTH,through a door,,,,,
+3,4,WEST,through a door,,,,,
+3,5,EAST,through a door,,,,,
+50,51,UP,some stone steps,,,,,
+51,52,UP,some stone steps,,,,,
+52,53,UP,some stone steps,,,,,
