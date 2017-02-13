@@ -1567,7 +1567,7 @@ class FloorBuilder:
 
         # The Colonnade
         new_floor_plan = (
-            '::::::::::::::::::::',
+            ':::::::::::N::::::::',
             ':                /::',
             ':               /) :',
             ': /:\  /:\  /:\/)  :',
@@ -1586,7 +1586,62 @@ class FloorBuilder:
             ':www:\ (:)  (:)    :',
             ':wwww:             :',
             ':wwww:             :',
+            ':::::::::S::::::::::',
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # The Shrine of the Snake God
+        new_floor_plan = (
+            '/:::wwww:N:wwww::::\\',
+            ': (:www:) (:www:)  :',
+            ':  :ww:)   (:ww:   :',
+            ':  (::)     (::)   :',
+            ':                  :',
+            ':                  :',
+            ':  /::\     /::\   :',
+            ':  :ww:\   /:ww:   :',
+            ':  :wB:     :Bw:   :',
+            ':  (::)     (::)   :',
+            '(\      /:\       /)',
+            '8:     /:w:\      :8',
+            '8(\     :w:      /)8',
+            '88:     :w:      :88',
+            '88:     :w:      :88',
+            '88(\   /:w:\    /)88',
+            ':\8(\ /):w:(\  /)8/:',
+            'ww\8:/)8:w:8(\ :8/ww',
+            'ww:8()88(:)88(\:8:ww',
+            'ww:88888888888()8:ww',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # Priest Quarters
+        new_floor_plan = (
             '::::::::::::::::::::',
+            ':  ?:   :       :ww:',
+            ':   :   :       :ww:',
+            ':   :   :     /::ww:',
+            ':   :   :     : (:::',
+            ': :::: ::::: :)    :',
+            ':                  :',
+            ':              /::::',
+            '::::D:::\      :   :',
+            ':)     (:      :   :',
+            ':       :          :',
+            ':       :      :   :',
+            ':      B:      :::::',
+            '::     ::     /)   :',
+            ':B      :     :    :',
+            ':       :     :    :',
+            ':       :     :    :',
+            ':       :     D    :',
+            ':\  :  /: :\B/:    :',
+            ':::::::::S::::::::::',
 
         )
 
@@ -1777,7 +1832,12 @@ class FloorBuilder:
 
         logging.info("Started loading floor configs...")
 
+
+
         # id,name,treasures,traps,keys,monsters(1,2,3),secrets
+
+
+        # Forest World - Start
         new_floor_data = (0,"Ancient Woods",5,0,0,(0,5,0),0)
 
         # The Chapel
@@ -1794,10 +1854,15 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         # The Temple
-        new_floor_data = (20,"The Forest Temple",0,0,1,(6,0,0),0)
+        new_floor_data = (20,"The Forest Temple",5,2,1,(6,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (21,"The Colonnade",0,4,1,(6,0,0),1)
+        new_floor_data = (21,"The Colonnade",5,4,1,(6,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (22,"The Shrine of the Snake God",5,4,1,(6,0,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (23,"Priest Quarters",5,4,1,(6,0,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+
 
         # The Ruins
         new_floor_data = (30,"The Ruins",4,5,0,(0,5,0),0)
@@ -1870,7 +1935,7 @@ class LevelBuilder:
 
         logging.info("Starting loading Level Data...")
 
-        new_level_data = (1, "Forest World", (0,1,2,3,4,5,20,30,50,51,52,53),"forest")
+        new_level_data = (1, "Forest World", (0,1,2,3,4,5,20,21,22,23,30,50,51,52,53),"forest")
         self.level_data[1] = new_level_data
 
         new_level_data = (2, "Winter World", (100,101),"winter")
