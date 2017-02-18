@@ -189,7 +189,7 @@ class Game:
 
             self.get_current_floor().add_player(self.get_current_player(), position = Floor.ENTRANCE)
         else:
-            self.add_status_message("You need to complete this level first!")
+            self.add_status_message("{0} level not yet completed!".format(self.get_current_level().name))
 
     def previous_level(self):
 
@@ -612,9 +612,9 @@ class Game:
 
         logging.info("Ticking {0}...".format(self.name))
 
-        self.update_status_messages()
-
         self.tick_count += 1
+
+        self.update_status_messages()
 
         self.get_current_floor().tick()
 

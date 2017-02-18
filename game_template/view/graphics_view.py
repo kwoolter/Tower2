@@ -226,7 +226,7 @@ class StatusBar(View):
     BG_COLOUR = Colours.BLACK
     ICON_WIDTH = 40
     PADDING = 40
-    STATUS_TEXT_FONT_SIZE = 20
+    STATUS_TEXT_FONT_SIZE = 24
     MESSAGE_TICK_DURATION = 5
 
     def __init__(self, width: int, height: int):
