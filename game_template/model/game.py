@@ -289,6 +289,7 @@ class Game:
         current_player = self.get_current_player()
 
         current_floor.move_player(dx, dy)
+        self.check_collision()
 
         tile = current_floor.get_player_tile()
 
@@ -485,7 +486,7 @@ class Game:
 
     def check_collision(self):
 
-        # Check if the player has collided with an enemy?
+         # Check if the player has collided with an enemy?
         if self.get_current_floor().is_collision() is True:
 
             print("collision!")
@@ -593,6 +594,9 @@ class Game:
         self.tick_count += 1
 
         self.get_current_floor().tick()
+
+        # If the player has collided then take damage
+        self.check_collision()
 
         if self.tick_count % Game.EFFECT_COUNTDOWN_RATE == 0:
             expired_effects = []
@@ -744,12 +748,14 @@ class Tiles:
     # Define Tiles
     # Cut and Paste
     BANG = '$'
-    BEACH = 'b'
+    TILE1 = '`'
+    TILE2 = '¬'
+    TILE3 = '.'
+    TILE4 = '~'
     BOMB = 'q'
     BOMB_LIT = 'Q'
     BOSS_DOOR = 'd'
     BRAZIER = 'B'
-    CLOUD = '.'
     DECORATION1 = 'z'
     DECORATION2 = 'Z'
     DOOR = 'D'
@@ -782,7 +788,6 @@ class Tiles:
     SHIELD = 'O'
     SHOP = 's'
     SHOP_KEEPER = 'SHOP'
-    SKY = '~'
     SOUTH = 'S'
     START_POSITON = '='
     SWITCH = ','
@@ -803,17 +808,18 @@ class Tiles:
     WALL_BR = ')'
     WALL_TL = '/'
     WALL_TR = '\\'
-    WATER = 'w'
+    WALL2 = 'w'
     WEAPON = '|'
     WEST = 'W'
 
     MONSTERS = (MONSTER1, MONSTER2, MONSTER3)
     EXPLODABLES = (BOMB_LIT)
+    FLOOR_TILES = (TILE1, TILE2, TILE3, TILE4)
     INDESTRUCTIBLE_ITEMS = (KEY, TREE, TROPHY, NORTH, SOUTH, EAST, WEST, UP, DOWN, SHOP)
     TRAPS = (TRAP1, TRAP2, TRAP3)
     RUNES = (RUNE1, RUNE2, RUNE3, RUNE4, RUNE5)
-    MONSTER_EMPTY_TILES = (EMPTY, PLAYER)
-    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WATER, BRAZIER, RUNE)
+    MONSTER_EMPTY_TILES = (EMPTY, PLAYER) + FLOOR_TILES
+    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WALL2, BRAZIER, RUNE)
     PLAYER_DOT_TILES = (DOT1, DOT2)
     PLAYER_EQUIPABLE_ITEMS = (WEAPON, SHIELD, RED_POTION, BOMB)
     SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
@@ -1546,8 +1552,8 @@ class FloorBuilder:
             'ww:        :wwww:B  ',
             'w::\    :  ::www::  ',
             '::::::  :  (:::::)  ',
-            'W    :  :          E',
-            'M    :  (\          ',
+            'W````:  :  ``````` E',
+            '`````:  (\ ```````  ',
             '::::D:   (:::::::\  ',
             'w::) (\   (::www::  ',
             'ww:   (:   :wwww:B  ',
@@ -1555,7 +1561,7 @@ class FloorBuilder:
             'Tww:\     /:w T     ',
             '  ww::::::::w   T   ',
             '   wwwwwwwwww       ',
-            ' T    wwww        T ',
+            ' T    wwww     T  T ',
             '                    ',
 
         )
@@ -1642,6 +1648,34 @@ class FloorBuilder:
             ':       :     D    :',
             ':\  :  /: :\B/:    :',
             ':::::::::S::::::::::',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # Altar of Sacrifice
+        new_floor_plan = (
+            'www::::::::::::::www',
+            'ww:)      :   (z:www',
+            'w:)       :    (:www',
+            ':)        :     (:ww',
+            ':    T  /:::\    :ww',
+            ': :    B) : (B   (:w',
+            ':j:       D       :w',
+            '::)       :       (:',
+            ':    T  :::::  T    ',
+            ':M      :www:      E',
+            ':       :www:       ',
+            '::\  T  :::::  T  /:',
+            ':j:       :       :w',
+            ': :       D      /:w',
+            ':      B\ : /B   :ww',
+            ':    T  (:::)   /:ww',
+            ':\        :     :www',
+            'w:\       :    /:www',
+            'ww:\      :   /z:www',
+            'www::::::::::::::www',
 
         )
 
@@ -1862,6 +1896,8 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (23,"Priest Quarters",5,4,1,(6,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (24,"Altar of Sacrifice",5,4,1,(6,0,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
 
 
         # The Ruins
@@ -1935,7 +1971,7 @@ class LevelBuilder:
 
         logging.info("Starting loading Level Data...")
 
-        new_level_data = (1, "Forest World", (0,1,2,3,4,5,20,21,22,23,30,50,51,52,53),"forest")
+        new_level_data = (1, "Forest World", (0,1,2,3,4,5,20,21,22,23,24,30,50,51,52,53),"forest")
         self.level_data[1] = new_level_data
 
         new_level_data = (2, "Winter World", (100,101),"winter")

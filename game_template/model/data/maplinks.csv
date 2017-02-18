@@ -10,6 +10,7 @@ FromID,ToID,Direction,Description,Lockable,Locked,LockedDescription,Reversible,H
 20,21,WEST,through a door,,,,,
 21,22,SOUTH,through an archway,,,,,
 21,23,NORTH,through a door,,,,,
+21,24,WEST,through a door,,,,,
 50,51,UP,some stone steps,,,,,
 51,52,UP,some stone steps,,,,,
 52,53,UP,some stone steps,,,,,

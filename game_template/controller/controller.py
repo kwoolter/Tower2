@@ -172,8 +172,7 @@ class Controller:
                         elif event.key in (K_RIGHT, K_d):
                             self.game.move_player(1, 0)
 
-                        # If the player has collided then take damage
-                        self.game.check_collision()
+
 
                     # If we are in Inventory mode...
                     elif self.mode == Controller.INVENTORY:
