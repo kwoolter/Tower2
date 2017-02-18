@@ -226,6 +226,8 @@ class StatusBar(View):
     BG_COLOUR = Colours.BLACK
     ICON_WIDTH = 40
     PADDING = 40
+    STATUS_TEXT_FONT_SIZE = 20
+    MESSAGE_TICK_DURATION = 5
 
     def __init__(self, width: int, height: int):
 
@@ -242,27 +244,31 @@ class StatusBar(View):
         self.game = game
         self.title = game.name
         self.current_message_number = 0
-        for i in range(4):
-            self.status_messages.append("Msg {0}".format(i))
+
 
     def tick(self):
 
         super(StatusBar, self).tick()
 
-        self.current_message_number += 1
-        if self.current_message_number >= len(self.status_messages):
-            self.current_message_number = 0
+        self.status_messages = list(self.game.status_messages.keys())
+
+        if self.tick_count % StatusBar.MESSAGE_TICK_DURATION == 0:
+
+            self.current_message_number += 1
+            if self.current_message_number >= len(self.status_messages):
+                self.current_message_number = 0
 
     def draw(self):
 
+
         self.surface.fill(StatusBar.BG_COLOUR)
 
-        self.status_messages = []
-        self.status_messages.append("{0}".format(self.game.state))
+        if len(self.status_messages) == 0 or self.current_message_number >= len(self.status_messages):
+            msg = "{0}".format(self.game.state)
+        else:
+            msg = self.status_messages[self.current_message_number]
 
         pane_rect = self.surface.get_rect()
-
-        msg = self.status_messages[self.current_message_number]
 
         draw_text(self.surface,
                   msg=msg,
@@ -270,7 +276,7 @@ class StatusBar(View):
                   y=int(pane_rect.height / 2),
                   fg_colour=StatusBar.FG_COLOUR,
                   bg_colour=StatusBar.BG_COLOUR,
-                  size=pane_rect.height)
+                  size=StatusBar.STATUS_TEXT_FONT_SIZE)
 
         if self.game.state == model.Game.PLAYING:
 

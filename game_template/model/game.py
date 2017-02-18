@@ -79,6 +79,9 @@ class Game:
     GAME_OVER = "GAME OVER"
     END = "END"
     EFFECT_COUNTDOWN_RATE = 4
+    TARGET_RUNE_COUNT = 5
+    MAX_STATUS_MESSAGES = 5
+    STATUS_MESSAGE_LIFETIME = 6
 
     DATA_FILES_DIR = os.path.dirname(__file__) + "\\data\\"
 
@@ -89,6 +92,7 @@ class Game:
         self._state = Game.LOADED
         self.game_start = None
         self.tick_count = 0
+        self.status_messages = {}
         self.current_shop_keeper = None
 
         self.hst = utils.HighScoreTable(self.name)
@@ -169,17 +173,23 @@ class Game:
 
     def next_level(self):
 
-        level_ids = sorted(self.level_factory.levels.keys())
-        index = level_ids.index(self.current_level_id)
-        index += 1
-        if index >= len(level_ids):
-            index = 0
+        # If you have completed the current level...
+        if self.is_level_complete(self.get_current_player(), self.current_level_id) == True:
 
-        self.current_level_id = level_ids[index]
+            # Get the id of the next level....
+            level_ids = sorted(self.level_factory.levels.keys())
+            index = level_ids.index(self.current_level_id)
+            index += 1
+            if index >= len(level_ids):
+                index = 0
 
-        self.current_floor_id = min(self.get_current_level().floors.keys())
+            self.current_level_id = level_ids[index]
 
-        self.get_current_floor().add_player(self.get_current_player(), position = Floor.ENTRANCE)
+            self.current_floor_id = min(self.get_current_level().floors.keys())
+
+            self.get_current_floor().add_player(self.get_current_player(), position = Floor.ENTRANCE)
+        else:
+            self.add_status_message("You need to complete this level first!")
 
     def previous_level(self):
 
@@ -194,6 +204,15 @@ class Game:
         self.current_floor_id = max(self.get_current_level().floors.keys())
 
         self.get_current_floor().add_player(self.get_current_player(), position = Floor.EXIT)
+
+    def is_level_complete(self, player : Player, level_id : int):
+        complete = False
+
+        if len(player.runes) >= Game.TARGET_RUNE_COUNT:
+            complete = True
+
+
+        return complete
 
     def enter_shop(self):
         self._state = Game.SHOPPING
@@ -351,7 +370,8 @@ class Game:
                                                              Tiles.TREASURE10, Tiles.TREASURE25]))
                 print("...and you opened it!")
             else:
-                print("...but you don't have a key to open it!")
+                print("You don't have a key to open it!")
+                self.add_status_message("You don't have a key to open it!")
 
             current_player.back()
 
@@ -385,6 +405,7 @@ class Game:
                 print("...and you opened it!")
             else:
                 current_player.back()
+                self.add_status_message("The door is locked!")
                 print("...but the door is locked!")
 
         elif tile == Tiles.NEXT_LEVEL:
@@ -468,7 +489,7 @@ class Game:
             and current_level.id in current_player.treasure_maps.keys():
 
             # See if the player has the exact map for the secret...
-            # ...and there are stil some runes to find...
+            # ...and there are still some runes to find...
             found_maps = current_player.treasure_maps[current_level.id]
 
             if (current_floor.id, (pos)) in found_maps and len(self.hidden_runes) > 0:
@@ -591,6 +612,8 @@ class Game:
 
         logging.info("Ticking {0}...".format(self.name))
 
+        self.update_status_messages()
+
         self.tick_count += 1
 
         self.get_current_floor().tick()
@@ -609,6 +632,26 @@ class Game:
 
             for effect in expired_effects:
                 del self.effects[effect]
+
+    def add_status_message(self, new_msg : str):
+        self.status_messages[new_msg] = Game.STATUS_MESSAGE_LIFETIME
+
+    def update_status_messages(self):
+
+        expired_msgs = []
+
+        for msg, count in self.status_messages.items():
+            count -= 1
+            if count < 0:
+                expired_msgs.append(msg)
+            else:
+                self.status_messages[msg] = count
+                print("{0} ({1})".format(msg,count))
+
+        for msg in expired_msgs:
+            del self.status_messages[msg]
+
+
 
     def get_scores(self):
 

@@ -203,6 +203,7 @@ class Controller:
                             try:
                                 self.game.shop.buy_item(self.view.shop_view.shop_keeper_inventory.get_current_selection(), self.game.get_current_player())
                             except Exception as err:
+                                self.game.add_status_message(str(err))
                                 print(str(err))
 
             FPSCLOCK.tick(30)
