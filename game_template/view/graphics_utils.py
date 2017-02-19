@@ -107,7 +107,7 @@ class ImageManager:
                                     model.Tiles.TREASURE_CHEST: "treasure_chest.png",
                                     model.Tiles.TREE: "forest_tree.png",
                                     model.Tiles.MONSTER1: ("skeleton1.png", "skeleton2.png","skeleton1.png","skeleton3.png" ),
-                                    model.Tiles.MONSTER2: ("goblin1.png", "goblin2.png"),
+                                    model.Tiles.MONSTER2: ("goblin1.png", "goblin2.png","goblin1.png", "goblin3.png"),
                                     model.Tiles.MONSTER3: ("skeleton1.png", "skeleton2.png"),
                                     model.Tiles.TRAP1: ("empty.png","spike0.png","spike1.png","spike2.png","spike3.png",
                                                         "spike2.png","spike1.png","spike0.png"),
@@ -131,7 +131,8 @@ class ImageManager:
                                     model.Tiles.WALL_TL: "ice_wall_tl.png",
                                     model.Tiles.WALL_BR: "ice_wall_br.png",
                                     model.Tiles.WALL_BL: "ice_wall_bl.png",
-                                    model.Tiles.TREASURE: "treasure1.png",
+                                    model.Tiles.TREASURE: "treasure_blue.png",
+                                    model.Tiles.MONSTER1: ("snow_beast.png", "snow_beast.png"),
                                     model.Tiles.DOT1: ("ice.png"),
                                     model.Tiles.TREE: "winter_tree.png"
                                     })
@@ -148,7 +149,7 @@ class ImageManager:
                                     model.Tiles.DOOR: "door.png",
                                     model.Tiles.TREASURE: ("treasure.png","treasure2.png","treasure3.png","treasure2.png"),
                                     model.Tiles.TREE: "forest_tree.png",
-                                    model.Tiles.MONSTER1: ("goblin1.png", "goblin2.png"),
+                                    model.Tiles.MONSTER1: ("goblin1.png", "goblin2.png","goblin1.png", "goblin3.png"),
                                     model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png","skeleton1.png","skeleton3.png" ),
                                     model.Tiles.MONSTER3: ("eye1.png", "eye2.png", "eye3.png", "eye2.png","eye4.png", "eye2.png"),
                                     })

@@ -227,7 +227,7 @@ class StatusBar(View):
     ICON_WIDTH = 40
     PADDING = 40
     STATUS_TEXT_FONT_SIZE = 24
-    MESSAGE_TICK_DURATION = 10
+    MESSAGE_TICK_DURATION = 7
 
     def __init__(self, width: int, height: int):
 
@@ -469,7 +469,7 @@ class GameOverView(View):
         x = pane_rect.centerx
 
         if self.game.is_game_complete() is True:
-            text = "G A M E   C O M P L E T E"
+            text = "A D V E N T U R E     C O M P L E T E D"
             fg_colour = Colours.GOLD
         else:
             text = "G A M E    O V E R"
@@ -523,8 +523,10 @@ class GameOverView(View):
 
         if self.game.is_game_complete() is True:
             tile_name = model.Tiles.PLAYER
+            tile_name2 = model.Tiles.SHOP_KEEPER
         else:
             tile_name = model.Tiles.MONSTER1
+            tile_name2 = model.Tiles.MONSTER2
 
         image = View.image_manager.get_skin_image(tile_name, tick=self.tick_count)
 
@@ -533,7 +535,7 @@ class GameOverView(View):
         image = pygame.transform.scale(image, (image_width,image_height))
         self.surface.blit(image,(x,y))
 
-        image = View.image_manager.get_skin_image(model.Tiles.MONSTER2, tick=self.tick_count)
+        image = View.image_manager.get_skin_image(tile_name2, tick=self.tick_count)
         image = pygame.transform.scale(image, (image_width,image_height))
 
         y = 20 + GameOverView.SCORE_TEXT_SIZE
@@ -976,9 +978,9 @@ class CharacterView(View):
                   bg_colour=CharacterView.BG_COLOUR)
 
         y+=20
-        x = pane_rect.centerx - int(len(self.player.runes)*(CharacterView.ICON_WIDTH + CharacterView.ICON_PADDING))/2
 
         if current_level.id in self.player.runes.keys() and len(self.player.runes[current_level.id]) > 0:
+            x = pane_rect.centerx - int(len(self.player.runes[current_level.id]) * (CharacterView.ICON_WIDTH + CharacterView.ICON_PADDING)) / 2
             for rune in self.player.runes[current_level.id]:
                 image = self.image_manager.get_skin_image(rune, skin_name=self.game.get_level(current_level.id).skin_name)
                 self.surface.blit(image, (x, y))
