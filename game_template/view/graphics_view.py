@@ -282,7 +282,6 @@ class StatusBar(View):
 
             player = self.game.get_current_player()
 
-
             y = pane_rect.top + 4
             x = 0
 
@@ -310,7 +309,7 @@ class StatusBar(View):
             draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.TREASURE, count=player.treasure)
 
             x += StatusBar.ICON_WIDTH
-            draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.TROPHY, count=player.trophies)
+            draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.RUNE, count=player.runes_collected(self.game.get_current_level().id))
 
 
 
@@ -979,8 +978,10 @@ class CharacterView(View):
 
         y+=20
 
-        if current_level.id in self.player.runes.keys() and len(self.player.runes[current_level.id]) > 0:
-            x = pane_rect.centerx - int(len(self.player.runes[current_level.id]) * (CharacterView.ICON_WIDTH + CharacterView.ICON_PADDING)) / 2
+        runes_collected = self.game.get_current_player().runes_collected(current_level.id)
+
+        if runes_collected > 0:
+            x = pane_rect.centerx - int(runes_collected * (CharacterView.ICON_WIDTH + CharacterView.ICON_PADDING)) / 2
             for rune in self.player.runes[current_level.id]:
                 image = self.image_manager.get_skin_image(rune, skin_name=self.game.get_level(current_level.id).skin_name)
                 self.surface.blit(image, (x, y))

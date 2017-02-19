@@ -81,6 +81,19 @@ class Player():
         level_runes = self.runes[level_id]
         level_runes.append(rune)
 
+    def runes_collected(self, level_id : None):
+
+        rune_count = 0
+
+        if level_id is None:
+            for runes in self.runes.values():
+                rune_count += len(runes)
+
+        elif level_id in self.runes.keys():
+            rune_count = len(self.runes[level_id])
+
+        return rune_count
+
 
 class Game:
 
@@ -691,7 +704,6 @@ class Game:
                 expired_msgs.append(msg)
             else:
                 self.status_messages[msg] = count
-                print("{0} ({1})".format(msg,count))
 
         for msg in expired_msgs:
             del self.status_messages[msg]
@@ -723,7 +735,8 @@ class Game:
 
         self.player_scores[player.name] = player.score
 
-        self.hst.add(self.get_current_player().name, self.get_current_player().score)
+        self.hst.add(player.name, player.score)
+        self.hst.save()
 
         self._state=Game.GAME_OVER
 
@@ -2024,7 +2037,7 @@ class FloorBuilder:
 
 
         # Forest World - Start
-        new_floor_data = (0,"Ancient Woods",5,0,0,(0,5,0),0)
+        new_floor_data = (0,"Ancient Woods",5,0,0,(0,5,2),0)
 
         # The Chapel
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -2070,7 +2083,7 @@ class FloorBuilder:
 
         # id,name,treasures,traps,keys,monsters(1,2,3),secrets
 
-        new_floor_data = (100,"Frozen Forest",2,3,0,(1,1,1),0)
+        new_floor_data = (100,"Frozen Forest",2,3,1,(1,1,1),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (101,"End",2,3,0,(1,1,1),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
