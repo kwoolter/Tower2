@@ -105,9 +105,9 @@ class Game:
     GAME_OVER = "GAME OVER"
     END = "END"
     EFFECT_COUNTDOWN_RATE = 4
-    TARGET_RUNE_COUNT = 0
+    TARGET_RUNE_COUNT = 4
     MAX_STATUS_MESSAGES = 5
-    STATUS_MESSAGE_LIFETIME = 10
+    STATUS_MESSAGE_LIFETIME = 8
 
     DATA_FILES_DIR = os.path.dirname(__file__) + "\\data\\"
 
@@ -305,9 +305,6 @@ class Game:
         self.maps = trpg.MapFactory(self.locations)
         self.maps.load("RuneQuest", 1, Game.DATA_FILES_DIR + "maplinks.csv")
         self.current_map = self.maps.get_map(1)
-
-        self.current_map.print()
-
 
     def add_player(self, new_player : Player):
 
@@ -1005,7 +1002,7 @@ class FloorPlan:
 
         if tile_name in FloorPlan.EXIT_TO_DIRECTION.keys():
             self.exits[FloorPlan.EXIT_TO_DIRECTION[tile_name]] = (x, y)
-            print("Floor Plan {0} - set {1} exit at ({2},{3}).".format(self.id, FloorPlan.EXIT_TO_DIRECTION[tile_name], x,y))
+            #print("Floor Plan {0} - set {1} exit at ({2},{3}).".format(self.id, FloorPlan.EXIT_TO_DIRECTION[tile_name], x,y))
         elif tile_name == Tiles.START_POSITION and self.entrance is None:
             self.entrance = (x,y)
             self.plan[x][y] = Tiles.EMPTY
@@ -1015,7 +1012,7 @@ class FloorPlan:
             self.entrance = (x,y)
         elif tile_name == Tiles.SECRET_TREASURE:
             self.secret = (x,y)
-            print("Floor Plan {2} - set secret at {0},{1}".format(x,y, self.id))
+            #print("Floor Plan {2} - set secret at {0},{1}".format(x,y, self.id))
 
     # Build a safety zone around a specified location
     def safety_zone(self, x, y, height, width):
@@ -1448,7 +1445,6 @@ class FloorBuilder:
     def load_floor_plans(self):
 
         logging.info("Starting loading floor plans...")
-
 
         new_floor_plan = [
             '         N          ',

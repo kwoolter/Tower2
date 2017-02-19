@@ -732,8 +732,7 @@ class InventoryView(View):
     ICON_PRICE_PADDING = ICON_WIDTH + 20
 
     ITEMS = (model.Tiles.TREASURE, model.Tiles.KEY, model.Tiles.RED_POTION,
-             model.Tiles.WEAPON, model.Tiles.SHIELD, model.Tiles.BOMB,
-             model.Tiles.MAP)
+             model.Tiles.WEAPON, model.Tiles.SHIELD, model.Tiles.BOMB)
 
     def __init__(self, width : int, height : int, tile_width : int = ICON_WIDTH, tile_height : int = ICON_HEIGHT):
 
@@ -856,14 +855,6 @@ class InventoryView(View):
         item_type = InventoryView.ITEMS[item_index]
         y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
         draw_icon(self.surface, x=x, y=y, icon_name=item_type, count=self.player.bombs)
-        if self.item_prices is not None and item_type in self.item_prices.keys():
-            item_price = self.item_prices[item_type]
-            draw_icon(self.surface, x=x + InventoryView.ICON_PRICE_PADDING, y=y, icon_name=model.Tiles.TREASURE, count=item_price)
-
-        item_index += 1
-        item_type = InventoryView.ITEMS[item_index]
-        y += InventoryView.ICON_HEIGHT + InventoryView.ICON_PADDING
-        draw_icon(self.surface, x=x, y=y, icon_name=item_type, count=self.player.maps)
         if self.item_prices is not None and item_type in self.item_prices.keys():
             item_price = self.item_prices[item_type]
             draw_icon(self.surface, x=x + InventoryView.ICON_PRICE_PADDING, y=y, icon_name=model.Tiles.TREASURE, count=item_price)
