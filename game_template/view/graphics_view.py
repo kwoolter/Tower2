@@ -227,7 +227,7 @@ class StatusBar(View):
     ICON_WIDTH = 40
     PADDING = 40
     STATUS_TEXT_FONT_SIZE = 24
-    MESSAGE_TICK_DURATION = 5
+    MESSAGE_TICK_DURATION = 10
 
     def __init__(self, width: int, height: int):
 
@@ -468,12 +468,19 @@ class GameOverView(View):
         y = 20
         x = pane_rect.centerx
 
+        if self.game.is_game_complete() is True:
+            text = "G A M E   C O M P L E T E"
+            fg_colour = Colours.GOLD
+        else:
+            text = "G A M E    O V E R"
+            fg_colour = GameOverView.FG_COLOUR
+
         draw_text(self.surface,
-                  msg="G A M E    O V E R",
+                  msg=text,
                   x=x,
                   y=y,
                   size=30,
-                  fg_colour=GameOverView.FG_COLOUR,
+                  fg_colour=fg_colour,
                   bg_colour=GameOverView.BG_COLOUR)
 
         y += 30
@@ -514,7 +521,12 @@ class GameOverView(View):
         image_width = 200
         image_height = 200
 
-        image = View.image_manager.get_skin_image(model.Tiles.MONSTER1, tick=self.tick_count)
+        if self.game.is_game_complete() is True:
+            tile_name = model.Tiles.PLAYER
+        else:
+            tile_name = model.Tiles.MONSTER1
+
+        image = View.image_manager.get_skin_image(tile_name, tick=self.tick_count)
 
         x = pane_rect.centerx - int(image_width/2)
         y += 5
@@ -524,7 +536,7 @@ class GameOverView(View):
         image = View.image_manager.get_skin_image(model.Tiles.MONSTER2, tick=self.tick_count)
         image = pygame.transform.scale(image, (image_width,image_height))
 
-        y = 20
+        y = 20 + GameOverView.SCORE_TEXT_SIZE
 
         x = int(pane_rect.width*1/5 - image_width/2)
         self.surface.blit(image,(x,y))
@@ -963,19 +975,14 @@ class CharacterView(View):
                   fg_colour=CharacterView.FG_COLOUR,
                   bg_colour=CharacterView.BG_COLOUR)
 
-
         y+=20
         x = pane_rect.centerx - int(len(self.player.runes)*(CharacterView.ICON_WIDTH + CharacterView.ICON_PADDING))/2
 
-        for rune in self.player.runes:
-            image = self.image_manager.get_skin_image(rune, skin_name="runes")
-            self.surface.blit(image, (x, y))
-
-            x += CharacterView.ICON_WIDTH + CharacterView.ICON_PADDING
-
-
-
-
+        if current_level.id in self.player.runes.keys() and len(self.player.runes[current_level.id]) > 0:
+            for rune in self.player.runes[current_level.id]:
+                image = self.image_manager.get_skin_image(rune, skin_name=self.game.get_level(current_level.id).skin_name)
+                self.surface.blit(image, (x, y))
+                x += CharacterView.ICON_WIDTH + CharacterView.ICON_PADDING
 
 class ShopView(View):
 

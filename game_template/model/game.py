@@ -30,7 +30,7 @@ class Player():
         self.bombs = 0
         self.maps = 0
         self.treasure_maps = {}
-        self.runes = []
+        self.runes = {}
         self.equipment_slots=[]
         self.equipment_slots.append(Tiles.RED_POTION)
         self.equipment_slots.append(Tiles.WEAPON)
@@ -66,7 +66,20 @@ class Player():
 
     @property
     def score(self):
-        return self.kills + self.treasure + (self.trophies * 50)
+
+        rune_count = 0
+        for runes in self.runes.items():
+            rune_count += len(runes)
+
+        return self.kills + self.treasure + (self.trophies * 50) + (rune_count * 50)
+
+    def collect_rune(self, rune : str, level_id : int):
+
+        if level_id not in self.runes.keys():
+            self.runes[level_id] = []
+
+        level_runes = self.runes[level_id]
+        level_runes.append(rune)
 
 
 class Game:
@@ -79,9 +92,9 @@ class Game:
     GAME_OVER = "GAME OVER"
     END = "END"
     EFFECT_COUNTDOWN_RATE = 4
-    TARGET_RUNE_COUNT = 5
+    TARGET_RUNE_COUNT = 0
     MAX_STATUS_MESSAGES = 5
-    STATUS_MESSAGE_LIFETIME = 6
+    STATUS_MESSAGE_LIFETIME = 10
 
     DATA_FILES_DIR = os.path.dirname(__file__) + "\\data\\"
 
@@ -108,6 +121,9 @@ class Game:
     def state(self):
 
         if self._state == Game.PLAYING and self.get_current_player().HP <=0:
+            self.game_over()
+
+        elif self.is_game_complete() is True:
             self.game_over()
 
         return self._state
@@ -176,6 +192,8 @@ class Game:
         # If you have completed the current level...
         if self.is_level_complete(self.get_current_player(), self.current_level_id) == True:
 
+            self.add_status_message("Leaving {0} level...!".format(self.get_current_level().name))
+
             # Get the id of the next level....
             level_ids = sorted(self.level_factory.levels.keys())
             index = level_ids.index(self.current_level_id)
@@ -188,10 +206,16 @@ class Game:
             self.current_floor_id = min(self.get_current_level().floors.keys())
 
             self.get_current_floor().add_player(self.get_current_player(), position = Floor.ENTRANCE)
+
+            self.add_status_message("Heading to {0} level...!".format(self.get_current_level().name))
+
         else:
             self.add_status_message("{0} level not yet completed!".format(self.get_current_level().name))
+            self.get_current_player().back()
 
     def previous_level(self):
+
+        self.add_status_message("Leaving {0} level...!".format(self.get_current_level().name))
 
         level_ids = sorted(self.level_factory.levels.keys())
         index = level_ids.index(self.current_level_id)
@@ -205,12 +229,21 @@ class Game:
 
         self.get_current_floor().add_player(self.get_current_player(), position = Floor.EXIT)
 
+        self.add_status_message("Heading to {0} level...!".format(self.get_current_level().name))
+
     def is_level_complete(self, player : Player, level_id : int):
         complete = False
 
         if len(player.runes) >= Game.TARGET_RUNE_COUNT:
             complete = True
 
+        return complete
+
+    def is_game_complete(self):
+        complete = False
+
+        if self.get_current_player() is not None and self.get_current_player().trophies == self.trophies:
+            complete = True
 
         return complete
 
@@ -336,6 +369,7 @@ class Game:
         elif tile in Tiles.TRAPS:
             current_player.HP -= 1
             current_floor.set_player_tile(Tiles.EMPTY)
+            self.add_status_message("Ouch! You walked into a trap!")
             print("Hit a trap!")
 
         elif tile in Tiles.PLAYER_DOT_TILES:
@@ -345,6 +379,7 @@ class Game:
         elif tile == Tiles.RED_POTION:
             self.use_item(tile, decrement = False)
             current_floor.set_player_tile(Tiles.EMPTY)
+            self.add_status_message("You feel healthier!")
             print("Some HP restored")
 
         elif tile in Tiles.SWAP_TILES.keys():
@@ -359,6 +394,7 @@ class Game:
                 current_player.treasure += 25
             else:
                 current_player.treasure += 1
+            self.add_status_message("You found some treasure!")
             print("You found some treasure!")
 
         elif tile == Tiles.TREASURE_CHEST:
@@ -418,6 +454,8 @@ class Game:
 
         elif tile == Tiles.SHOP:
             self.enter_shop()
+            self.add_status_message("Welcome to the shop!")
+
 
         elif tile == Tiles.MAP:
             level_secrets = current_level.secrets
@@ -437,6 +475,7 @@ class Game:
                     current_player.treasure_maps[current_level.id].append(secret)
                     current_floor.set_player_tile(Tiles.EMPTY)
                     print("You found a secret treasure map!")
+                    self.add_status_message("You found a secret treasure map!")
 
                 else:
                     print("No more secrets to find for this level!")
@@ -467,6 +506,9 @@ class Game:
 
             # If all good move to the new location
             print("You go %s %s..." % (direction.title(), link.description))
+
+            self.add_status_message("You go {0} {1}...".format(direction.title(), link.description))
+
             self.current_floor_id = link.to_id
             self.get_current_floor().add_player(self.get_current_player(), FloorPlan.REVERSE_DIRECTION[direction])
 
@@ -495,13 +537,16 @@ class Game:
             if (current_floor.id, (pos)) in found_maps and len(self.hidden_runes) > 0:
 
                 found_rune = random.choice(self.hidden_runes)
-                current_player.runes.append(found_rune)
+                current_player.collect_rune(found_rune, current_level.id)
                 current_player.back()
                 self.hidden_runes.remove(found_rune)
                 current_floor.treasure_found()
                 current_player.treasure_maps[current_level.id].remove((current_floor.id, (pos)))
                 print("You found the secret treasure {0} and you have now collected {1}.".format(found_rune,
                                                                                                  current_player.runes))
+
+                self.add_status_message("You have found a hidden rune!")
+
             else:
                 print("You haven't got the map for this secret yet.")
 
@@ -528,7 +573,7 @@ class Game:
 
         player = self.get_current_player()
 
-        if self.items_in_inventory(item_type) == 0:
+        if self.items_in_inventory(item_type) == 0 and decrement == True:
             logging.info("Player {0} does not have any items of type {1} in their inventory to use!".format(player.name, item_type))
             return
 
@@ -832,7 +877,7 @@ class Tiles:
     SHOP = 's'
     SHOP_KEEPER = 'SHOP'
     SOUTH = 'S'
-    START_POSITON = '='
+    START_POSITION = '='
     SWITCH = ','
     SWITCH_LIT = '<'
     SWITCH_TILE = '_'
@@ -948,7 +993,7 @@ class FloorPlan:
         if tile_name in FloorPlan.EXIT_TO_DIRECTION.keys():
             self.exits[FloorPlan.EXIT_TO_DIRECTION[tile_name]] = (x, y)
             print("Floor Plan {0} - set {1} exit at ({2},{3}).".format(self.id, FloorPlan.EXIT_TO_DIRECTION[tile_name], x,y))
-        elif tile_name == Tiles.START_POSITON and self.entrance is None:
+        elif tile_name == Tiles.START_POSITION and self.entrance is None:
             self.entrance = (x,y)
             self.plan[x][y] = Tiles.EMPTY
         elif tile_name == Tiles.NEXT_LEVEL and self.exit is None:
@@ -1114,6 +1159,12 @@ class Floor:
             self.player.x = x
             self.player.y = y
 
+        elif self.floor_plan.entrance is not None:
+            x, y = self.floor_plan.entrance
+            self.player.x = x
+            self.player.y = y
+
+
         print("Adding player to entrance at {0},{1}".format(x, y))
 
     def add_explodable(self, tile, x : int, y : int):
@@ -1166,7 +1217,7 @@ class Floor:
 
     def is_collision(self):
 
-        collision_items = list(Tiles.MONSTERS)
+        collision_items = list(Tiles.MONSTERS + Tiles.PLAYER_DOT_TILES)
 
         if self.get_tile(self.player.x, self.player.y) in collision_items:
             return True
@@ -1412,8 +1463,6 @@ class FloorBuilder:
 
         floor_id = 0
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
-        floor_id = 100
-        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
         floor_id = 200
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
         floor_id = 300
@@ -1421,6 +1470,7 @@ class FloorBuilder:
 
         floor_id = 0
 
+        # Chapel
         new_floor_plan = [
             '         N          ',
             ' T           T     T',
@@ -1448,6 +1498,7 @@ class FloorBuilder:
         floor_id += 1
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
+        # Crypt
         new_floor_plan = [
 
             ':::::::::N::::::::::',
@@ -1476,6 +1527,7 @@ class FloorBuilder:
         floor_id += 1
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
+        # Library
         new_floor_plan = [
 
             '::::::::::::::::::::',
@@ -1484,13 +1536,13 @@ class FloorBuilder:
             ':                  :',
             ':    \        /    :',
             ':   B::::::::::B   :',
-            ':         :        :',
-            ':B                B:',
+            ':                :::',
+            ':                Dx:',
             ':::              :::',
-            'W D  ::::::::::  D E',
+            'W D  ::::::::::  Dj:',
             ':::     :        :::',
-            ':B                B:',
-            ':         :        :',
+            ':                Dx:',
+            ':                :::',
             ':   B::::::::::B   :',
             ':    )        (    :',
             ':                  :',
@@ -1504,86 +1556,6 @@ class FloorBuilder:
         floor_id += 1
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
-        new_floor_plan = [
-
-        '::::::::::::::::::::',
-        ':                  :',
-        ':       1          :',
-        ':                  :',
-        ':                  :',
-        ':  -            2  :',
-        ':                  :',
-        ':                  :',
-        '::::\    /\    /::::',
-        'D        ()        D',
-        '::::)          (::::',
-        ':                  :',
-        ':      3           :',
-        ':                 +:',
-        ':                  :',
-        ':                  :',
-        ':                  :',
-        ':       1          :',
-        ':                  :',
-        '::::::::::::::::::::',
-        ]
-
-        floor_id += 1
-
-        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
-
-        new_floor_plan = [
-
-        '::::::::::::::::::::',
-        ':                  :',
-        ':       1          :',
-        ':                  :',
-        ':  :::::    :::::  :',
-        ':  :   ;    :   :  :',
-        ':  :   :     B  : L:',
-        ':  :   :        :  :',
-        ':  :   B        :  :',
-        'D  :            :  D',
-        '::::            ::::',
-        ':       B:::B      :',
-        ':        (:)       :',
-        ':         :        :',
-        ': -       : 1  1   :',
-        ':         :        :',
-        ':         :        :',
-        ':       1 :        :',
-        ':         :        :',
-        '::::::::::::::::::::',
-        ]
-
-
-        floor_id += 1
-
-        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
-
-        new_floor_plan = [
-
-        '::::::::::::::::::::',
-        ':        = MMMM    :',
-        ':                  :',
-        ':      T   T       :',
-        ':  T               :',
-        ':    T T      z    :',
-        ':                  :',
-        ':    T      z      :',
-        ':::Z      z     Z:::',
-        '+ D              D  ',
-        ':::Z            Z:::',
-        ':                  :',
-        ': z                :',
-        ':            T     :',
-        ':   T              :',
-        ': T                :',
-        ':     T       ?    :',
-        ':                  :',
-        ':                  :',
-        '::::::::::::::::::::',
-        ]
         # The Forest Temple
         new_floor_plan = (
             '             T      ',
@@ -1606,10 +1578,7 @@ class FloorBuilder:
             '   wwwwwwwwww       ',
             ' T    wwww     T  T ',
             '                    ',
-
         )
-
-
 
         floor_id = 20
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
@@ -1753,11 +1722,40 @@ class FloorBuilder:
         floor_id = 30
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
+
+        # The Tomb
+        new_floor_plan = (
+            '::::::)  /wwww::::::',
+            ':   D    :wwww:   (:',
+            ':   :    :wwww:    :',
+            ':   :    :wwww:    :',
+            ':   ;    (::::)  /::',
+            ':j  :           ::ww',
+            '::::)           wwww',
+            ':M`:          www::w',
+            ':``:   :::   ww:::::',
+            ':``:   :+:  www:```:',
+            ':D::  /: :\   ww```:',
+            ':  :   B B     ww``:',
+            ':  (:          ww:::',
+            ':              :wwww',
+            ':              :::ww',
+            ':      ::      ::www',
+            ':       :     /:ww::',
+            ':   :\  :     :ww:::',
+            ':   ::  :    /:ww:z:',
+            ':::::::::::::::ww:::',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
         # The old Tower
         new_floor_plan = (
             ' T  T  T T   TT  TT ',
             'T TT TT T TT T TT  T',
-            'T T   T   T T   TT  ',
+            'T T = T   T T   TT  ',
             'T                 T ',
             ' T       :::   T   T',
             'T   T   :::::     T ',
@@ -1865,8 +1863,89 @@ class FloorBuilder:
         floor_id += 1
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
-        floor_id = 101
+        # The Tower Top
+        new_floor_plan = (
+            '~~~~~~~~~~~.~~~~~~~~',
+            '~~.~~~~~.~~~~~~.~~~~',
+            '~~~~~.~~~~~~.~~~~~~~',
+            '~~~~~~~~~~~~~~~~~.~~',
+            '.~~~~:::::::::~~~~~~',
+            '~~~~:: j:-:j=::~.~~~',
+            '~.~~:   : :   :~~~~~',
+            '~~~~:  :: ::  :~~~.~',
+            '~~~~:         :~~~~~',
+            '~~~~:         :~~.~~',
+            '~~~~:         :~~~~~',
+            '~~.~:    M    :~.~~~',
+            '.~~~: xx:+:xx :~~~.~',
+            '~~~~:: ::::: ::~~~~~',
+            '~~~~~:::::::::~~~~~~',
+            '~~.~~~~~~~~~~~~~~.~~',
+            '~~~~~~~.~~.~~~.~~~~~',
+            '~~~~.~~~~~~~~~~~~~~~',
+            '~.~~~~~~~~~.~~~~.~~~',
+            '~~~~~~.~~~~~~~~~~~~~',
 
+        )
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # Portal1
+        new_floor_plan = [
+
+            '::::::::::::::::::::',
+            ':)     : j :      (:',
+            ':      :   :       :',
+            ':      (:D:)       :',
+            ':                  :',
+            ':R                 :',
+            ':B  B              :',
+            ':::::        B:\   :',
+            ':````          (\ /:',
+            ':````           (:::',
+            ':`L``=           88E',
+            ':````           /:::',
+            ':````          /) (:',
+            ':::::        B:)   :',
+            ':B  B              :',
+            ':x                 :',
+            ':      /:D:\       :',
+            ':      :   :       :',
+            ':\     : j :      /:',
+            '::::::::::::::::::::',
+
+        ]
+
+        floor_id = 99
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+
+        # The Start of ICE Level
+        new_floor_plan = (
+            '!!!!:::::N::     !!!',
+            '!! !!:    :      :!!',
+            '!           T   :::!',
+            ' T      T        ::!',
+            '                T : ',
+            '    T               ',
+            ': T      T         !',
+            'W                  !',
+            '::       :  T      w',
+            ':       /:\      www',
+            '!   T   wlw        E',
+            '!      ww=ww     www',
+            '        w w    T  !w',
+            ' T /:\            !!',
+            '   wsw    T       !:',
+            '   w8w            ::',
+            '   B8B  T    T   T !',
+            '!                  !',
+            '::     !:       :  !',
+            ':::   !!:S::   :::!!',
+
+        )
+
+        floor_id = 100
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
         new_floor_plan = (
@@ -1889,7 +1968,7 @@ class FloorBuilder:
         ':         :        :',
         ':         :        :',
         ':       1 :        :',
-        ':         : G      :',
+        ':         :        :',
         '::::::::::::::::::::',
         )
 
@@ -1900,6 +1979,35 @@ class FloorBuilder:
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
         floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+
+        new_floor_plan = (
+
+            '::::::::::::::::::::',
+            ':        :         :',
+            ':        :         :',
+            ':       /:\        :',
+            ':        L         :',
+            ':                  :',
+            ':     B     B      :',
+            ':                  :',
+            ':     B     B      :',
+            ':                  :',
+            ':     B     B      :',
+            ':        `         :',
+            ':     B  `  B      :',
+            ':        `         :',
+            ':        `         :',
+            ':     /\ ` /\      :',
+            ':     :`````:      :',
+            ':     :`````:      :',
+            ':    /:``G``:\     :',
+            '::::::::::::::::::::',
+
+        )
+
+        floor_id = 1000
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
 
@@ -1925,9 +2033,7 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (3, "Library of Zastaross",2,3,2,(4,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (4,"Floor 4",5,3,0,(0,5,0),1)
-        self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (5,"Floor 5",5,3,0,(0,5,0),1)
+        new_floor_data = (99,"Portal Between Worlds",5,3,0,(0,5,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         # The Temple
@@ -1942,9 +2048,10 @@ class FloorBuilder:
         new_floor_data = (24,"Altar of Sacrifice",5,4,1,(6,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
-
         # The Ruins
-        new_floor_data = (30,"The Ruins",4,5,0,(0,5,0),0)
+        new_floor_data = (30,"The Ruins",4,5,1,(0,5,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (31,"Tomb of the Fallen Knight",4,5,0,(0,5,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         # The Old Tower
@@ -1956,9 +2063,13 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (53,"The Guard House",3,3,0,(5,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (54,"The Tower Top",0,0,0,(0,0,0),0)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
 
 
-        new_floor_data = (100,"Home straight",2,3,0,(1,1,1),1)
+        # id,name,treasures,traps,keys,monsters(1,2,3),secrets
+
+        new_floor_data = (100,"Frozen Forest",2,3,0,(1,1,1),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (101,"End",2,3,0,(1,1,1),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -1967,6 +2078,9 @@ class FloorBuilder:
         new_floor_data = (200, "The Woods",7,4,0,(7,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (201, "The Copse",7,4,0,(2,7,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+
+        new_floor_data = (1000, "The END",0,0,0,(0,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         logging.info("Finished loading floor configs. {0} floor configs loaded.".format(len(self.floor_configs.keys())))
@@ -2014,7 +2128,7 @@ class LevelBuilder:
 
         logging.info("Starting loading Level Data...")
 
-        new_level_data = (1, "Forest World", (0,1,2,3,4,5,20,21,22,23,24,30,50,51,52,53),"forest")
+        new_level_data = (1, "Forest World", (0,1,2,3,20,21,22,23,24,30,31,50,51,52,53,54,99),"forest")
         self.level_data[1] = new_level_data
 
         new_level_data = (2, "Winter World", (100,101),"winter")
@@ -2022,6 +2136,9 @@ class LevelBuilder:
 
         new_level_data = (3, "Squirrel World", (200,201),"squirrel")
         self.level_data[3] = new_level_data
+
+        new_level_data = (100, "The End", (1000,1000),"forest")
+        self.level_data[100] = new_level_data
 
         logging.info("Finished Loading Level Data. {0} levels loaded.".format(len(self.level_data.keys())))
 
@@ -2051,6 +2168,8 @@ class LevelBuilder:
 
         if level_id in self.levels.keys():
             level = self.levels[level_id]
+        else:
+            raise Exception("Level {0} does not exist!".format(level_id))
 
         return level
 
@@ -2059,5 +2178,8 @@ class LevelBuilder:
 
         if floor_id in self.floor_builder.floors.keys():
             floor = self.floor_builder.floors[floor_id]
+
+        else:
+            raise Exception("Floor {0} does not exist!".format(floor_id))
 
         return floor

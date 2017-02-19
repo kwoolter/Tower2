@@ -3,19 +3,17 @@ ID,Name,Description
 1,a chapel,a chapel
 2,a crypt,a crypt
 3,library,library
-4,a,a
-5,a,a
-6,a,a
-7,a,a
-8,a,a
 20,temple,temple
 21,colonnade,colonnade
 22,snake shrine,snake shrine
 23,priest quarters, priest quarters
 24,altar,altar
 30,the ruins,the ruins
+31,tomb,tomb
 50,old tower,old tower
 51,1st floor,1st floor
 52,2nd floor,2nd floor
 53,3rd floor,3rd floor
-100,XX,
+54,Tower Top,Tower Top
+99,portal1,portal1
+100,Ice Level,Ice Level

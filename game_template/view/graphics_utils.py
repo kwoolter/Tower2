@@ -64,6 +64,7 @@ class ImageManager:
                                     model.Tiles.DECORATION2: ("pyre1.png","pyre2.png","pyre3.png","pyre4.png"),
                                     model.Tiles.EMPTY : None,
                                     model.Tiles.SAFETY: None,
+                                    model.Tiles.START_POSITION: None,
                                     model.Tiles.NORTH: "north.png",
                                     model.Tiles.SOUTH: "south.png",
                                     model.Tiles.EAST: "east.png",
@@ -73,6 +74,11 @@ class ImageManager:
                                     model.Tiles.TILE2: "tile2.png",
                                     model.Tiles.TILE4: "sky.png",
                                     model.Tiles.TILE3: "cloud.png",
+                                    model.Tiles.RUNE1: "rune1.png",
+                                    model.Tiles.RUNE2: "rune2.png",
+                                    model.Tiles.RUNE3: "rune3.png",
+                                    model.Tiles.RUNE4: "rune4.png",
+                                    model.Tiles.RUNE5: "rune5.png",
                                     model.Tiles.SHOP: "door.png",
                                     model.Tiles.HEART : "heart2.png",
                                     model.Tiles.PLAYER : ("player1.png","player.png","player2.png","player.png"),
@@ -99,7 +105,7 @@ class ImageManager:
                                     model.Tiles.TREASURE25: "treasure25.png",
                                     model.Tiles.SECRET_TREASURE: "treasure_chest.png",
                                     model.Tiles.TREASURE_CHEST: "treasure_chest.png",
-                                    model.Tiles.TREE: "winter_tree.png",
+                                    model.Tiles.TREE: "forest_tree.png",
                                     model.Tiles.MONSTER1: ("skeleton1.png", "skeleton2.png","skeleton1.png","skeleton3.png" ),
                                     model.Tiles.MONSTER2: ("goblin1.png", "goblin2.png"),
                                     model.Tiles.MONSTER3: ("skeleton1.png", "skeleton2.png"),
@@ -114,10 +120,17 @@ class ImageManager:
         ImageManager.skins[new_skin_name] = new_skin
 
         new_skin_name = "winter"
-        new_skin = (new_skin_name, {model.Tiles.WALL : "winter_wall.png",
-                                    model.Tiles.SECRET_WALL: "winter_wall.png",
+        new_skin = (new_skin_name, {
+                                    model.Tiles.SECRET_WALL: "ice_wall.png",
                                     model.Tiles.DOOR : "winter_door.png",
+                                    model.Tiles.SHOP: "winter_door.png",
                                     model.Tiles.KEY : "key.png",
+                                    model.Tiles.WALL: "ice_wall.png",
+                                    model.Tiles.WALL2: "stone_wall.png",
+                                    model.Tiles.WALL_TR: "ice_wall_tr.png",
+                                    model.Tiles.WALL_TL: "ice_wall_tl.png",
+                                    model.Tiles.WALL_BR: "ice_wall_br.png",
+                                    model.Tiles.WALL_BL: "ice_wall_bl.png",
                                     model.Tiles.TREASURE: "treasure1.png",
                                     model.Tiles.DOT1: ("ice.png"),
                                     model.Tiles.TREE: "winter_tree.png"
