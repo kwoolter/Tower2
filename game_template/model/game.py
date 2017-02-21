@@ -105,7 +105,7 @@ class Game:
     GAME_OVER = "GAME OVER"
     END = "END"
     EFFECT_COUNTDOWN_RATE = 4
-    TARGET_RUNE_COUNT = 4
+    TARGET_RUNE_COUNT = 0
     MAX_STATUS_MESSAGES = 5
     STATUS_MESSAGE_LIFETIME = 8
 
@@ -245,9 +245,10 @@ class Game:
         self.add_status_message("Heading to {0} level...!".format(self.get_current_level().name))
 
     def is_level_complete(self, player : Player, level_id : int):
+
         complete = False
 
-        if len(player.runes) >= Game.TARGET_RUNE_COUNT:
+        if player.runes_collected(level_id) >= Game.TARGET_RUNE_COUNT:
             complete = True
 
         return complete
@@ -558,7 +559,8 @@ class Game:
                 self.add_status_message("You have found a hidden rune!")
 
             else:
-                print("You haven't got the map for this secret yet.")
+                pass
+                #print("You haven't got the map for this secret yet.")
 
     def check_collision(self):
 
@@ -1940,15 +1942,15 @@ class FloorBuilder:
             '    T               ',
             ': T      T         !',
             'W                  !',
-            '::       :  T      w',
-            ':       /:\      www',
-            '!   T   wlw        E',
-            '!      ww=ww     www',
-            '        w w    T  !w',
+            '::       :  T      :',
+            ':       /:\      :::',
+            '!   T   :l:        E',
+            '!      ::=::     :::',
+            '        : :    T  !:',
             ' T /:\            !!',
-            '   wsw    T       !:',
-            '   w8w            ::',
-            '   B8B  T    T   T !',
+            '   :s:    T       !:',
+            '   B8B            ::',
+            '    8   T    T   T !',
             '!                  !',
             '::     !:       :  !',
             ':::   !!:S::   :::!!',
@@ -1958,31 +1960,205 @@ class FloorBuilder:
         floor_id = 100
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
+        # Ice Cave
         new_floor_plan = (
+            'wwwwwwwwwwwwwwwwwwww',
+            'ww!! www  !!!   wwww',
+            'w!!  ww    !!     ww',
+            'ww    w     !!    ww',
+            'ww           !     w',
+            'ww                w:',
+            'www                :',
+            'w!       :        ::',
+            'w!     w::!w       E',
+            'w     www!!ww   !!::',
+            'w      wwwww   !!!!:',
+            'w         w   !!  !:',
+            'w                 !w',
+            'w   :              w',
+            'w   :         ww   w',
+            'w   :::w      w:   w',
+            'w     www   www:   w',
+            'ww    ww:  wwww:!  w',
+            'ww!!!www:  wwww:!! w',
+            'wwwwwwww:Swwwww:wwww',
 
-        '::::::::::::::::::::',
-        ':                  :',
-        ':       1          :',
-        ':                  :',
-        ':  :::::     ::::  :',
-        ':  :   :     : -:  :',
-        ':  :   :     B  :  :',
-        ':  :   :        :  :',
-        ':  :   B        :  :',
-        'D  :            :  D',
-        '::::            ::::',
-        ':       B:::B      :',
-        ':         :        :',
-        ':         :        :',
-        ':         : 1  1   :',
-        ':         :        :',
-        ':         :        :',
-        ':       1 :        :',
-        ':         :        :',
-        '::::::::::::::::::::',
         )
 
-        floor_id += 1
+        floor_id +=1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # Castle Black
+        new_floor_plan = (
+
+            '   T  !!::::::::::::',
+            '     !!!:  :     !!:',
+            ' T   !!:)  :      !:',
+            '     !!:   D      !:',
+            'T  T  !:   :     !!:',
+            '     !!:j  :    /:::',
+            '  ::!!!:::::   /:  :',
+            ' /:::::)   B  B:)  :',
+            '       ````````:```:',
+            'W      ````````D```E',
+            '       ````````:```:',
+            ' (:::::\   B  B:\  :',
+            '  ::!!!:::::   (:  :',
+            '     !!:j  :    (:::',
+            'T     !:   :     !!:',
+            '  T   !:   :      !:',
+            '     !!:   D      !:',
+            '    !!!:\  :     !!:',
+            ' T  !!!!: -:    !!!:',
+            '     !!!::::::::::::',
+
+        )
+
+        floor_id +=1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+
+        # Frost Bite Dungeon
+        new_floor_plan = (
+
+            '::::::::::::::::::::',
+            ':1   :  ?:?  :    j:',
+            ':    D   :   D     :',
+            ':    :   :   : 1   :',
+            ':    :  B:B  :     :',
+            ':    :   :   :     :',
+            ':!   :   :   :::::;:',
+            ':!   :  /:\  :     :',
+            ':!!  :  :::  :     :',
+            '::::::  :+:  D     :',
+            ':    :  ( )  :  2  :',
+            ':    D       :     :',
+            ':    :       :     :',
+            ': 2  :   B   :!   j:',
+            ':::::::D:::D::::::::',
+            ':        :       !!:',
+            ':        :        !:',
+            ':       !:!  2     :',
+            ':1    !!!:!!      -:',
+            '::::::::::::::::::::',
+
+        )
+
+        floor_id +=1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # Oubliette
+        new_floor_plan = (
+
+            'wwwwwwwwwwwwwwwwwwww',
+            'ww:::::::wMw::::::ww',
+            'w::      w w    j::w',
+            'w:              !!:w',
+            'w:               !:w',
+            'w:!     !!!!!    !:w',
+            'w:!    !!!!!!!    :w',
+            'w:!   !!:::::!!   :w',
+            'w:!!  !!:```:!!   :w',
+            'w:!   !!:`+`:!!   :w',
+            'w:    !!:```:!!   :w',
+            'w:    !!::D::!!   :w',
+            'w: ``  !!!`!!!    :w',
+            'w:  `    !`!      :w',
+            'w:  `     `      !:w',
+            'w:  ````  `      !:w',
+            'w:   ` ``````   !!:w',
+            'w::         `  !!::w',
+            'ww::::::::::::::::ww',
+            'wwwwwwwwwwwwwwwwwwww',
+
+        )
+
+        floor_id +=1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # Shard Throne
+        new_floor_plan = (
+
+            'wwwwwwwwwwwwwwwwwwww',
+            'wwwwwwwwwwwwwwwwwwww',
+            '::::::::::::::::::ww',
+            ':      (:)      (:ww',
+            ':                :ww',
+            ': :              :ww',
+            '::)   /\ /\     /:ww',
+            ':)   B:::::  B::::ww',
+            ':             ``w::w',
+            'W             ``ww:w',
+            ':             ``w::w',
+            ':\   B:::::  B::::ww',
+            '::\   () ()     (:ww',
+            ': :              :ww',
+            ':                :ww',
+            ':                :ww',
+            ':      /:\      /:ww',
+            '::::::::::::::::::ww',
+            'wwwwwwwwwwwwwwwwwwww',
+            'wwwwwwwwwwwwwwwwwwww',
+
+        )
+
+        floor_id +=1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # Dwarf Hall
+        new_floor_plan = (
+            'wwwwwwwwwwwwwwwwwwww',
+            'wwwwwwwwwwwwwwwwwwww',
+            'wwwwww::::::::::::ww',
+            'wwwwww:!! :  : !!:ww',
+            'wwwwww:!        !:ww',
+            ':::::w:!        !:ww',
+            ':   :w:          :ww',
+            ':   ::)        :::ww',
+            ':  /:````````````:ww',
+            'W  D````````````M:ww',
+            ':  (:````````````:ww',
+            ':   ::\        :::ww',
+            ':   :w:          :ww',
+            ':::::w:          :ww',
+            'wwwwww:!         :ww',
+            'wwwwww:!  :  :  j:ww',
+            'wwwwww::::::::::::ww',
+            'wwwwwwwwwwwwwwwwwwww',
+            'wwwwwwwwwwwwwwwwwwww',
+            'wwwwwwwwwwwwwwwwwwww',
+
+        )
+
+        floor_id +=1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        new_floor_plan = (
+
+            ':::::::::N::::::::::',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':      /:::\       :',
+            ':    /::   :::\    :',
+            ':  /::   L    ::\  :',
+            ':  :    ```     :  :',
+            ':  :    ```     :  :',
+            ':  :    ```     :  :',
+            ':  :    ```     :  :',
+            ':  ::   ```    ::  :',
+            ':   ::  ```   ::   :',
+            ':    ::      ::    :',
+            ':     :      :     :',
+            ':     :      :     :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            '::::::::::::::::::::',
+
+        )
+
+        floor_id = 199
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
         floor_id = 201
@@ -2079,9 +2255,21 @@ class FloorBuilder:
 
         # id,name,treasures,traps,keys,monsters(1,2,3),secrets
 
-        new_floor_data = (100,"Frozen Forest",2,3,1,(1,1,1),0)
+        new_floor_data = (100,"Frozen Forest",2,3,1,(2,3,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (101,"End",2,3,0,(1,1,1),1)
+        new_floor_data = (101, "Cave of Ice", 2, 3, 1, (5, 0, 0), 1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (102, "Castle Black", 6, 3, 1, (5, 0, 0), 1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (103, "Frost Bite Dungeon", 6, 3, 4, (2, 2, 0), 1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (104, "Oubliette", 4, 3, 1, (4, 4, 0), 1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (105, "Shard Throne", 4, 3, 1, (4, 4, 0), 1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (106, "Dwarf Hall", 4, 3, 1, (4, 4, 0), 1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (199,"Frozen End",2,3,0,(5,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
 
@@ -2141,7 +2329,7 @@ class LevelBuilder:
         new_level_data = (1, "Forest World", (0,1,2,3,20,21,22,23,24,30,31,50,51,52,53,54,99),"forest")
         self.level_data[1] = new_level_data
 
-        new_level_data = (2, "Winter World", (100,101),"winter")
+        new_level_data = (2, "Winter World", (100,101,102,103,104,105,106,199),"winter")
         self.level_data[2] = new_level_data
 
         new_level_data = (3, "Squirrel World", (200,201),"squirrel")

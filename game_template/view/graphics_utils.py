@@ -121,19 +121,20 @@ class ImageManager:
 
         new_skin_name = "winter"
         new_skin = (new_skin_name, {
-                                    model.Tiles.SECRET_WALL: "ice_wall.png",
+                                    model.Tiles.SECRET_WALL: "stone_wall.png",
                                     model.Tiles.DOOR : "winter_door.png",
                                     model.Tiles.SHOP: "winter_door.png",
                                     model.Tiles.KEY : "key_silver.png",
-                                    model.Tiles.WALL: "ice_wall.png",
-                                    model.Tiles.WALL2: "stone_wall.png",
-                                    model.Tiles.WALL_TR: "ice_wall_tr.png",
-                                    model.Tiles.WALL_TL: "ice_wall_tl.png",
-                                    model.Tiles.WALL_BR: "ice_wall_br.png",
-                                    model.Tiles.WALL_BL: "ice_wall_bl.png",
+                                    model.Tiles.WALL: "stone_wall.png",
+                                    model.Tiles.WALL2: "snow.png",
+                                    model.Tiles.WALL_TR: "stone_wall_tr.png",
+                                    model.Tiles.WALL_TL: "stone_wall_tl.png",
+                                    model.Tiles.WALL_BR: "stone_wall_br.png",
+                                    model.Tiles.WALL_BL: "stone_wall_bl.png",
                                     model.Tiles.TREASURE: "treasure_blue.png",
                                     model.Tiles.MONSTER1: ("snow_beast.png", "snow_beast2.png","snow_beast.png", "snow_beast3.png"),
-                                    model.Tiles.DOT1: ("ice.png"),
+                                    model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png", "skeleton1.png", "skeleton3.png"),
+                                    model.Tiles.DOT1: ("ice_wall.png"),
                                     model.Tiles.TREE: "winter_tree.png"
                                     })
 

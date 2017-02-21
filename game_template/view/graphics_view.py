@@ -315,10 +315,10 @@ class StatusBar(View):
 
 class HighScoreTableView(View):
 
-    TITLE_HEIGHT = 24
+    TITLE_HEIGHT = 26
     TITLE_TEXT_SIZE = 30
-    SCORE_HEIGHT = 20
-    SCORE_TEXT_SIZE = 20
+    SCORE_HEIGHT = 23
+    SCORE_TEXT_SIZE = 22
     FG_COLOUR = Colours.WHITE
     BG_COLOUR = Colours.BLACK
 
@@ -439,7 +439,7 @@ class GameOverView(View):
 
     FG_COLOUR = Colours.WHITE
     BG_COLOUR = Colours.DARK_GREY
-    SCORE_TEXT_SIZE = 20
+    SCORE_TEXT_SIZE = 22
 
     def __init__(self, width: int, height: int = 500):
 
