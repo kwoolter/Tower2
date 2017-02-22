@@ -1004,7 +1004,7 @@ class ShopView(View):
         self.game = game
 
         self.player_inventory.initialise(self.game.get_current_player())
-        self.shop_keeper_inventory.initialise(self.game.shop.current_shop_keeper, game.shop.item_prices)
+        self.shop_keeper_inventory.initialise(self.game.shop.get_shop_keeper(game.get_current_level().id), game.shop.item_prices)
 
     def draw(self):
 
@@ -1019,7 +1019,7 @@ class ShopView(View):
         x = pane_rect.centerx
 
         draw_text(self.surface,
-                  msg="{0}'s Shop".format(self.game.shop.current_shop_keeper.name),
+                  msg="{0}'s Shop".format(self.game.shop.get_shop_keeper(self.game.get_current_level().id).name),
                   x=x,
                   y=y,
                   size=30,

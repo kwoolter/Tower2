@@ -263,7 +263,7 @@ class Game:
 
     def enter_shop(self):
         self._state = Game.SHOPPING
-        self.shop.get_random_shop_keeper()
+        self.shop.get_shop_keeper(self.get_current_level().id)
 
     def get_current_shop_keeper(self):
         return self.shop.current_shop_keeper
@@ -756,17 +756,22 @@ class Shop:
 
     def __init__(self):
         self.shop_keepers = {}
-        self.current_shop_keeper = None
+        self.shop_keepers_by_level = {}
         self.item_prices = {}
 
     def initialise(self):
         self.load_shop_keepers()
         self.load_item_prices()
 
-    def get_random_shop_keeper(self):
-        shop_keeper_name = random.choice(list(self.shop_keepers.keys()))
-        self.current_shop_keeper =  self.shop_keepers[shop_keeper_name]
-        return self.current_shop_keeper
+    def get_shop_keeper(self, level_id : int = 1):
+
+        if level_id not in self.shop_keepers_by_level.keys():
+
+            shop_keeper_name = random.choice(list(self.shop_keepers.keys()))
+            self.shop_keepers_by_level[level_id] = self.shop_keepers[shop_keeper_name]
+            del self.shop_keepers[shop_keeper_name]
+
+        return self.shop_keepers_by_level[level_id]
 
     def buy_item(self, item_type, player : Player):
 
@@ -817,7 +822,7 @@ class Shop:
 
     def load_shop_keepers(self):
 
-        shop_keeper_names = ("Zordo", "Bylur", "Fenix", "Thof", "Korgul")
+        shop_keeper_names = ("Zordo", "Bylur", "Fenix", "Thof", "Korgul", "Trodh", "Ogbog", "Lasar", "Xenux", "Kaylor")
 
         for shop_keeper_name in shop_keeper_names:
 
@@ -835,11 +840,11 @@ class Shop:
 
     def load_store_items(self, shop_keeper : Player):
 
-        shop_keeper.bombs = random.randint(0,5)
-        shop_keeper.keys = random.randint(0,5)
-        shop_keeper.red_potions = random.randint(0, 5)
-        shop_keeper.weapon = random.randint(0, 5)
-        shop_keeper.shield = random.randint(0, 5)
+        shop_keeper.bombs = random.randint(1,5)
+        shop_keeper.keys = random.randint(1,5)
+        shop_keeper.red_potions = random.randint(2, 5)
+        shop_keeper.weapon = random.randint(1, 5)
+        shop_keeper.shield = random.randint(1, 5)
         shop_keeper.maps = random.randint(0, 5)
 
 
@@ -1934,12 +1939,12 @@ class FloorBuilder:
 
         # The Start of ICE Level
         new_floor_plan = (
-            '!!!!:::::N::     !!!',
-            '!! !!:    :      :!!',
+            '!!!!:::::N::wwwww!!!',
+            '!! !!:  : :     w:!!',
             '!           T   :::!',
             ' T      T        ::!',
-            '                T : ',
-            '    T               ',
+            '                T :w',
+            ':   T              w',
             ': T      T         !',
             'W                  !',
             '::       :  T      :',
@@ -1952,8 +1957,8 @@ class FloorBuilder:
             '   B8B            ::',
             '    8   T    T   T !',
             '!                  !',
-            '::     !:       :  !',
-            ':::   !!:S::   :::!!',
+            '::     !: :     :  !',
+            ':::www!::S::www:::!!',
 
         )
 
@@ -2084,15 +2089,15 @@ class FloorBuilder:
             '::::::::::::::::::ww',
             ':      (:)      (:ww',
             ':                :ww',
-            ': :              :ww',
+            ':j:              :ww',
             '::)   /\ /\     /:ww',
-            ':)   B:::::  B::::ww',
-            ':             ``w::w',
-            'W             ``ww:w',
-            ':             ``w::w',
+            ':)   B::;::  B::::ww',
+            ':             ```::w',
+            'W             ```M:w',
+            ':             ```::w',
             ':\   B:::::  B::::ww',
             '::\   () ()     (:ww',
-            ': :              :ww',
+            ':j:              :ww',
             ':                :ww',
             ':                :ww',
             ':      /:\      /:ww',
@@ -2126,6 +2131,62 @@ class FloorBuilder:
             'wwwwww::::::::::::ww',
             'wwwwwwwwwwwwwwwwwwww',
             'wwwwwwwwwwwwwwwwwwww',
+            'wwwwwwwwwwwwwwwwwwww',
+
+        )
+
+        floor_id +=1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # The Crevasse
+        new_floor_plan = (
+            '!wwwwww     wwwwww!!',
+            '! wwww      www!!w!!',
+            '!  w    w  www   ww!',
+            '        wjww!w   ww!',
+            'w      wwwww!w    ww',
+            'ww    wwwww        w',
+            'ww      www        w',
+            ' ww      ww         ',
+            '         ww         ',
+            'W        w         E',
+            '    w    w    w     ',
+            '    w        www  w ',
+            '   www       wwwwww ',
+            '   www      wwwwwwww',
+            '   wwww    wwww  www',
+            'w   www   ww  w  www',
+            'w   wwww      w   ww',
+            'w   !w!w          ww',
+            'ww  !w!w!!       jww',
+            'ww !!w!!w!!    !!www',
+
+        )
+
+        floor_id +=1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # Shard Mountain
+        new_floor_plan = (
+            'wwwwwwwwwwwwwwwwwwww',
+            'wwwwwww!!j:ww: !!!ww',
+            'wwwww!!!  ::::   !ww',
+            'wwww      :  :    ww',
+            'wwww         :     w',
+            'ww:::\       :     w',
+            'w::  :   :   ::    w',
+            'w:)  :   :         w',
+            'w:```::  :          ',
+            'w:M``D8  :          ',
+            'w:```::  :     :   E',
+            'w:\  :   :     :    ',
+            'ww:::)   ::    :    ',
+            'wwwww          :   w',
+            'www                w',
+            'ww                 w',
+            'ww          :    !!w',
+            'ww!!   :  :::   !!ww',
+            'www!!! ::::www !!www',
             'wwwwwwwwwwwwwwwwwwww',
 
         )
@@ -2269,6 +2330,10 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (106, "Dwarf Hall", 4, 3, 1, (4, 4, 0), 1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (107, "The Crevasse", 4, 3, 1, (4, 4, 0), 1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (108, "Shard Mountain", 4, 3, 1, (4, 4, 0), 1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (199,"Frozen End",2,3,0,(5,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
@@ -2329,11 +2394,11 @@ class LevelBuilder:
         new_level_data = (1, "Forest World", (0,1,2,3,20,21,22,23,24,30,31,50,51,52,53,54,99),"forest")
         self.level_data[1] = new_level_data
 
-        new_level_data = (2, "Winter World", (100,101,102,103,104,105,106,199),"winter")
+        new_level_data = (2, "Winter World", (100,101,102,103,104,105,106,107,108,199),"winter")
         self.level_data[2] = new_level_data
 
-        new_level_data = (3, "Squirrel World", (200,201),"squirrel")
-        self.level_data[3] = new_level_data
+        # new_level_data = (3, "Squirrel World", (200,201),"squirrel")
+        # self.level_data[3] = new_level_data
 
         new_level_data = (100, "The End", (1000,1000),"forest")
         self.level_data[100] = new_level_data
