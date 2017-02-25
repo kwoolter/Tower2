@@ -664,14 +664,14 @@ class Game:
         if self.state != Game.PLAYING:
             raise Exception("Game is in state {0} so can't be ticked!".format(self.state))
 
+        logging.info("Ticking {0}...".format(self.name))
+
+        self.update_status_messages()
+
         if self.state in (Game.PAUSED, Game.SHOPPING):
             return
 
-        logging.info("Ticking {0}...".format(self.name))
-
         self.tick_count += 1
-
-        self.update_status_messages()
 
         self.get_current_floor().tick()
 
@@ -758,6 +758,8 @@ class Shop:
         self.shop_keepers = {}
         self.shop_keepers_by_level = {}
         self.item_prices = {}
+        self.current_shop_keeper = None
+
 
     def initialise(self):
         self.load_shop_keepers()
@@ -771,7 +773,9 @@ class Shop:
             self.shop_keepers_by_level[level_id] = self.shop_keepers[shop_keeper_name]
             del self.shop_keepers[shop_keeper_name]
 
-        return self.shop_keepers_by_level[level_id]
+        self.current_shop_keeper = self.shop_keepers_by_level[level_id]
+
+        return self.current_shop_keeper
 
     def buy_item(self, item_type, player : Player):
 
@@ -781,7 +785,7 @@ class Shop:
         item_price = self.item_prices[item_type]
 
         if self.item_prices[item_type] > player.treasure:
-            raise Exception("Player {0} does not have enough money to buy {1} at {2}".format(player.name,item_type,item_price))
+            raise Exception("Player {0} does not have enough money to buy that!".format(player.name))
 
         if item_type == Tiles.BOMB and self.current_shop_keeper.bombs > 0:
             player.bombs += 1
@@ -853,10 +857,6 @@ class Tiles:
     # Define Tiles
     # Cut and Paste
     BANG = '$'
-    TILE1 = '`'
-    TILE2 = '¬'
-    TILE3 = '.'
-    TILE4 = '~'
     BOMB = 'q'
     BOMB_LIT = 'Q'
     BOSS_DOOR = 'd'
@@ -898,6 +898,10 @@ class Tiles:
     SWITCH = ','
     SWITCH_LIT = '<'
     SWITCH_TILE = '_'
+    TILE1 = '`'
+    TILE2 = '¬'
+    TILE3 = '.'
+    TILE4 = '~'
     TRAP1 = '^'
     TRAP2 = '&'
     TRAP3 = '['
@@ -914,6 +918,7 @@ class Tiles:
     WALL_TL = '/'
     WALL_TR = '\\'
     WALL2 = 'w'
+    WALL3 = 'e'
     WEAPON = '|'
     WEST = 'W'
 
@@ -924,7 +929,7 @@ class Tiles:
     TRAPS = (TRAP1, TRAP2, TRAP3)
     RUNES = (RUNE1, RUNE2, RUNE3, RUNE4, RUNE5)
     MONSTER_EMPTY_TILES = (EMPTY, PLAYER) + FLOOR_TILES
-    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WALL2, BRAZIER, RUNE)
+    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WALL2, WALL3, BRAZIER, RUNE)
     PLAYER_DOT_TILES = (DOT1, DOT2)
     PLAYER_EQUIPABLE_ITEMS = (WEAPON, SHIELD, RED_POTION, BOMB)
     SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
@@ -1479,8 +1484,7 @@ class FloorBuilder:
 
         floor_id = 0
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
-        floor_id = 200
-        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
         floor_id = 300
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
@@ -2222,11 +2226,271 @@ class FloorBuilder:
         floor_id = 199
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
-        floor_id = 201
-        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # Desert Level Start
+        new_floor_plan = (
+
+            'www:     N       www',
+            'ww:)              ww',
+            'ww:   T        T   w',
+            '::)                :',
+            ')                 /:',
+            '       /www\    T (:',
+            '     (:::::::)     :',
+            '  T    :```:       w',
+            '       )`l`(      ww',
+            'W       ```        E',
+            '              T   ww',
+            '    T              w',
+            '        T       T  w',
+            ' T                 w',
+            '              T   ww',
+            '                  ww',
+            'w       T T        w',
+            'w                  w',
+            'ww      :D:    www w',
+            'wwww   /:S:\  wwwwww',
+
+        )
+
+        floor_id = 200
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Tomb Entrance
+        new_floor_plan = (
+
+            'wwwwww::`N`::wwwwwww',
+            'wwwwwww:```:wwwwwwww',
+            'wwwwwww:```:wwwwwwww',
+            'ww:::::::D::::::::ww',
+            'ww:    : ` :     :ww',
+            'ww:    : ` :     :ww',
+            'ww:      `       :ww',
+            'ww:      `       (::',
+            '::)8     `         (',
+            ')  8/:::::::::\     ',
+            '        ```         ',
+            '        ```         ',
+            '   /   \```/   \    ',
+            '   :   :```:   :    ',
+            '   )   (```)   (    ',
+            'w       ```       w ',
+            'ww      ```       ww',
+            'w       ```      www',
+            'w      w```w       w',
+            'ww  wwww`S`www     w',
+
+        )
 
         floor_id += 1
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        # Tomb of the Pharoah
+        new_floor_plan = (
+
+            '::::::::::::::::::::',
+            ':  :            : j:',
+            ':  D            D  :',
+            ':  :     -      :  :',
+            '::::\  \   /   /::::',
+            ':ww)   (:::)    (ww:',
+            ':w       :        w:',
+            ':    /   :    \    :',
+            ':   /)   :    (\   :',
+            ':  /)   (:)    (\  :',
+            ':        `         :',
+            ':        `         :',
+            ':     \  `  /      :',
+            ':w    (\ ` /)     w:',
+            ':ww    : ` :     ww:',
+            '::::   ( ` )    ::::',
+            ':  :     `      :  :',
+            ':  D     `      D  :',
+            ':  :    /`\     :  :',
+            ':::::::::S::::::::::',
+
+        )
+
+
+
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+
+        # Chamber of the Sarcophagus
+        new_floor_plan = (
+
+            'wwww::::::::::::wwww',
+            'ww::)          (::ww',
+            'w:)              (:w',
+            'w:       +        :w',
+            ':)      (:)       (:',
+            ':   B          B   :',
+            ':                  :',
+            ':                  :',
+            '::::::\      /::::::',
+            'wwwwww:``````:wwwwww',
+            'wwwwww:``````:wwwwww',
+            '::::::)  `   (::::::',
+            ':j       `        j:',
+            ':        `         :',
+            ':   B    `     B   :',
+            ':\       `        /:',
+            'w:     /)`(\      :w',
+            'w:\    :```:     /:w',
+            'ww::\  :`M`:   /::ww',
+            'wwww::::::::::::wwww',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+
+        # Oasis
+        new_floor_plan = (
+
+            '                    ',
+            '                    ',
+            ' /:\  T        /:\  ',
+            ' :s:         T :j:  ',
+            '       wwww         ',
+            'T      weeww     T  ',
+            '      wweeew        ',
+            '    wwweeeew        ',
+            'w wwweeeewww        ',
+            'wwweeeeeww         E',
+            'eeeeeewww    T      ',
+            'eeeeeww             ',
+            'eeeeww              ',
+            'eewww      T        ',
+            'eew   /:\           ',
+            'eew   : :     T     ',
+            'www              T  ',
+            'w         T         ',
+            'w   T         T     ',
+            'ww     S            ',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Pyramid entrance
+        new_floor_plan = (
+
+            '       N            ',
+            '                    ',
+            '                T   ',
+            ' T    ``            ',
+            '   :  ``  :  T      ',
+            '   (: `` :)         ',
+            'T   : `` :        T ',
+            '   w: `` :w         ',
+            ' www: `` :www       ',
+            '::::) `` (::::::\   ',
+            ')     ``       (:   ',
+            '     ````       :   ',
+            '     ```` \     :www',
+            '     ```` :  \  :www',
+            'W /:::::::)  :::::::',
+            '  :          )  :  :',
+            '  (             :  :',
+            '                D  :',
+            '                :  :',
+            '\   /:S:\       ::::',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Western Sanctum
+        new_floor_plan = (
+
+            'wwww::::::::::::wwww',
+            'wwww:          :wwww',
+            'wwww:          :wwww',
+            'wwww:          :wwww',
+            'wwww:          :::::',
+            'wwww:   :::::      :',
+            ':::::   B : B      :',
+            ':   :     :        :',
+            ':   :     :       ::',
+            ':   :     :        E',
+            ':   D     :       ::',
+            ':   :     :   (:   :',
+            ':   :     ;    :   :',
+            ':M  :   B : B  :   :',
+            ':::::   :::::  :   :',
+            'wwww:          :   :',
+            'wwww:          :\  :',
+            'wwww:              :',
+            'wwww:              :',
+            'wwww::::::::::::::::',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Inner Temple
+        new_floor_plan = (
+
+            ':::::::::N::::::::::',
+            ':)     :```:      (:',
+            ':      :```:       :',
+            ':      88888       :',
+            ':        B         :',
+            ':                  :',
+            ':                  :',
+            ':::::::  B  ::::::::',
+            ':)                (:',
+            ':                  :',
+            ':        B         :',
+            ':      /   \       :',
+            ':  :::::```:::::   :',
+            ':       ```        :',
+            ':       ```        :',
+            ':       `M`        :',
+            ':      /:::\       :',
+            ':     /:eee:\      :',
+            ':\    :eeeee:     /:',
+            ':::::::eeeee::::::::',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Desert Level End
+        new_floor_plan = (
+            '::::::ww:N:ww:::::::',
+            ':)  (:::) (:::)   (:',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':    /:\   /::\    :',
+            ':  /:: :   :  ::\  :',
+            ':  :   )```(    :  :',
+            ':  :    ```     :  :',
+            ':  :    ```     :  :',
+            ': /:    ```     :\j:',
+            ':::::   ```    :::::',
+            ':www::  ```   ::www:',
+            ':wwww:: ```  ::wwww:',
+            ':wwwww: ```  :wwwww:',
+            ':wwwww: ```  :wwwww:',
+            ':wwwww: ```  :wwww::',
+            ':wwww:) :`:  (:ww:::',
+            ':www:)  :L:   (ww:::',
+            '::::::::::::::::::::',
+
+        )
+
+        floor_id = 299
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
 
         new_floor_plan = (
@@ -2235,7 +2499,7 @@ class FloorBuilder:
             ':        :         :',
             ':        :         :',
             ':       /:\        :',
-            ':     /::L::\      :',
+            ':     /::l::\      :',
             ':     : ``` :      :',
             ':     B ``` B      :',
             ':       ```        :',
@@ -2337,11 +2601,27 @@ class FloorBuilder:
         new_floor_data = (199,"Frozen End",2,3,0,(5,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
+        # id,name,treasures,traps,keys,monsters(1,2,3),secrets
 
-        new_floor_data = (200, "The Woods",7,4,0,(7,0,0),1)
+        new_floor_data = (200,"Shifting Sands",2,3,1,(2,3,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (201, "The Copse",7,4,0,(2,7,0),1)
+        new_floor_data = (201,"Tomb Entrance",2,2,0,(3,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (202,"Tomb of the Pharoah",2,2,0,(3,0,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (203,"Chamber of the Sarcophagus",2,2,0,(3,3,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (204,"Oasis",2,2,0,(3,0,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (205,"Pyramid Rises",2,4,1,(3,3,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (206,"Western Sanctum",2,4,1,(3,3,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (207,"Inner Temple",2,4,1,(3,3,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (299,"Ancient City",2,3,1,(2,3,0),0)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+
 
         new_floor_data = (1000, "The END",0,0,0,(0,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -2396,6 +2676,9 @@ class LevelBuilder:
 
         new_level_data = (2, "Winter World", (100,101,102,103,104,105,106,107,108,199),"winter")
         self.level_data[2] = new_level_data
+
+        new_level_data = (3, "Desert World", (200,201,202,203,204,205,206,207,299),"desert")
+        self.level_data[3] = new_level_data
 
         # new_level_data = (3, "Squirrel World", (200,201),"squirrel")
         # self.level_data[3] = new_level_data
