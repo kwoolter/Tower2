@@ -166,13 +166,61 @@ class ImageManager:
                                     model.Tiles.WALL_BR: "sand_wall_br.png",
                                     model.Tiles.WALL_BL: "sand_wall_bl.png",
                                     model.Tiles.SECRET_WALL: "sand_wall.png",
+                                    model.Tiles.DECORATION1: "palm_tree.png",
                                     model.Tiles.DOOR: "desert_door.png",
                                     model.Tiles.KEY: "key_orange.png",
                                     model.Tiles.TREASURE: "treasure_orange.png",
                                     model.Tiles.TREE: "cactus.png",
                                     model.Tiles.TILE1: "tile3.png",
+                                    model.Tiles.DOT1: ("oil.png"),
                                     model.Tiles.MONSTER1: ("snake1.png", "snake2.png"),
                                     model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png", "skeleton1.png", "skeleton3.png"),
+                                    })
+
+        ImageManager.skins[new_skin_name] = new_skin
+
+        new_skin_name = "cave"
+        new_skin = (new_skin_name, {model.Tiles.WALL: "cave_wall.png",
+                                    model.Tiles.WALL2: "forest_wall.png",
+                                    model.Tiles.WALL3: ("water.png", "water2.png", "water3.png", "water4.png"),
+                                    model.Tiles.WALL_TR: "cave_wall_tr.png",
+                                    model.Tiles.WALL_TL: "cave_wall_tl.png",
+                                    model.Tiles.WALL_BR: "cave_wall_br.png",
+                                    model.Tiles.WALL_BL: "cave_wall_bl.png",
+                                    model.Tiles.SECRET_WALL: "cave_wall.png",
+                                    model.Tiles.DECORATION1: "palm_tree.png",
+                                    model.Tiles.DOOR: "door.png",
+                                    model.Tiles.KEY: "key.png",
+                                    model.Tiles.TREASURE: "treasure_red.png",
+                                    model.Tiles.TREE: "tree.png",
+                                    model.Tiles.TILE1: "tile3.png",
+                                    model.Tiles.DOT1: ("lava.png"),
+                                    model.Tiles.MONSTER1: ("biter.png", "biter1.png", "biter.png","biter2.png","biter.png"),
+                                    model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png", "skeleton1.png", "skeleton3.png"),
+                                    model.Tiles.MONSTER3: ("goblin1.png", "goblin2.png", "goblin1.png", "goblin3.png"),
+                                    })
+
+        ImageManager.skins[new_skin_name] = new_skin
+
+        new_skin_name = "chaos"
+        new_skin = (new_skin_name, {model.Tiles.WALL: "cave_wall.png",
+                                    model.Tiles.WALL2: "forest_wall.png",
+                                    model.Tiles.WALL3: "water.png",
+                                    model.Tiles.WALL_TR: "cave_wall_tr.png",
+                                    model.Tiles.WALL_TL: "cave_wall_tl.png",
+                                    model.Tiles.WALL_BR: "cave_wall_br.png",
+                                    model.Tiles.WALL_BL: "cave_wall_bl.png",
+                                    model.Tiles.SECRET_WALL: "cave_wall.png",
+                                    model.Tiles.DECORATION1: "palm_tree.png",
+                                    model.Tiles.DOOR: "door.png",
+                                    model.Tiles.KEY: "key.png",
+                                    model.Tiles.TREASURE: "treasure_red.png",
+                                    model.Tiles.TREE: "tree.png",
+                                    model.Tiles.TILE1: "tile3.png",
+                                    model.Tiles.DOT1: ("lava.png"),
+                                    model.Tiles.MONSTER1: ("biter.png", "biter1.png", "biter.png","biter2.png","biter.png"),
+                                    model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png", "skeleton1.png", "skeleton3.png"),
+                                    model.Tiles.MONSTER3: ("goblin1.png", "goblin2.png", "goblin1.png", "goblin3.png"),
                                     })
 
         ImageManager.skins[new_skin_name] = new_skin

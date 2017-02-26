@@ -81,7 +81,7 @@ class Player():
         level_runes = self.runes[level_id]
         level_runes.append(rune)
 
-    def runes_collected(self, level_id : None):
+    def runes_collected(self, level_id : int = None):
 
         rune_count = 0
 
@@ -93,6 +93,15 @@ class Player():
             rune_count = len(self.runes[level_id])
 
         return rune_count
+
+    def maps_collected(self, level_id : int):
+
+        maps = []
+
+        if level_id in self.treasure_maps.keys():
+            maps = self.treasure_maps[level_id]
+
+        return maps
 
 
 class Game:
@@ -412,10 +421,22 @@ class Game:
             print("You found a treasure chest...")
             if current_player.keys > 0:
                 current_player.keys -= 1
-                current_floor.set_player_tile(random.choice([Tiles.KEY, Tiles.SHIELD, Tiles.WEAPON,
-                                                            Tiles.MAP, Tiles.BOMB, Tiles.RED_POTION,
-                                                             Tiles.TREASURE10, Tiles.TREASURE25]))
+
+                rewards = [Tiles.KEY, Tiles.SHIELD, Tiles.WEAPON,Tiles.BOMB, Tiles.RED_POTION, \
+                                                                 Tiles.TREASURE10, Tiles.TREASURE25]
+
+
+                #  If the progress allows the add a map as an optional reward
+                level_progress = current_player.runes_collected(current_level.id) + \
+                                 len(current_player.maps_collected(current_level.id))
+
+                if level_progress < Game.TARGET_RUNE_COUNT:
+                    rewards.append(Tiles.MAP)
+
+                current_floor.set_player_tile(random.choice(rewards))
+
                 print("...and you opened it!")
+
             else:
                 print("You don't have a key to open it!")
                 self.add_status_message("You don't have a key to open it!")
@@ -837,16 +858,16 @@ class Shop:
     def load_item_prices(self):
         self.item_prices[Tiles.KEY] = random.randint(5,10)
         self.item_prices[Tiles.RED_POTION] = random.randint(5, 10)
-        self.item_prices[Tiles.BOMB] = random.randint(5, 10)
-        self.item_prices[Tiles.WEAPON] = random.randint(5, 10)
-        self.item_prices[Tiles.SHIELD] = random.randint(5, 10)
+        self.item_prices[Tiles.BOMB] = random.randint(8, 15)
+        self.item_prices[Tiles.WEAPON] = random.randint(8, 15)
+        self.item_prices[Tiles.SHIELD] = random.randint(8, 15)
         self.item_prices[Tiles.MAP] = random.randint(5, 10)
 
     def load_store_items(self, shop_keeper : Player):
 
-        shop_keeper.bombs = random.randint(1,5)
+        shop_keeper.bombs = random.randint(1,4)
         shop_keeper.keys = random.randint(1,5)
-        shop_keeper.red_potions = random.randint(2, 5)
+        shop_keeper.red_potions = random.randint(3, 6)
         shop_keeper.weapon = random.randint(1, 5)
         shop_keeper.shield = random.randint(1, 5)
         shop_keeper.maps = random.randint(0, 5)
@@ -1528,9 +1549,9 @@ class FloorBuilder:
             ':                  :',
             ':   /\        /\   :',
             ':   ()        ()   :',
-            ':                  :',
-            '::\      B       /::',
-            ':::     /:\     /:):',
+            ';                  :',
+            ';:\      B       /::',
+            ';;:     /:\     /:):',
             ':j:    B:+:B    ; ?:',
             ':::     : :     (:\:',
             '::)     (D)      (::',
@@ -2232,7 +2253,7 @@ class FloorBuilder:
 
             'www:     N       www',
             'ww:)              ww',
-            'ww:   T        T   w',
+            'ww:   z        T   w',
             '::)                :',
             ')                 /:',
             '       /www\    T (:',
@@ -2240,8 +2261,8 @@ class FloorBuilder:
             '  T    :```:       w',
             '       )`l`(      ww',
             'W       ```        E',
-            '              T   ww',
-            '    T              w',
+            '              z   ww',
+            '    z              w',
             '        T       T  w',
             ' T                 w',
             '              T   ww',
@@ -2265,7 +2286,7 @@ class FloorBuilder:
             'ww:::::::D::::::::ww',
             'ww:    : ` :     :ww',
             'ww:    : ` :     :ww',
-            'ww:      `       :ww',
+            'ww:    z ` z     :ww',
             'ww:      `       (::',
             '::)8     `         (',
             ')  8/:::::::::\     ',
@@ -2276,7 +2297,7 @@ class FloorBuilder:
             '   )   (```)   (    ',
             'w       ```       w ',
             'ww      ```       ww',
-            'w       ```      www',
+            'w      z```z     www',
             'w      w```w       w',
             'ww  wwww`S`www     w',
 
@@ -2326,8 +2347,8 @@ class FloorBuilder:
             'w:)              (:w',
             'w:       +        :w',
             ':)      (:)       (:',
-            ':   B          B   :',
-            ':                  :',
+            ':   B   !!     B   :',
+            ':        !!!       :',
             ':                  :',
             '::::::\      /::::::',
             'wwwwww:``````:wwwwww',
@@ -2356,7 +2377,7 @@ class FloorBuilder:
             ' /:\  T        /:\  ',
             ' :s:         T :j:  ',
             '       wwww         ',
-            'T      weeww     T  ',
+            'z  z   weeww     z  ',
             '      wweeew        ',
             '    wwweeeew        ',
             'w wwweeeewww        ',
@@ -2364,10 +2385,10 @@ class FloorBuilder:
             'eeeeeewww    T      ',
             'eeeeeww             ',
             'eeeeww              ',
-            'eewww      T        ',
+            'eewww      z        ',
             'eew   /:\           ',
             'eew   : :     T     ',
-            'www              T  ',
+            'www   z z        T  ',
             'w         T         ',
             'w   T         T     ',
             'ww     S            ',
@@ -2464,6 +2485,93 @@ class FloorBuilder:
         floor_id += 1
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
+        # Wadi
+        new_floor_plan = (
+
+            'wwwwwwwww      wwwww',
+            'ww   ww           ww',
+            'w     w            w',
+            '      w             ',
+            '  z        z       /',
+            '             :``:``:',
+            '             ``````E',
+            '    !!z !!   :``:``:',
+            '     !!!!    ww    (',
+            'W      !!  wwwww    ',
+            '   z         wwww   ',
+            '               www  ',
+            '          z         ',
+            '     z           z  ',
+            '                    ',
+            ' z                  ',
+            'w   z   w          w',
+            'w       w  z       w',
+            'ww     ww       wwww',
+            'wwww  wwwww   wwwwww',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Ancient City
+        new_floor_plan = (
+
+            '   wwww::::::       ',
+            '      w:j   :       ',
+            '       :    :       ',
+            '\      :::D::       ',
+            ':          z  ::::  ',
+            ':             :ee:  ',
+            ':     z  z    :ee:  ',
+            ':`:`:       :::ee:::',
+            'W````       :eeeeee:',
+            ':`:`:       :eeeeee:',
+            ':     z  z  :::ee:::',
+            ':             :ee:  ',
+            ':             :ee:  ',
+            ')          z  :::: E',
+            '                    ',
+            '  ::::D:::          ',
+            ' w:R     :         w',
+            ' w:      :w        w',
+            'ww:      :ww      ww',
+            'ww::::::::www   wwww',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Palace
+        new_floor_plan = (
+
+            '             wwwwwww',
+            'z    z     wwwwwwwww',
+            '         wwwww::::::',
+            '        ww:::::!! R:',
+            ' z  :::::::!  :    :',
+            '    :     :   :    :',
+            '    :     :   :    :',
+            '  /::B   ::  ::)  /:',
+            '         (   (`````:',
+            'W   !!     !  ````M:',
+            '       !      `````:',
+            '         /   /`````:',
+            '  (::B   ::  ::\  (:',
+            '    :     :   :    :',
+            '    :     :!  :    :',
+            ' z  :::;:::!! :    :',
+            '        ww:::::   j:',
+            '         wwwww::::::',
+            'z    z     wwwwwwwww',
+            '            wwwwwwww',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
         # Desert Level End
         new_floor_plan = (
             '::::::ww:N:ww:::::::',
@@ -2492,6 +2600,89 @@ class FloorBuilder:
         floor_id = 299
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
+        # Cave Level Start
+        new_floor_plan = (
+            ':::::::::::::N::::::',
+            ':)         () ()  (:',
+            ':   l              :',
+            ':                  :',
+            ':      /\          :',
+            ':      (::\        :',
+            ':  /\   :::        :',
+            ':  ::\  (::\       :',
+            ')  (:)    ()      /:',
+            'W                  E',
+            ':\                (:',
+            '::                 :',
+            ':)    /:\          :',
+            ':     (:)          :',
+            ':           /:\    :',
+            ':           ::)   /:',
+            ':           :)    ::',
+            ':  /:\     /:    /::',
+            ':\ :::\   /::\   :::',
+            ':::::::\S/::::::::::',
+
+        )
+
+        floor_id = 300
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Canal
+        new_floor_plan = (
+            '::::)(:weew:::::::::',
+            ':::)  (weew)   (::::',
+            '::)    weew      (::',
+            '::    wwwwww      ::',
+            ':)                (:',
+            ':             www  (',
+            ':     wwwwww  wsw  /',
+            ')      weew   ```  :',
+            'W      weew       /:',
+            '\      weewwwwwwwwww',
+            ':      weeeeeeeeeeee',
+            ':      weeeeeeeeeeee',
+            ':      wwwwwwwwwwwww',
+            ':       (:)    (::::',
+            ': /\            ::::',
+            ':::)            (:::',
+            '::)             /:::',
+            '::\             ::::',
+            ':::\    /\     /::::',
+            ':::::::::::\S/::::::',
+
+        )
+
+        floor_id +=1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Cave Level End
+        new_floor_plan = (
+            '::::::::N:::::::::::',
+            ':) (:::)      (:::::',
+            ':   (:)         ::::',
+            ':               (:::',
+            ':                  :',
+            ':                  :',
+            ':                /::',
+            ':             wwwwww',
+            ':             weeeee',
+            ':     w   w   weeeee',
+            ':     wwwww   weeeee',
+            ':             weeeee',
+            ':             wwwwww',
+            ':     B   B      (::',
+            ':     w   w        :',
+            ':     w```w        :',
+            ':   /:w```w        :',
+            ':   ::w```w\       :',
+            ':\ /::w`L`w:\     /:',
+            '::::::::::::::::::::',
+
+        )
+
+        floor_id = 399
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
         new_floor_plan = (
 
@@ -2619,7 +2810,23 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (207,"Inner Temple",2,4,1,(3,3,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (299,"Ancient City",2,3,1,(2,3,0),0)
+        new_floor_data = (208,"Bone Dry Wadi",2,4,1,(3,3,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (209,"Ancient City",2,4,1,(3,3,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (210,"Palace of the Djinn",2,4,1,(3,3,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (299,"Sanctum of the Sands",2,3,1,(2,3,0),0)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+
+        # id,name,treasures,traps,keys,monsters(1,2,3),secrets
+
+        new_floor_data = (300,"Cavern Entrance",2,5,0,(5,0,0),0)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (301,"Canal",2,5,0,(0,0,5),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+
+        new_floor_data = (399,"Earthern Vault",2,3,0,(2,0,2),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
 
@@ -2677,8 +2884,12 @@ class LevelBuilder:
         new_level_data = (2, "Winter World", (100,101,102,103,104,105,106,107,108,199),"winter")
         self.level_data[2] = new_level_data
 
-        new_level_data = (3, "Desert World", (200,201,202,203,204,205,206,207,299),"desert")
+        new_level_data = (3, "Desert World", (200,201,202,203,204,205,206,207,208,209,210,299),"desert")
         self.level_data[3] = new_level_data
+
+        new_level_data = (4, "Underground World", (300,301,399),"cave")
+        self.level_data[4] = new_level_data
+
 
         # new_level_data = (3, "Squirrel World", (200,201),"squirrel")
         # self.level_data[3] = new_level_data

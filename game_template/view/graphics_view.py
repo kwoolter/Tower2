@@ -522,7 +522,7 @@ class GameOverView(View):
 
         if self.game.is_game_complete() is True:
             tile_name = model.Tiles.PLAYER
-            tile_name2 = model.Tiles.SHOP_KEEPER
+            tile_name2 = model.Tiles.TROPHY
         else:
             tile_name = model.Tiles.MONSTER1
             tile_name2 = model.Tiles.MONSTER2

@@ -33,3 +33,8 @@ FromID,ToID,Direction,Description,Lockable,Locked,LockedDescription,Reversible,H
 204,205,SOUTH,through the dunes,,,,,
 205,206,WEST,along a passageway,,,,,
 205,207,SOUTH,through an archway,,,,,
+200,208,EAST,across the sands,,,,,
+208,209,EAST,across the sand,,,,,
+209,210,EAST,through the gates,,,,,
+300,399,SOUTH,through a tunnel,,,,,
+300,301,EAST,through the rocks,,,,,
