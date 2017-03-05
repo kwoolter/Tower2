@@ -148,6 +148,7 @@ class ImageManager:
                                     model.Tiles.WALL_BL: "forest_wall_bl.png",
                                     model.Tiles.SECRET_WALL: "forest_wall.png",
                                     model.Tiles.DOOR: "door.png",
+                                    model.Tiles.TILE2: "tile4.png",
                                     model.Tiles.TREASURE: ("treasure_red.png"),
                                     model.Tiles.TREE: "forest_tree.png",
                                     model.Tiles.MONSTER1: ("goblin1.png", "goblin2.png","goblin1.png", "goblin3.png"),

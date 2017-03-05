@@ -429,6 +429,17 @@ class GameReadyView(View):
         x = int(pane_rect.width*4/5 - image_width/2)
         self.surface.blit(image,(x,y))
 
+        x = pane_rect.centerx
+        y += image_height + 50
+
+        draw_text(self.surface,
+                  msg="F I N D   T H E    C H A L I C E !",
+                  x=x,
+                  y=y,
+                  size=40,
+                  fg_colour=GameReadyView.FG_COLOUR,
+                  bg_colour=GameReadyView.BG_COLOUR)
+
         x = 0
         y = pane_rect.bottom - self.hst.surface.get_height()
         self.hst.draw()
