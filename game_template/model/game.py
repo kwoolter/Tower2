@@ -751,6 +751,9 @@ class Game:
     def game_over(self):
 
         logging.info("Game Over {0}...".format(self.name))
+
+        self.status_messages = {}
+
         player = self.get_current_player()
 
         self.player_scores[player.name] = player.score
@@ -2910,26 +2913,26 @@ class FloorBuilder:
 
         # Cave Level End
         new_floor_plan = (
-            '::::::::N:::::::::::',
-            ':) (:::)      (:::::',
-            ':   (:)         ::::',
-            ':               (:::',
-            ':                  :',
-            ':                  :',
-            ':                /::',
-            ':             wwwwww',
-            ':             weeeee',
-            ':     w   w   weeeee',
-            ':     wwwww   weeeee',
-            ':             weeeee',
-            ':             wwwwww',
-            ':     B   B      (::',
-            ':     w   w        :',
-            ':     w```w        :',
-            ':   /:w```w        :',
-            ':   ::w```w\       :',
-            ':\ /::w`L`w:\     /:',
-            '::::::::::::::::::::',
+            ':::::::::N::::::::::',
+            '() (:::)```   (:::::',
+            '\   (:) ```     ::::',
+            ':               (::)',
+            ':                  /',
+            ':                 /:',
+            ':\     wwwww     /::',
+            'wwwww  w£££w  wwwwww',
+            '!!!!w  w£££w  weeeee',
+            '!!!!w  w£££w  weeeee',
+            '!!!!w  wwwww  weeeee',
+            '!!!!w         weeeee',
+            'wwwww         wwwwww',
+            ':)     B   B     (::',
+            ')      w   w       (',
+            '\      w`¬`w       /',
+            ':   /::w`¬`w       :',
+            ':   :::w`¬`w\      :',
+            ':\ /:::w`L`w:\    /:',
+            ':::::::::::::::\/:::',
         )
 
         floor_id = 399
@@ -2937,26 +2940,27 @@ class FloorBuilder:
 
         new_floor_plan = (
 
-            '::::::::::::::::::::',
-            ':        :         :',
+            ':::::)  /:\  (::::::',
+            ':)       :        (:',
             ':        :         :',
             ':       /:\        :',
-            ':     /::l::\      :',
-            ':     : ``` :      :',
-            ':     B ``` B      :',
-            ':       ```        :',
-            ':     B ``` B      :',
-            ':       ```        :',
-            ':     B ``` B      :',
-            ':       ```        :',
-            ':     B ``` B      :',
-            ':       ```        :',
-            ':       ```        :',
-            ':     /\```/\      :',
-            ':     :`````:      :',
-            ':     :`````:      :',
-            ':    /:``G``:\     :',
+            ':     /::L::\      :',
+            ':     : `¬` :      :',
+            ':  B    `¬`     B  :',
+            ':       `¬`        :',
+            ':  B    `¬`     B  :',
+            ':       `¬`        :',
+            ':  B    `¬`     B  :',
+            ':       `¬`        :',
+            ':  B    `¬`     B  :',
+            ':       `¬`        :',
+            ':       `¬`        :',
+            ':   /\   ¬   /\    :',
+            ':   :    ¬    :    :',
+            ':   :         :    :',
+            ':\ /:    G    :\  /:',
             '::::::::::::::::::::',
+
         )
 
         floor_id = 1000
@@ -3091,11 +3095,11 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (310,"Dragon Hoard",2,3,0,(0,5,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (399,"Earthern Vault",2,3,0,(2,0,2),0)
+        new_floor_data = (399,"Elemental Vault",2,3,0,(2,0,2),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
 
-        new_floor_data = (1000, "The END",0,0,0,(0,0,0),0)
+        new_floor_data = (1000, "Great Sword",0,0,0,(0,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         logging.info("Finished loading floor configs. {0} floor configs loaded.".format(len(self.floor_configs.keys())))
@@ -3159,7 +3163,7 @@ class LevelBuilder:
         # new_level_data = (3, "Squirrel World", (200,201),"squirrel")
         # self.level_data[3] = new_level_data
 
-        new_level_data = (100, "The End", (1000,1000),"forest")
+        new_level_data = (100, "The End", (1000,1000),"end")
         self.level_data[100] = new_level_data
 
         logging.info("Finished Loading Level Data. {0} levels loaded.".format(len(self.level_data.keys())))

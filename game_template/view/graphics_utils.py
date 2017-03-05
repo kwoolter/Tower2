@@ -196,6 +196,7 @@ class ImageManager:
                                     model.Tiles.TILE1: "tile3.png",
                                     model.Tiles.TILE2: "tile4.png",
                                     model.Tiles.DOT1: ("lava1.png", "lava2.png","lava3.png", "lava4.png"),
+                                    model.Tiles.DOT2: "ice_wall.png",
                                     model.Tiles.MONSTER1: ("biter.png", "biter1.png", "biter.png","biter2.png","biter.png"),
                                     model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png", "skeleton1.png", "skeleton3.png"),
                                     model.Tiles.MONSTER3: ("goblin1.png", "goblin2.png", "goblin1.png", "goblin3.png"),
@@ -248,6 +249,13 @@ class ImageManager:
                                     model.Tiles.RUNE3: "rune3.png",
                                     model.Tiles.RUNE4: "rune4.png",
                                     model.Tiles.RUNE5: "rune5.png"})
+
+        ImageManager.skins[new_skin_name] = new_skin
+
+        new_skin_name = "end"
+        new_skin = (new_skin_name, {
+                                    model.Tiles.TILE2: "tile4.png"
+                                    })
 
         ImageManager.skins[new_skin_name] = new_skin
 
