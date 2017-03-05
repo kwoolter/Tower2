@@ -1003,7 +1003,7 @@ class FloorPlan:
             self.safety_zone(x, y, 4, 4)
 
         if self.entrance is None:
-            self.entrance = (1, 1)
+            self.random_entrance()
 
         # Create safety zones around the entrance and exits
         if self.entrance is not None:
@@ -1049,6 +1049,31 @@ class FloorPlan:
         elif tile_name == Tiles.SECRET_TREASURE:
             self.secret = (x,y)
             #print("Floor Plan {2} - set secret at {0},{1}".format(x,y, self.id))
+
+    def random_entrance(self):
+
+        tries = 30
+
+        self.entrance = (1, 1)
+
+        attempts = 0
+        while True:
+            x = random.randint(0,self.width - 1)
+            y = random.randint(0,self.height - 1)
+            if self.get_tile(x,y) == Tiles.EMPTY:
+
+                logging.info("Placed entrance at {0},{1}".format(x, y))
+
+                self.entrance = (x, y)
+                break
+
+            attempts += 1
+
+            # We tried several times to find an empty square, time to give up!
+            if attempts > tries:
+                print("Can't find an empty tile to place entrance after {0} tries".format(attempts))
+                break
+
 
     # Build a safety zone around a specified location
     def safety_zone(self, x, y, height, width):
@@ -3099,7 +3124,7 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
 
-        new_floor_data = (1000, "Great Sword",0,0,0,(0,0,0),0)
+        new_floor_data = (1000, "Great Sword & Chalice",0,0,0,(0,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         logging.info("Finished loading floor configs. {0} floor configs loaded.".format(len(self.floor_configs.keys())))
