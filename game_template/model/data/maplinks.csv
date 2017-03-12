@@ -49,3 +49,4 @@ FromID,ToID,Direction,Description,Lockable,Locked,LockedDescription,Reversible,H
 301,308,DOWN,on a ladder,,,,,
 310,309,DOWN,a secret passageway,,,,,
 900,999,SOUTH,through the rubble,,,,,
+900,901,EAST,through a door,,,,,

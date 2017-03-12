@@ -293,8 +293,6 @@ class Game:
         self.player_scores = {}
         self.effects = {}
         self.tick_count = 0
-        self.hidden_runes = list(Tiles.RUNES)
-
 
         self.hst.load()
 
@@ -2540,24 +2538,23 @@ class FloorBuilder:
 
         # Inner Temple
         new_floor_plan = (
-
             ':::::::::N::::::::::',
             ':)     :```:      (:',
-            ':      :```:       :',
-            ':      88888       :',
-            ':        B         :',
+            ':      (```)       :',
+            ':  !   88888   !!  :',
+            ':  !!    B     !   :',
             ':                  :',
             ':                  :',
-            ':::::::  B  ::::::::',
+            '::::::)  B  (:::::::',
             ':)                (:',
             ':                  :',
             ':        B         :',
-            ':      /   \       :',
-            ':  :::::```:::::   :',
-            ':       ```        :',
-            ':       ```        :',
-            ':       `M`        :',
             ':      /:::\       :',
+            ':  ::::)```(::::   :',
+            ':       ```        :',
+            ':       ```        :',
+            ':   !   `M`   !!   :',
+            ':  !!  /:::\   !!  :',
             ':     /:eee:\      :',
             ':\    :eeeee:     /:',
             ':::::::eeeee::::::::',
@@ -3032,9 +3029,9 @@ class FloorBuilder:
             '         `        /:',
             ' /\          /\   ::',
             ' ()          ()   ()',
-            '       /\/\         ',
-            '       ::::         ',
-            '       (::)         ',
+            '       /\/\        /',
+            '       ::::        E',
+            '       (::)        (',
             '                /\  ',
             '                ()  ',
             '                    ',
@@ -3044,6 +3041,34 @@ class FloorBuilder:
         )
 
         floor_id = 900
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Chamber of the Deceiver
+        new_floor_plan = (
+            '/:)(::::)(:)(::::::\\',
+            ':)        :       (:',
+            ':        /:\       :',
+            ':      wwwwwww     :',
+            ':      w`````w     :',
+            ')    _ w  _  w _  /:',
+            '\                www',
+            ':\        B       `w',
+            'ww`     /:::\     `w',
+            'W````  8D`,`D8    `w',
+            'ww`     (:::)     `w',
+            ':)        B      www',
+            ')                 (:',
+            '\                  :',
+            ':    _ w  _  w _   (',
+            ':      w`````w     /',
+            ':      wwwwwww     :',
+            ':        (:)       :',
+            ':\        :       /:',
+            '(:::::::\/:\/::::::)',
+
+        )
+
+        floor_id += 1
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
         # Chaos Level End
@@ -3196,7 +3221,7 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (206,"Western Sanctum",2,4,1,(0,0,6),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (207,"Inner Temple",2,4,1,(0,0,0),1)
+        new_floor_data = (207,"Inner Temple",2,4,1,(0,6,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (208,"Bone Dry Wadi",2,4,1,(3,3,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -3236,7 +3261,9 @@ class FloorBuilder:
 
         # id,name,treasures,traps,keys,monsters(1,2,3),secrets, switch tiles
 
-        new_floor_data = (900, "Edge of Sanity",2,5,2,(2,2,2),0)
+        new_floor_data = (900, "Edge of Sanity",2,5,2,(2,2,2),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (901, "Chamber of the Deceiver",2,5,2,(2,2,2),1,(Tiles.TREASURE, Tiles.RED_POTION))
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         new_floor_data = (999, "Escape the Asylum",0,10,0,(5,5,5),0)
@@ -3309,7 +3336,7 @@ class LevelBuilder:
         new_level_data = (4, "Underground World", (300,301,302,303,304,305,306,307,308,309,310,399),"cave")
         self.level_data[4] = new_level_data
 
-        new_level_data = (90, "Chaos World", (900,999),"chaos")
+        new_level_data = (90, "Chaos World", (900,901,999),"chaos")
         self.level_data[90] = new_level_data
 
 

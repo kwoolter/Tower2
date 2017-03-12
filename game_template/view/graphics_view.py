@@ -167,7 +167,7 @@ class MainFrame(View):
 
 class TitleBar(View):
     FILL_COLOUR = Colours.BLACK
-    TEXT_FG_COLOUR = Colours.WHITE
+    TEXT_FG_COLOUR = Colours.GOLD
     TEXT_BG_COLOUR = None
 
     def __init__(self, width: int, height: int):
