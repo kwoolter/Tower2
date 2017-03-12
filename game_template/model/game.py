@@ -114,6 +114,8 @@ class Game:
     GAME_OVER = "GAME OVER"
     END = "END"
     EFFECT_COUNTDOWN_RATE = 4
+    DOT_DAMAGE_RATE = 2
+    ENEMY_DAMAGE_RATE = 2
     TARGET_RUNE_COUNT = 0
     MAX_STATUS_MESSAGES = 5
     STATUS_MESSAGE_LIFETIME = 8
@@ -393,8 +395,9 @@ class Game:
             print("Hit a trap!")
 
         elif tile in Tiles.PLAYER_DOT_TILES:
-            current_player.HP -= 1
-            print("Stood in something nasty!")
+            # current_player.HP -= 1
+            # self.add_status_message("You are losing health!")
+            print("You stood in something nasty!")
 
         elif tile == Tiles.RED_POTION:
             self.use_item(tile, decrement = False)
@@ -408,6 +411,7 @@ class Game:
 
             if tile in (Tiles.SWITCH, Tiles.SWITCH_LIT):
                 self.get_current_floor().switch()
+                self.add_status_message("You operated the switch.")
                 print("You operated the switch. Switch on = {0}".format(self.get_current_floor().switch_on))
 
         elif tile in (Tiles.TREASURE, Tiles.TREASURE10, Tiles.TREASURE25):
@@ -437,7 +441,7 @@ class Game:
                     rewards.append(Tiles.MAP)
 
                 current_floor.set_player_tile(random.choice(rewards))
-
+                self.add_status_message("You opened the treasure chest!")
                 print("...and you opened it!")
 
             else:
@@ -590,22 +594,34 @@ class Game:
 
     def check_collision(self):
 
-         # Check if the player has collided with an enemy?
+         # Check if the player has collided with something?
         if self.get_current_floor().is_collision() is True:
 
             print("collision!")
+            current_tile = self.get_current_floor().get_player_tile()
 
-            if Tiles.WEAPON in self.effects.keys():
-                print("You killed an enemy with your sword")
-                self.get_current_player().kills += 1
-                self.get_current_floor().kill_monster()
+            if current_tile in Tiles.MONSTERS:
 
-            elif Tiles.SHIELD in self.effects.keys():
-                print("You defended yourself with your shield")
+                if Tiles.WEAPON in self.effects.keys():
+                    print("You killed an enemy with your sword")
+                    self.get_current_player().kills += 1
+                    self.get_current_floor().kill_monster()
 
-            else:
-                self.get_current_player().HP -= 1
-                print("HP down to %i" % self.get_current_player().HP)
+                elif Tiles.SHIELD in self.effects.keys():
+                    print("You defended yourself with your shield")
+
+                elif self.tick_count % Game.ENEMY_DAMAGE_RATE == 0:
+                    self.get_current_player().HP -= 1
+                    print("HP down to %i" % self.get_current_player().HP)
+
+            elif current_tile in Tiles.PLAYER_DOT_TILES:
+
+                if Tiles.SHIELD in self.effects.keys():
+                    print("You defended yourself with your shield")
+                elif self.tick_count % Game.DOT_DAMAGE_RATE == 0:
+                    self.get_current_player().HP -= 1
+                    print("HP down to %i" % self.get_current_player().HP)
+
 
     def use_item(self, item_type, decrement : bool = True):
 
@@ -1255,7 +1271,7 @@ class Floor:
         self.explodables[(x,y)] = (tile, Floor.EXPLODABLE_COUNTDOWN)
 
     # Find empty tiles to place items
-    def place_tiles(self, item_count, item_type, tries=20):
+    def place_tiles(self, item_count, item_type, tries=30):
 
         for i in range(0, item_count):
             attempts = 0
