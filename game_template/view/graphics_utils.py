@@ -200,7 +200,7 @@ class ImageManager:
                                     model.Tiles.TREASURE: "treasure_red.png",
                                     model.Tiles.TREE: "tree.png",
                                     model.Tiles.TILE1: "tile3.png",
-                                    model.Tiles.TILE2: "tile4.png",
+                                    model.Tiles.TILE2: "tile5.png",
                                     model.Tiles.DOT1: ("lava1.png", "lava2.png","lava3.png", "lava4.png"),
                                     model.Tiles.DOT2: "ice_wall.png",
                                     model.Tiles.MONSTER1: ("biter.png", "biter1.png", "biter.png","biter2.png","biter.png"),

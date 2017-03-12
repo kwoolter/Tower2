@@ -17,7 +17,7 @@ class Player():
 
     # Set player's attributes back to starting values
     def initialise(self):
-        self.keys = 0
+        self.keys = 10
         self.red_potions = 0
         self.exit_keys = 0
         self.boss_key = False
@@ -2923,8 +2923,9 @@ class FloorBuilder:
             '\        `         :',
             ':        `        /:',
             ':       w`w      /::',
-            ':\     ww`ww     :::',
+            ':\     ww`ww     ;=:',
             '::\/::::wSw:::\/::::',
+
         )
 
         floor_id +=1
@@ -2935,14 +2936,14 @@ class FloorBuilder:
             ':!!!wwwwwwwwwww!!!!!',
             '!!!!!w!!!!!!!w!!!!!!',
             '!:::!!!wwwww!!!:::::',
-            ':)j(:::) j (:::::)j(',
+            ':)j(:::) j (:::::)_(',
             ':   (w       w)    /',
             ':    w  ¬¬¬  w     :',
             ':    w  ¬¬¬  w    R:',
             ':    w  ¬¬¬  w     :',
             ') R  wB ¬¬¬ Bw     :',
             '\    ww¬¬¬¬¬ww     :',
-            ':\   ww¬¬¬¬¬ww    /:',
+            ':\  ,ww¬¬¬¬¬ww    /:',
             'wwDwwwB¬¬w¬¬BwwwDwww',
             ':)     ¬¬w¬¬      (:',
             ':      ¬www¬       :',
@@ -3139,7 +3140,7 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (309,"Chasm of Fire",2,3,0,(0,5,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (310,"Dragon Hoard",2,3,0,(0,5,0),1)
+        new_floor_data = (310,"Dragon Hoard",2,3,0,(0,5,0),1,(Tiles.TREASURE_CHEST,Tiles.DOWN))
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (399,"Elemental Vault",2,3,0,(2,0,2),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
