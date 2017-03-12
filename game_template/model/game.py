@@ -402,9 +402,13 @@ class Game:
             self.add_status_message("You feel healthier!")
             print("Some HP restored")
 
-        elif tile in Tiles.SWAP_TILES.keys():
+        elif tile in Tiles.SWAP_TILES.keys() and self.get_current_player().moved() is True:
             current_floor.set_player_tile(Tiles.SWAP_TILES[tile])
             print("You found a {0} to {1} swappable tile!!".format(tile,Tiles.SWAP_TILES[tile]))
+
+            if tile in (Tiles.SWITCH, Tiles.SWITCH_LIT):
+                self.get_current_floor().switch()
+                print("You operated the switch. Switch on = {0}".format(self.get_current_floor().switch_on))
 
         elif tile in (Tiles.TREASURE, Tiles.TREASURE10, Tiles.TREASURE25):
             current_floor.set_player_tile(Tiles.EMPTY)
@@ -424,7 +428,6 @@ class Game:
 
                 rewards = [Tiles.KEY, Tiles.SHIELD, Tiles.WEAPON,Tiles.BOMB, Tiles.RED_POTION, \
                                                                  Tiles.TREASURE10, Tiles.TREASURE25]
-
 
                 #  If the progress allows the add a map as an optional reward
                 level_progress = current_player.runes_collected(current_level.id) + \
@@ -513,6 +516,8 @@ class Game:
                     print("No more secrets to find for this level!")
 
         self.check_secret()
+
+        #print("Player move={0}".format(self.get_current_player().moved()))
 
     def check_exit(self, direction):
 
@@ -953,7 +958,7 @@ class Tiles:
     TRAPS = (TRAP1, TRAP2, TRAP3)
     RUNES = (RUNE1, RUNE2, RUNE3, RUNE4, RUNE5)
     MONSTER_EMPTY_TILES = (EMPTY, PLAYER) + FLOOR_TILES
-    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WALL2, WALL3, BRAZIER, RUNE)
+    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WALL2, WALL3, BRAZIER, RUNE, DECORATION1, DECORATION2)
     PLAYER_DOT_TILES = (DOT1, DOT2)
     PLAYER_EQUIPABLE_ITEMS = (WEAPON, SHIELD, RED_POTION, BOMB)
     SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
@@ -1124,7 +1129,8 @@ class Floor:
                  trap_count : int = 0,
                  key_count = 0,
                  monster_count : tuple = (0,0,0),
-                 secret_count : int = 0):
+                 secret_count : int = 0,
+                 switch_tiles : list = None):
         self.id = id
         self.name = name
         self.treasure_count = treasure_count
@@ -1133,6 +1139,8 @@ class Floor:
         self.key_count = key_count
         self.secret_count = secret_count
         self.tick_count = 0
+        self.switch_on = False
+        self.switch_tiles = switch_tiles
         self.monsters = {}
         self.explodables = {}
         self.runes = {}
@@ -1275,16 +1283,16 @@ class Floor:
 
     def move_player(self, dx : int, dy : int):
 
-        new_x = self.player.x + dx
-        new_y = self.player.y + dy
+        self.player.x += dx
+        self.player.y += dy
 
-        if self.is_valid_xy(new_x, new_y) is False:
+        if self.is_valid_xy(self.player.x, self.player.y) is False:
+            self.player.back()
             print("Hit the boundary!")
-        elif self.get_tile(new_x, new_y) in Tiles.PLAYER_BLOCK_TILES:
+
+        elif self.get_tile(self.player.x, self.player.y) in Tiles.PLAYER_BLOCK_TILES:
+            self.player.back()
             print("Square blocked!")
-        else:
-            self.player.x = new_x
-            self.player.y = new_y
 
     def is_collision(self):
 
@@ -1384,6 +1392,12 @@ class Floor:
 
         self.explodables = new_explodables
 
+    def switch(self, setting=None):
+        if setting is None:
+            self.switch_on = not self.switch_on
+        else:
+            self.switch_on = setting
+
 
     def get_tile(self, x : int, y: int):
 
@@ -1399,6 +1413,12 @@ class Floor:
             tile, count = self.explodables[(x,y)]
             if count == 1:
                 tile = Tiles.BANG
+
+        elif tile == Tiles.SWITCH_TILE and self.switch_tiles is not None:
+            if self.switch_on == True:
+                tile = self.switch_tiles[1]
+            else:
+                tile = self.switch_tiles[0]
 
         if tile == Tiles.SECRET_TREASURE:
             tile = Tiles.EMPTY
@@ -1513,16 +1533,16 @@ class FloorBuilder:
             'T        `       T  ',
             '    T    `  T       ',
             ' T      T`          ',
-            '         `      T T ',
+            '         `      Z T ',
             '    T    `          ',
-            '  T      `   T      ',
+            '  Z     Z`   T      ',
             'W`````````          ',
             '      T  `  T     T ',
             'T       ```         ',
             '    T   `=`````````E',
-            '        ``` `       ',
+            '        ``` `Z      z',
             '            `  T    ',
-            ' T /:\      `    T  ',
+            ' Z /:\      `    T  ',
             '   :s:    T `       ',
             'T  B`B      `       ',
             '   8`8  T   `T   T  ',
@@ -1544,23 +1564,23 @@ class FloorBuilder:
         new_floor_plan = [
             '         N          ',
             ' T           T     T',
-            '             T   T  ',
-            'T    T /:D:\   T    ',
+            '             T   Z  ',
+            'T Z  T /:D:\   T    ',
             '       :) (:        ',
             '   T   : ? : T    T ',
             '       :   :        ',
             'T     /:B B:\       ',
             '  /::::)   (::::\   ',
-            '  :)  B  `  B  (:   ',
+            '  :)  Z  `  Z  (:   ',
             '  D     `-`     D   ',
-            '  :\  B  `  B  /:   ',
+            '  :\  Z  `  Z  /:   ',
             '  (::::\   /::::)  T',
             '      (:B B:)       ',
             ' T     :   :        ',
-            '       :   :        ',
-            ' T     :\ /:    T   ',
+            '       :   :  Z     ',
+            ' T  Z  :\ /:    T   ',
             '       (:;:)      T ',
-            'T                   ',
+            'Z                   ',
             '        T T      T  ',
 
         ]
@@ -1573,18 +1593,18 @@ class FloorBuilder:
 
             ':::::::::N::::::::::',
             ':z:B    :`:     B:z:',
-            '::)    B:`:B     (::',
+            '::)    Z:`:Z     (::',
             ':B      (D)       B:',
             ':                  :',
             ':   /\        /\   :',
             ':   ()        ()   :',
             ';                  :',
-            ';:\      B       /::',
+            ';:\      Z       /::',
             ';;:     /:\     /:):',
             ':j:    B:+:B    ;`?:',
             ':::     :`:     (:\:',
             '::)     (D)      (::',
-            ':   /\        /\   :',
+            ':Z  /\        /\   :',
             ':   ()        ()   :',
             ':                  :',
             ':B      B B       B:',
@@ -1601,24 +1621,24 @@ class FloorBuilder:
         new_floor_plan = [
 
             '::::::::::::::::::::',
-            ':?      (:)       ?:',
-            ':                  :',
+            ':,D     (:)       ?:',
+            ':::                :',
             ':                  :',
             ':    \        /    :',
             ':   B::::::::::B  /:',
             ':                :::',
-            ':\               Dx:',
+            ':\               _x:',
             ':::              :::',
-            'W`D  ::::::::::  Dj:',
-            ':::     :        :::',
-            ':)               Dx:',
+            'W`D  ::::::::::  _j:',
+            ':::              :::',
+            ':)               _x:',
             ':                :::',
             ':   B::::::::::B  (:',
             ':    )        (    :',
             ':                  :',
             ':\     B   B      /:',
             '::`:   :   :    :`::',
-            ':j`:   :\ /:    :`j:',
+            ':j`:   :\ /:   ?:`j:',
             ':::::::::S::::::::::',
 
         ]
@@ -1774,18 +1794,18 @@ class FloorBuilder:
             '      ::\        (: ',
             '  T   `-:   :T  T : ',
             ' T    ``:::::     : ',
-            '\     /:) :w:     : ',
+            '\     /:) :w:  Z  : ',
             ':     :   :w:       ',
             ':ww\  :     )     T ',
-            '::::  (: T    /:\   ',
+            '::::  (: Z    /:\   ',
             ':  :\         :     ',
-            ')  ::         :     ',
+            ')  ::         :    Z',
             '        /  \  (\    ',
             'T       :ww:   (:   ',
             '     /:::::::       ',
             '  T  :)     )   T   ',
             '     :              ',
-            'T    (   `   T      ',
+            'T    (   `   Z      ',
             '        ```      T  ',
             '       ``S``        ',
 
@@ -1795,16 +1815,16 @@ class FloorBuilder:
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
 
-        # The Tomb
+        # The Tomb of Fallen Knight
         new_floor_plan = (
             '::::::)  /wwww::::::',
-            ':   D    :wwww:   (:',
+            ':   D    :wwww:Z  (:',
             ':   :    :wwww:    :',
             ':   :    :wwww:    :',
             ':   ;    (::::)  /::',
             ':j  :           ::ww',
             '::::)           wwww',
-            ':M`:          www::w',
+            ':M`:    Z     www::w',
             ':``:   :::   ww:::::',
             ':``:   :+:  www:```:',
             ':D::  /:`:\   ww``j:',
@@ -1996,21 +2016,21 @@ class FloorBuilder:
         new_floor_plan = (
             '!!!!:::::N::wwwww!!!',
             '!! !!:  ( )     w:!!',
-            '!           T   (::!',
+            '!           z   (::!',
             ' T      T        (:!',
-            '                T (w',
+            '                z (w',
             ':   T              w',
-            ': T      T         !',
+            ':\       T    z    !',
             'W                  !',
-            '::       :  T     /:',
+            '::    z  :  T     /:',
             ':)      /:\      :::',
             '!   T   :l:      ``E',
             '!      ::`::     :::',
             '       (```)   T  !:',
             ' T /:\            !!',
             '   :s:    T       !:',
-            '   B8B            ::',
-            '    8   T    T   T !',
+            '   z8z            ::',
+            '    8   T    T  z  !',
             '!                  !',
             ':\    !!:`:    /:\ !',
             ':::www!::S::www:::!!',
@@ -2024,24 +2044,24 @@ class FloorBuilder:
         new_floor_plan = (
             'wwwwwwwwwwwwwwwwwwww',
             'ww!! www  !!!   wwww',
-            'w!!  ww    !!     ww',
+            'w!!  ww    !!    www',
             'ww    w     !!    ww',
-            'ww           !     w',
+            'ww           !    ww',
             'ww                w:',
-            'www                :',
+            'www      /        w:',
             'w!       :        ::',
-            'w!     w::!w       E',
+            'w!     /::!w      `E',
             'w     www!!ww   !!::',
-            'w      wwwww   !!!!:',
-            'w         w   !!  !:',
-            'w                 !w',
+            '!      wwwww   !!!!:',
+            '!         w   !!  !:',
+            '!   \             !w',
             'w   :              w',
-            'w   :         ww   w',
-            'w   :::w      w:   w',
+            'w   :\        ww   w',
+            'w   (::w      w:   w',
             'w     www   www:   w',
             'ww    ww:  wwww:!  w',
-            'ww!!!www:  wwww:!! w',
-            'wwwwwwww:Swwwww:wwww',
+            'ww!!!www:`:wwww:!! w',
+            'wwwwwwww:S:wwww:wwww',
 
         )
 
@@ -2089,12 +2109,12 @@ class FloorBuilder:
             ':    :`  :  `:     :',
             ':!   :`  :  `:::::;:',
             ':!   :` /:\ `:     :',
-            ':!!  :` ::: `:     :',
-            '::::::` :+: `D     :',
+            ':!!  :` :+: `:     :',
+            '::::::` :`: `D     :',
             ':    :` (`) `:  2  :',
             ':    D`     `:     :',
-            ':    :`     `:     :',
-            ': 2  :```B```:!   j:',
+            ':    :`     `:!    :',
+            ': 2  :```B```:!!  j:',
             ':::::::D:::D::::::::',
             ':        :       !!:',
             ':        :        !:',
@@ -2112,7 +2132,7 @@ class FloorBuilder:
 
             'wwwwwwwwwwwwwwwwwwww',
             'ww:::::::wMw::::::ww',
-            'w::      w w    j::w',
+            'w::     (w`w)   j::w',
             'w:              !!:w',
             'w:               !:w',
             'w:!     !!!!!    !:w',
@@ -2143,18 +2163,18 @@ class FloorBuilder:
             'wwwwwwwwwwwwwwwwwwww',
             '::::::::::::::::::ww',
             ':      (:)      (:ww',
-            ':                :ww',
-            ':j:              :ww',
-            '::)   /\ /\     /:ww',
+            ':       `        :ww',
+            ':j:     `        :ww',
+            '::)   /\`/\     /:ww',
             ':)   B::;::  B::::ww',
-            ':             ```::w',
-            'W             ```M:w',
-            ':             ```::w',
+            ':`      `    ¬```::w',
+            'W``     `    ¬¬¬¬M:w',
+            ':`      `    ¬```::w',
             ':\   B:::::  B::::ww',
-            '::\   () ()     (:ww',
-            ':j:              :ww',
-            ':                :ww',
-            ':                :ww',
+            '::\   ()`()     (:ww',
+            ':j:     `        :ww',
+            ':       `        :ww',
+            ':       `        :ww',
             ':      /:\      /:ww',
             '::::::::::::::::::ww',
             'wwwwwwwwwwwwwwwwwwww',
@@ -2197,23 +2217,23 @@ class FloorBuilder:
         new_floor_plan = (
             '!wwwwww     wwwwww!!',
             '! wwww      www!!w!!',
-            '!  w    w  www   ww!',
+            '!  w    z  www   ww!',
             '        wjww!w   ww!',
             'w      wwwww!w    ww',
             'ww    wwwww        w',
-            'ww      www        w',
-            ' ww      ww         ',
+            'ww      www     z  w',
+            ' ww      ww  z      ',
             '         ww         ',
-            'W        w         E',
+            'W      z w         E',
             '    w    w    w     ',
-            '    w        www  w ',
+            '    w        www  z ',
             '   www       wwwwww ',
             '   www      wwwwwwww',
             '   wwww    wwww  www',
             'w   www   ww  w  www',
             'w   wwww      w   ww',
             'w   !w!w          ww',
-            'ww  !w!w!!       jww',
+            'ww  !w!w!!  z    jww',
             'ww !!w!!w!!    !!www',
 
         )
@@ -2252,24 +2272,24 @@ class FloorBuilder:
         new_floor_plan = (
 
             ':::::::::N::::::::::',
-            ':                  :',
+            ':)      (`)       (:',
             ':                  :',
             ':                  :',
             ':      /:::\       :',
-            ':    /::   :::\    :',
-            ':  /::   L    ::\  :',
-            ':  :    ```     :  :',
-            ':  :    ```     :  :',
-            ':  :    ```     :  :',
-            ':  :    ```     :  :',
-            ':  ::   ```    ::  :',
-            ':   ::  ```   ::   :',
-            ':    ::      ::    :',
-            ':     :      :     :',
-            ':     :      :     :',
-            ':                  :',
-            ':                  :',
-            ':                  :',
+            ':    /:)```(::\    :',
+            ':  /:)  `L`   (:\  :',
+            ':  :B   ```    B:  :',
+            ':  :    `¬`     :  :',
+            ':  :    `¬`     :  :',
+            ':  :    `¬`     :  :',
+            ':  (:   `¬`    :)  :',
+            ':   (:  `¬`   :)   :',
+            ':    (:  ¬   :)    :',
+            ':     :  ¬   :     :',
+            ':     B ¬¬¬  B    w:',
+            ':                 w:',
+            ':w               ww:',
+            ':www            www:',
             '::::::::::::::::::::',
 
         )
@@ -2463,20 +2483,20 @@ class FloorBuilder:
             'wwww::::::::::::wwww',
             'wwww:          :wwww',
             'wwww:          :wwww',
-            'wwww:          :wwww',
+            'wwww: !        :wwww',
             'wwww:          :::::',
             'wwww:   :::::      :',
             ':::::   B : B      :',
-            ':   :     :        :',
-            ':   :     :       ::',
-            ':   :     :        E',
-            ':   D     :       ::',
-            ':   :     :   (:   :',
-            ':   :     ;    :   :',
+            ':   :     :    !   :',
+            ':   :\    :   !!  ::',
+            ':   :` !  :       `E',
+            ':   D`    :       ::',
+            ':   :`    :   (:   :',
+            ':   :)    ;    :   :',
             ':M  :   B : B  :   :',
             ':::::   :::::  :   :',
             'wwww:          :   :',
-            'wwww:          :\  :',
+            'wwww: !        :\  :',
             'wwww:              :',
             'wwww:              :',
             'wwww::::::::::::::::',
@@ -2727,7 +2747,7 @@ class FloorBuilder:
             'wwwwwwB            :',
             'w````ww     ````Bw (',
             'wM```D      `````www',
-            'w````ww     `````  E',
+            'w````ww     ```````E',
             'wwwwwwB     `````www',
             '::)         ````Bw(:',
             ':)                 :',
@@ -3000,7 +3020,7 @@ class FloorBuilder:
 
         logging.info("Started loading floor configs...")
 
-        # id,name,treasures,traps,keys,monsters(1,2,3),secrets
+        # id,name,treasures,traps,keys,monsters(1,2,3),secrets,swap tiles
 
 
         # Forest World - Start
@@ -3012,7 +3032,7 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (2,"Crypts of Eternity",5,3,0,(0,7,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (3, "Library of Zastaross",2,3,2,(4,0,0),1)
+        new_floor_data = (3, "Library of Zastaross",2,3,1,(4,0,0),1,(Tiles.DOOR,Tiles.EMPTY))
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (99,"Portal Between Worlds",5,3,0,(0,5,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -3074,27 +3094,27 @@ class FloorBuilder:
 
         new_floor_data = (200,"Shifting Sands",2,3,1,(2,3,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (201,"Tomb Entrance",2,2,0,(3,0,0),1)
+        new_floor_data = (201,"Tomb Entrance",2,2,0,(6,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (202,"Tomb of the Pharoah",2,2,0,(3,0,0),1)
+        new_floor_data = (202,"Tomb of the Pharoah",2,2,0,(5,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (203,"Chamber of the Sarcophagus",2,2,0,(3,3,0),1)
+        new_floor_data = (203,"Chamber of the Sarcophagus",2,2,0,(0,0,6),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (204,"Oasis",2,2,0,(3,0,0),1)
+        new_floor_data = (204,"Oasis",2,2,0,(6,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (205,"Pyramid Rises",2,4,1,(3,3,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (206,"Western Sanctum",2,4,1,(3,3,0),1)
+        new_floor_data = (206,"Western Sanctum",2,4,1,(0,0,6),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (207,"Inner Temple",2,4,1,(3,3,0),1)
+        new_floor_data = (207,"Inner Temple",2,4,1,(0,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (208,"Bone Dry Wadi",2,4,1,(3,3,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (209,"Ancient City",2,4,1,(3,3,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (210,"Palace of the Djinn",2,4,1,(3,3,0),1)
+        new_floor_data = (210,"Palace of the Djinn",2,4,1,(0,0,6),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (299,"Sanctum of the Sands",2,3,1,(2,3,0),0)
+        new_floor_data = (299,"Sanctum of the Sands",2,3,1,(2,3,2),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         # id,name,treasures,traps,keys,monsters(1,2,3),secrets
@@ -3124,7 +3144,6 @@ class FloorBuilder:
         new_floor_data = (399,"Elemental Vault",2,3,0,(2,0,2),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
-
         new_floor_data = (1000, "Great Sword & Chalice",0,0,0,(0,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
@@ -3141,9 +3160,16 @@ class FloorBuilder:
             if floor_id in self.floor_plans.keys():
                 floor_plan = self.floor_plans[floor_id]
 
-                id,name,treasures,traps,keys,monsters,secrets = floor_data
+                # I'm lazy and didn't want to add switch tiles to each floor data :)
+                try:
+                    id,name,treasures,traps,keys,monsters,secrets,swap_tiles = floor_data
+                except ValueError as e:
+                    id,name,treasures,traps,keys,monsters,secrets = floor_data
+                    swap_tiles = None
+
                 new_floor = Floor(id = floor_id, name=name, treasure_count=treasures, key_count=keys,
-                                  trap_count=traps, monster_count=monsters, secret_count=secrets)
+                                  trap_count=traps, monster_count=monsters, secret_count=secrets, switch_tiles=swap_tiles)
+
                 new_floor.initialise(floor_plan)
                 self.floors[floor_id] = new_floor
 

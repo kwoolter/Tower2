@@ -51,7 +51,7 @@ class MainFrame(View):
         os.environ["SDL_VIDEO_CENTERED"] = "1"
         pygame.init()
         pygame.display.set_caption(self.game.name)
-        filename = MainFrame.RESOURCES_DIR + "icon.jpg"
+        filename = MainFrame.RESOURCES_DIR + "icon.png"
 
         try:
             image = pygame.image.load(filename)
