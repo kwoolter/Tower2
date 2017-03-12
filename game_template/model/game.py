@@ -495,7 +495,6 @@ class Game:
             self.enter_shop()
             self.add_status_message("Welcome to the shop!")
 
-
         elif tile == Tiles.MAP:
             level_secrets = current_level.secrets
 
@@ -571,16 +570,18 @@ class Game:
             pos == (current_player.x, current_player.y) \
             and current_level.id in current_player.treasure_maps.keys():
 
+            self.hint()
+
             # See if the player has the exact map for the secret...
-            # ...and there are still some runes to find...
+            # ...and there are still some runes to find on the current level...
             found_maps = current_player.treasure_maps[current_level.id]
 
-            if (current_floor.id, (pos)) in found_maps and len(self.hidden_runes) > 0:
+            if (current_floor.id, (pos)) in found_maps and len(current_level.hidden_runes) > 0:
 
-                found_rune = random.choice(self.hidden_runes)
+                found_rune = random.choice(current_level.hidden_runes)
                 current_player.collect_rune(found_rune, current_level.id)
                 current_player.back()
-                self.hidden_runes.remove(found_rune)
+                current_level.hidden_runes.remove(found_rune)
                 current_floor.treasure_found()
                 current_player.treasure_maps[current_level.id].remove((current_floor.id, (pos)))
                 print("You found the secret treasure {0} and you have now collected {1}.".format(found_rune,
@@ -591,6 +592,18 @@ class Game:
             else:
                 pass
                 #print("You haven't got the map for this secret yet.")
+
+    def hint(self):
+
+        current_level = self.get_current_level()
+        current_floor = self.get_current_floor()
+        current_player = self.get_current_player()
+
+        pos = current_floor.get_treasure_xy()
+
+        print("Floor {3}.  Player is at ({0},{1}\nRune is at {2}".format(current_player.x,current_player.y,pos, current_floor.id))
+        print("Player's maps for level {0}: {1}".format(current_level.id, current_player.maps_collected(current_level.id)))
+
 
     def check_collision(self):
 
@@ -1486,6 +1499,7 @@ class Level:
     def initialise(self):
 
         self.floors = {}
+        self.hidden_runes = list(Tiles.RUNES)
 
     @property
     def trophies(self):

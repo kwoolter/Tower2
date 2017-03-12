@@ -24,6 +24,7 @@ class Controller:
     KEY_ITEM2 = K_2
     KEY_ITEM3 = K_3
     KEY_ITEM4 = K_4
+    KEY_HINT = K_h
 
     def __init__(self):
         self.game = None
@@ -112,6 +113,9 @@ class Controller:
                                     self.game.next_level()
                             except Exception as err:
                                 print(str(err))
+
+                        elif event.key == Controller.KEY_HINT:
+                            self.game.hint()
 
                         elif event.key == Controller.KEY_INVENTORY:
                             try:
