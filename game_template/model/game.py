@@ -472,7 +472,7 @@ class Game:
             print("You found a door...")
             if current_player.keys > 0:
                 current_player.keys -= 1
-                current_floor.set_player_tile(Tiles.EMPTY)
+                current_floor.set_player_tile(Tiles.DOOR_OPEN)
                 print("...and you opened it!")
             else:
                 current_player.back()
@@ -893,6 +893,7 @@ class Tiles:
     DECORATION1 = 'z'
     DECORATION2 = 'Z'
     DOOR = 'D'
+    DOOR_OPEN = 'd'
     DOT1 = '!'
     DOT2 = '£'
     DOWN = '-'
@@ -957,7 +958,7 @@ class Tiles:
     INDESTRUCTIBLE_ITEMS = (KEY, TREE, TROPHY, NORTH, SOUTH, EAST, WEST, UP, DOWN, SHOP, DOOR, RUNE)
     TRAPS = (TRAP1, TRAP2, TRAP3)
     RUNES = (RUNE1, RUNE2, RUNE3, RUNE4, RUNE5)
-    MONSTER_EMPTY_TILES = (EMPTY, PLAYER) + FLOOR_TILES
+    MONSTER_EMPTY_TILES = (EMPTY, PLAYER, DOOR_OPEN) + FLOOR_TILES
     PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WALL2, WALL3, BRAZIER, RUNE, DECORATION1, DECORATION2)
     PLAYER_DOT_TILES = (DOT1, DOT2)
     PLAYER_EQUIPABLE_ITEMS = (WEAPON, SHIELD, RED_POTION, BOMB)
@@ -2269,6 +2270,7 @@ class FloorBuilder:
         floor_id +=1
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
+        # Frozen End
         new_floor_plan = (
 
             ':::::::::N::::::::::',
@@ -2279,7 +2281,7 @@ class FloorBuilder:
             ':    /:)```(::\    :',
             ':  /:)  `L`   (:\  :',
             ':  :B   ```    B:  :',
-            ':  :    `¬`     :  :',
+            ':  :)   `¬`    (:  :',
             ':  :    `¬`     :  :',
             ':  :    `¬`     :  :',
             ':  (:   `¬`    :)  :',
@@ -2287,7 +2289,7 @@ class FloorBuilder:
             ':    (:  ¬   :)    :',
             ':     :  ¬   :     :',
             ':     B ¬¬¬  B    w:',
-            ':                 w:',
+            ':        ¬        w:',
             ':w               ww:',
             ':www            www:',
             '::::::::::::::::::::',
@@ -2986,13 +2988,70 @@ class FloorBuilder:
         floor_id = 399
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
+        # Chaos Level Start
+        new_floor_plan = (
+            ':\    (:::::)     (:',
+            '::       :         (',
+            ':)       :          ',
+            ')       :::        /',
+            '        :::        :',
+            '        (:)        (',
+            '        `l`        /',
+            '        ```        :',
+            '       `````       :',
+            '         `        /:',
+            ' /\               ::',
+            ' ()               ()',
+            '       /\/\         ',
+            '       ::::         ',
+            '       (::)         ',
+            '             ?  /\  ',
+            '                ()  ',
+            '                    ',
+            '\/\     /D\         ',
+            ':::\    :S:         ',
+
+        )
+
+        floor_id = 900
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Chaos Level End
+        new_floor_plan = (
+            ':::::::::N::::::::::',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':        L         :',
+            '::::::::::::::::::::',
+
+        )
+
+        floor_id = 999
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+
         new_floor_plan = (
 
             ':::::)  /:\  (::::::',
             ':)       :        (:',
             ':        :         :',
             ':       /:\        :',
-            ':     /::L::\      :',
+            ':     /::l::\      :',
             ':     : `¬` :      :',
             ':  B    `¬`     B  :',
             ':       `¬`        :',
@@ -3033,7 +3092,7 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (2,"Crypts of Eternity",5,3,0,(0,7,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (3, "Library of Zastaross",2,3,1,(4,0,0),1,(Tiles.DOOR,Tiles.EMPTY))
+        new_floor_data = (3, "Library of Zastaross",2,3,1,(4,0,0),1,(Tiles.DOOR,Tiles.DOOR_OPEN))
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (99,"Portal Between Worlds",5,3,0,(0,5,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -3145,6 +3204,14 @@ class FloorBuilder:
         new_floor_data = (399,"Elemental Vault",2,3,0,(2,0,2),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
+        # id,name,treasures,traps,keys,monsters(1,2,3),secrets, switch tiles
+
+        new_floor_data = (900, "Edge of Sanity",2,5,2,(2,2,2),0)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+
+        new_floor_data = (999, "Escape the Asylum",0,10,0,(5,5,5),0)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+
         new_floor_data = (1000, "Great Sword & Chalice",0,0,0,(0,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
@@ -3211,6 +3278,9 @@ class LevelBuilder:
 
         new_level_data = (4, "Underground World", (300,301,302,303,304,305,306,307,308,309,310,399),"cave")
         self.level_data[4] = new_level_data
+
+        new_level_data = (90, "Chaos World", (900,999),"chaos")
+        self.level_data[90] = new_level_data
 
 
         # new_level_data = (3, "Squirrel World", (200,201),"squirrel")
