@@ -405,7 +405,7 @@ class GameReadyView(View):
                   msg="R E A D Y !",
                   x=x,
                   y=y,
-                  size=30,
+                  size=40,
                   fg_colour=GameReadyView.FG_COLOUR,
                   bg_colour=GameReadyView.BG_COLOUR)
 
@@ -436,7 +436,7 @@ class GameReadyView(View):
                   msg="F I N D   T H E    C H A L I C E !",
                   x=x,
                   y=y,
-                  size=40,
+                  size=44,
                   fg_colour=GameReadyView.FG_COLOUR,
                   bg_colour=GameReadyView.BG_COLOUR)
 

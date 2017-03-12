@@ -114,7 +114,7 @@ class Game:
     GAME_OVER = "GAME OVER"
     END = "END"
     EFFECT_COUNTDOWN_RATE = 4
-    DOT_DAMAGE_RATE = 2
+    DOT_DAMAGE_RATE = 3
     ENEMY_DAMAGE_RATE = 2
     TARGET_RUNE_COUNT = 0
     MAX_STATUS_MESSAGES = 5
@@ -216,7 +216,7 @@ class Game:
         # If you have completed the current level...
         if self.is_level_complete(self.get_current_player(), self.current_level_id) == True:
 
-            self.add_status_message("Leaving {0} level...!".format(self.get_current_level().name))
+            self.add_status_message("Leaving {0}...!".format(self.get_current_level().name))
 
             # Get the id of the next level....
             level_ids = sorted(self.level_factory.levels.keys())
@@ -231,15 +231,15 @@ class Game:
 
             self.get_current_floor().add_player(self.get_current_player(), position = Floor.ENTRANCE)
 
-            self.add_status_message("Heading to {0} level...!".format(self.get_current_level().name))
+            self.add_status_message("Heading to {0}...!".format(self.get_current_level().name))
 
         else:
-            self.add_status_message("{0} level not yet completed!".format(self.get_current_level().name))
+            self.add_status_message("{0} not completed yet!".format(self.get_current_level().name))
             self.get_current_player().back()
 
     def previous_level(self):
 
-        self.add_status_message("Leaving {0} level...!".format(self.get_current_level().name))
+        self.add_status_message("Leaving {0}...!".format(self.get_current_level().name))
 
         level_ids = sorted(self.level_factory.levels.keys())
         index = level_ids.index(self.current_level_id)
@@ -253,7 +253,7 @@ class Game:
 
         self.get_current_floor().add_player(self.get_current_player(), position = Floor.EXIT)
 
-        self.add_status_message("Heading to {0} level...!".format(self.get_current_level().name))
+        self.add_status_message("Heading to {0}...!".format(self.get_current_level().name))
 
     def is_level_complete(self, player : Player, level_id : int):
 
