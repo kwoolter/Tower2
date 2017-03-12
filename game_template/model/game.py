@@ -3021,20 +3021,20 @@ class FloorBuilder:
             '::      (:)        (',
             ':)       :          ',
             ')       /:\   /\   /',
-            '        :::   ()   :',
-            '    /\  (:)        (',
-            '    ()  `l`        /',
-            '        ```        :',
-            '       `````       :',
-            '         `        /:',
-            ' /\          /\   ::',
-            ' ()          ()   ()',
-            '       /\/\        /',
-            '       ::::        E',
-            '       (::)        (',
-            '                /\  ',
-            '                ()  ',
-            '                    ',
+            '   /\   :::   ()   :',
+            '   ()   (:)        (',
+            '        `l`        /',
+            '\       ```        :',
+            'W``````````` ` ``  :',
+            ')        `      ` /:',
+            '             /\ ` ::',
+            '             () ` ()',
+            ' /\    /\/\     `  /',
+            ' ()    ::::   `````E',
+            '       (::)   `    (',
+            '              ` /\  ',
+            '         `````` ()  ',
+            '         `          ',
             '\/\     /D\         ',
             ':::\    :S:         ',
 
@@ -3063,8 +3063,36 @@ class FloorBuilder:
             ':      w`````w     /',
             ':      wwwwwww     :',
             ':        (:)       :',
-            ':\        :       /:',
+            ':\        :     - /:',
             '(:::::::\/:\/::::::)',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Pool of the Miasma
+        new_floor_plan = (
+            '!!!!!!!!!!!!!!!!!!!!',
+            '!!!!!!!!!!!!!!!!!!!!',
+            '!!!!:)()()(::)(:!!!!',
+            '!!!:)          (:!!!',
+            '!!:)            (:!!',
+            '!!:              :!!',
+            '!!w      `      /w!!',
+            '!!www    `     www!!',
+            '!ww     ```      ww!',
+            '!ww   ```+```    ww!',
+            '!ww     ```      ww!',
+            '!!w\     `       w!!',
+            '!!www    `     www!!',
+            '!!w)            jw!!',
+            '!!\              /!!',
+            '!!:\            /:!!',
+            '!!!:\          /:!!!',
+            '!!!!:\/:\/\/:\/:!!!!',
+            '!!!!!!!!!!!!!!!!!!!!',
+            '!!!!!!!!!!!!!!!!!!!!',
 
         )
 
@@ -3263,7 +3291,9 @@ class FloorBuilder:
 
         new_floor_data = (900, "Edge of Sanity",2,5,2,(2,2,2),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (901, "Chamber of the Deceiver",2,5,2,(2,2,2),1,(Tiles.TREASURE, Tiles.RED_POTION))
+        new_floor_data = (901, "Chamber of the Deceiver",2,5,0,(2,2,2),1,(Tiles.TREASURE, Tiles.RED_POTION))
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (902, "Pool of the Miasma",2,5,0,(4,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         new_floor_data = (999, "Escape the Asylum",0,10,0,(5,5,5),0)
@@ -3336,7 +3366,7 @@ class LevelBuilder:
         new_level_data = (4, "Underground World", (300,301,302,303,304,305,306,307,308,309,310,399),"cave")
         self.level_data[4] = new_level_data
 
-        new_level_data = (90, "Chaos World", (900,901,999),"chaos")
+        new_level_data = (90, "Chaos World", (900,901,902,999),"chaos")
         self.level_data[90] = new_level_data
 
 
