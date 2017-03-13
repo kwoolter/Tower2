@@ -3073,30 +3073,120 @@ class FloorBuilder:
 
         # Pool of the Miasma
         new_floor_plan = (
-            '!!!!!!!!!!!!!!!!!!!!',
-            '!!!!!!!!!!!!!!!!!!!!',
+            'ww!!!!!!!!!!!!!!!!!!',
+            'w!!!!!!!!!!!!!!!!!!!',
             '!!!!:)()()(::)(:!!!!',
             '!!!:)          (:!!!',
             '!!:)            (:!!',
             '!!:              :!!',
-            '!!w      `      /w!!',
-            '!!www    `     www!!',
+            '!!w\     `      /w!!',
+            '!!wwwB   `    Bwww!!',
             '!ww     ```      ww!',
-            '!ww   ```+```    ww!',
-            '!ww     ```      ww!',
-            '!!w\     `       w!!',
-            '!!www    `     www!!',
+            '!w`   ```+```    `w!',
+            '!w`     ```      `w!',
+            '!ww\     `       ww!',
+            '!!wwwB   `    Bwww!!',
             '!!w)            jw!!',
-            '!!\              /!!',
-            '!!:\            /:!!',
+            '!!\              :!!',
+            '!!:\     M      /:!!',
             '!!!:\          /:!!!',
             '!!!!:\/:\/\/:\/:!!!!',
-            '!!!!!!!!!!!!!!!!!!!!',
-            '!!!!!!!!!!!!!!!!!!!!',
+            'w!!!!!!!!!!!!!!!!!!!',
+            'ww!!!!!!!!!!!!!!!!!!',
 
         )
 
         floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Desolation
+        new_floor_plan = (
+            ':!!!:::wwNww::::::::',
+            ': !!  (w```w)    j(:',
+            ': !!   `````      !!',
+            ':  !!! ww`ww    !!!!',
+            ':   !!!!w`w!!  !!! !',
+            ':    !!!w`w!!!!!   :',
+            ':\     !w`w!!!!    :',
+            'ww     ww`ww      /:',
+            'w`       `        ww',
+            'W`       `        `w',
+            'w`  ``````      ```E',
+            'ww   ww  `        `w',
+            ':)   ww  `        ww',
+            ':        `  ````  (:',
+            ':        `  `ww    :',
+            ':        ````ww    :',
+            '!        `         :',
+            '!!!      `         :',
+            '!!!!!  ww`ww\     /:',
+            '!::!!!!!wSw:::\j/::)',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Maze
+        new_floor_plan = (
+            '/:::::::)N(::::::::\\',
+            ':)                (:',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':       ```        :',
+            ':     ww```ww      :',
+            ':      w```w       :',
+            ')    `````````     (',
+            'W    ````,````     E',
+            '\    `````````     /',
+            ':      w```w       :',
+            ':     ww`_`ww      :',
+            ':       ```        :',
+            ':                  :',
+            ':                  :',
+            ':                  :',
+            ':\                /:',
+            '(:::::::\S/::::::::)',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Pilgrim's Reach
+        new_floor_plan = (
+            'wwww)(::)N(:::)(wwww',
+            'wR`w     `      w`|w',
+            'w``w     `      w``w',
+            'wwDw     `      wDww',
+            ':)       `        (:',
+            ')        `         (',
+            '\       B`B        /',
+            ':      ww`ww       :',
+            ':     Bw```wB      :',
+            ':      ``M``       :',
+            ':\    Bw```wB      :',
+            ':)     ww`ww       :',
+            ':       B B        :',
+            ':                ? (',
+            ':                  /',
+            ':                 /:',
+            ')               wDww',
+            '\_/\            w``w',
+            '::::\    /\    /w`,w',
+            ':::::\/:::::\/::wwww',
+
+        )
+
+        floor_id = 910
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
         # Chaos Level End
@@ -3295,6 +3385,18 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (902, "Pool of the Miasma",2,5,0,(4,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (903, "Desolation",2,5,0,(6,0,0),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (904, "Maze of Insanity",6,5,0,(6,0,1),1,(Tiles.UP,Tiles.DOWN))
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (905, "Maze of Insanity",6,5,0,(6,1,0),1,(Tiles.UP,Tiles.DOWN))
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (906, "Maze of Insanity",6,5,0,(2,4,0),1,(Tiles.UP,Tiles.DOWN))
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (907, "Maze of Insanity",6,5,0,(3,2,2),1,(Tiles.UP,Tiles.DOWN))
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (910, "Pilgrim's Reach",10,5,2,(6,0,0),1,(Tiles.EMPTY,Tiles.DOWN))
+        self.floor_configs[new_floor_data[0]] = new_floor_data
 
         new_floor_data = (999, "Escape the Asylum",0,10,0,(5,5,5),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -3366,7 +3468,7 @@ class LevelBuilder:
         new_level_data = (4, "Underground World", (300,301,302,303,304,305,306,307,308,309,310,399),"cave")
         self.level_data[4] = new_level_data
 
-        new_level_data = (90, "Chaos World", (900,901,902,999),"chaos")
+        new_level_data = (90, "Chaos World", (900,901,902,903,904,905,906,907,910,999),"chaos")
         self.level_data[90] = new_level_data
 
 
