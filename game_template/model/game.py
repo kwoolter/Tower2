@@ -3017,7 +3017,7 @@ class FloorBuilder:
 
         # Chaos Level Start
         new_floor_plan = (
-            ':\    (:::::)     (:',
+            ':\    (:::::)  N  (:',
             '::      (:)        (',
             ':)       :          ',
             ')       /:\   /\   /',
@@ -3132,20 +3132,20 @@ class FloorBuilder:
             '/:::::::)N(::::::::\\',
             ':)                (:',
             ':                  :',
-            ':                  :',
-            ':                  :',
+            ':        T         :',
+            ':   T          T   :',
             ':                  :',
             ':       ```        :',
             ':     ww```ww      :',
             ':      w```w       :',
-            ')    `````````     (',
-            'W    ````,````     E',
+            ') T  `````````     (',
+            'W    ````,````  T  E',
             '\    `````````     /',
             ':      w```w       :',
-            ':     ww`_`ww      :',
+            ':  T  ww`_`ww    T :',
             ':       ```        :',
             ':                  :',
-            ':                  :',
+            ':   T    T     T   :',
             ':                  :',
             ':\                /:',
             '(:::::::\S/::::::::)',
@@ -3187,6 +3187,34 @@ class FloorBuilder:
         )
 
         floor_id = 910
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Shadow Cave
+        new_floor_plan = (
+            '/::::::!!!!!!!:::::\\',
+            ':)    (:::!!!:)   (:',
+            ':        (:::)    /:',
+            ')               T ::',
+            '\ /ww  T          (:',
+            ':::ww       T      (',
+            ':::)               /',
+            ':)      /\    /:\  :',
+            ')       ww    www  :',
+            '\       ww\   wsw  :',
+            ')  T     ()   B`B  :',
+            '\             ```  (',
+            ':    T     T  ```  /',
+            ':                  (',
+            ': T             T  /',
+            ')       ```        :',
+            '\    T  w`w  T     (',
+            ':        `         /',
+            ':\       `        /:',
+            '(:::\/::\S/::\/::::)',
+
+        )
+
+        floor_id += 1
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
         # Chaos Level End
@@ -3385,7 +3413,7 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (902, "Pool of the Miasma",2,5,0,(4,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (903, "Desolation",2,5,0,(6,0,0),1)
+        new_floor_data = (903, "Bridge of Desolation",2,5,0,(6,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (904, "Maze of Insanity",6,5,0,(6,0,1),1,(Tiles.UP,Tiles.DOWN))
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -3396,6 +3424,8 @@ class FloorBuilder:
         new_floor_data = (907, "Maze of Insanity",6,5,0,(3,2,2),1,(Tiles.UP,Tiles.DOWN))
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (910, "Pilgrim's Reach",10,5,2,(6,0,0),1,(Tiles.EMPTY,Tiles.DOWN))
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (911, "Shadow Cave",10,5,2,(2,3,3),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         new_floor_data = (999, "Escape the Asylum",0,10,0,(5,5,5),0)
@@ -3468,7 +3498,7 @@ class LevelBuilder:
         new_level_data = (4, "Underground World", (300,301,302,303,304,305,306,307,308,309,310,399),"cave")
         self.level_data[4] = new_level_data
 
-        new_level_data = (90, "Chaos World", (900,901,902,903,904,905,906,907,910,999),"chaos")
+        new_level_data = (90, "Chaos World", (900,901,902,903,904,905,906,907,910,911,999),"chaos")
         self.level_data[90] = new_level_data
 
 

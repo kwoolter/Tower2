@@ -76,3 +76,4 @@ FromID,ToID,Direction,Description,Lockable,Locked,LockedDescription,Reversible,H
 907,904,NORTH,through an archway,,,,False,
 907,905,WEST,through an archway,,,,False,
 907,906,SOUTH,through an archway,,,,False,
+900,911,NORTH,through an archway,,,,,

@@ -234,12 +234,12 @@ class ImageManager:
                                     model.Tiles.DOOR_OPEN: "chaos_portal_open.png",
                                     model.Tiles.KEY: "chaos_key.png",
                                     model.Tiles.TREASURE: "treasure_purple.png",
-                                    model.Tiles.TREE: "tree.png",
+                                    model.Tiles.TREE: "chaos_tree.png",
                                     model.Tiles.TILE1: "tile6.png",
                                     model.Tiles.DOT1: ("lava1.png", "lava2.png","lava3.png", "lava4.png"),
                                     model.Tiles.MONSTER1: ("chaos_beast1.png", "chaos_beast2.png"),
-                                    model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png", "skeleton1.png", "skeleton3.png"),
-                                    model.Tiles.MONSTER3: ("goblin1.png", "goblin2.png", "goblin1.png", "goblin3.png"),
+                                    model.Tiles.MONSTER2: ("shadow_ghost1.png", "shadow_ghost2.png"),
+                                    model.Tiles.MONSTER3: ("beholder.png", "beholder2.png", "beholder.png", "beholder3.png"),
                                     })
 
         ImageManager.skins[new_skin_name] = new_skin
