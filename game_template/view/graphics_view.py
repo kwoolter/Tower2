@@ -673,6 +673,15 @@ class FloorView(View):
                                       self.tile_width,
                                       self.tile_height))
 
+        tile = model.Tiles.BOSS
+        image = View.image_manager.get_skin_image(tile_name=tile, skin_name=self.skin_name, tick=self.tick_count)
+
+        if self.floor.boss is not None and image is not None:
+            image = pygame.transform.scale(image, (self.floor.boss.width * self.tile_width,
+                                                   self.floor.boss.height * self.tile_height))
+            self.surface.blit(image, (self.floor.boss.x * self.tile_width,
+                                      self.floor.boss.y * self.tile_height))
+
 class TreasureMapView(View):
 
     BG_COLOUR = Colours.DARK_GREY

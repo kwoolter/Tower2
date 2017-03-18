@@ -7,37 +7,20 @@ from operator import itemgetter
 import pickle
 
 
-class Player():
-    def __init__(self, name, x : int = 1, y : int = 1):
+class Character():
+
+    def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1):
         self.name = name
         self._x = x
         self._y = y
+        self.height = height
+        self.width = width
         self.old_x = x
         self.old_y = y
         self.initialise()
 
-    # Set player's attributes back to starting values
     def initialise(self):
-        self.keys = 10
-        self.red_potions = 0
-        self.exit_keys = 0
-        self.boss_key = False
-        self.treasure = 0
-        self.trophies = 0
-        self.kills = 0
         self.HP = 10
-        self.weapon = 1
-        self.shield = 1
-        self.bombs = 0
-        self.maps = 0
-        self.treasure_maps = {}
-        self.runes = {}
-        self.equipment_slots=[]
-        self.equipment_slots.append(Tiles.RED_POTION)
-        self.equipment_slots.append(Tiles.WEAPON)
-        self.equipment_slots.append(Tiles.SHIELD)
-        self.equipment_slots.append(Tiles.BOMB_LIT)
-        self.effects = {}
 
     @property
     def x(self):
@@ -64,6 +47,34 @@ class Player():
     def back(self):
         self._x = self.old_x
         self._y = self.old_y
+
+class Player(Character):
+    def __init__(self, name : str, x : int = 1, y : int = 1):
+        super(Player, self).__init__(name=name, x=x, y=y)
+        self.initialise()
+
+    # Set player's attributes back to starting values
+    def initialise(self):
+        super(Player, self).initialise()
+        self.keys = 10
+        self.red_potions = 0
+        self.exit_keys = 0
+        self.boss_keys = 0
+        self.treasure = 0
+        self.trophies = 0
+        self.kills = 0
+        self.weapon = 1
+        self.shield = 1
+        self.bombs = 0
+        self.maps = 0
+        self.treasure_maps = {}
+        self.runes = {}
+        self.equipment_slots=[]
+        self.equipment_slots.append(Tiles.RED_POTION)
+        self.equipment_slots.append(Tiles.WEAPON)
+        self.equipment_slots.append(Tiles.SHIELD)
+        self.equipment_slots.append(Tiles.BOMB_LIT)
+        self.effects = {}
 
     @property
     def score(self):
@@ -103,6 +114,16 @@ class Player():
             maps = self.treasure_maps[level_id]
 
         return maps
+
+
+class Boss(Character):
+    def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1):
+        super(Boss, self).__init__(name=name, x=x, y=y, width=width, height=height)
+        self.height = height
+        self.width = width
+        self.initialise()
+    def initialise(self):
+        super(Boss,self).initialise()
 
 
 class Game:
@@ -417,7 +438,14 @@ class Game:
         elif tile == Tiles.KEY:
             current_player.keys += 1
             current_floor.set_player_tile(Tiles.EMPTY)
+            self.add_status_message("You found a key!")
             print("Found a key!")
+
+        elif tile == Tiles.BOSS_KEY:
+            current_player.boss_keys += 1
+            current_floor.set_player_tile(Tiles.EMPTY)
+            self.add_status_message("You found a Boss Key!")
+            print("Found a boss key!")
 
         elif tile in Tiles.MONSTERS:
             print("Hit a monster!")
@@ -525,6 +553,18 @@ class Game:
                 current_player.back()
                 self.add_status_message("The door is locked!")
                 print("...but the door is locked!")
+
+        elif tile == Tiles.BOSS_DOOR:
+            print("You found a boss door...")
+            if current_player.boss_keys > 0:
+                current_player.boss_keys -= 1
+                current_floor.set_player_tile(Tiles.BOSS_DOOR_OPEN)
+                self.add_status_message("You opened the Boss Door!")
+                print("...and you opened it!")
+            else:
+                current_player.back()
+                self.add_status_message("The Boss Door is locked!")
+                print("...but the boss door is locked!")
 
         elif tile == Tiles.NEXT_LEVEL:
             print("You found the entrance to the next level!")
@@ -964,7 +1004,8 @@ class Tiles:
     BANG = '$'
     BOMB = 'q'
     BOMB_LIT = 'Q'
-    BOSS_DOOR = 'd'
+    BOSS_DOOR = 'F'
+    BOSS_DOOR_OPEN = 'f'
     BRAZIER = 'B'
     DECORATION1 = 'z'
     DECORATION2 = 'Z'
@@ -983,6 +1024,8 @@ class Tiles:
     MONSTER1 = '1'
     MONSTER2 = '2'
     MONSTER3 = '3'
+    BOSS = '4'
+    BOSS_KEY = 'K'
     NEXT_LEVEL = 'L'
     NORTH = 'N'
     PLAYER = 'P'
@@ -1225,6 +1268,7 @@ class Floor:
         self.trophies = 0
         self.floor_plan = None
         self.player = None
+        self.boss = None
         self.exits = {}
 
     def initialise(self, floor_plan : FloorPlan):
@@ -1321,8 +1365,33 @@ class Floor:
             self.player.x = x
             self.player.y = y
 
-
         print("Adding player to entrance at {0},{1}".format(x, y))
+
+    def add_boss(self, boss : Boss):
+
+        print("Adding boss {0} to Floor {1}...".format(boss.name, self.name))
+
+        tries = 30
+        attempts = 0
+        while True:
+            x = random.randint(0, self.width - 1)
+            y = random.randint(0, self.height - 1)
+            boss.x = x
+            boss.y = y
+
+            if self.is_empty(boss) is True:
+                self.boss = boss
+                logging.info("Placed {0} at {1},{2}".format(self.boss.name, x, y))
+                print("Placed {0} at {1},{2}".format(self.boss.name, x, y))
+                break
+
+            attempts += 1
+
+            # We tried several times to find an empty square, time to give up!
+            if attempts > tries:
+                print("Can't find an empty tile to place boss {0} after {1} tries".format(boss.name, attempts))
+                break
+
 
     def add_explodable(self, tile, x : int, y : int):
 
@@ -1364,6 +1433,9 @@ class Floor:
         self.player.x += dx
         self.player.y += dy
 
+        empty = self.is_empty(self.player)
+        print("Empty check = {0}".format(empty))
+
         if self.is_valid_xy(self.player.x, self.player.y) is False:
             self.player.back()
             print("Hit the boundary!")
@@ -1374,12 +1446,46 @@ class Floor:
 
     def is_collision(self):
 
+        collision = False
+
         collision_items = list(Tiles.MONSTERS + Tiles.PLAYER_DOT_TILES)
 
         if self.get_tile(self.player.x, self.player.y) in collision_items:
-            return True
-        else:
-            return False
+            collision = True
+        elif self.boss is not None:
+            if self.player.x >= self.boss.x and \
+                self.player.x <= (self.boss.x + self.boss.width) and \
+                self.player.y >= self.boss.y and \
+                self.player.y <= (self.boss.y + self.boss.height):
+                collision = True
+                print("hit the boss")
+
+        return collision
+
+    def is_empty(self, char : Character):
+        empty = True
+
+        if isinstance(char, Player) is True:
+            block_tiles = Tiles.PLAYER_BLOCK_TILES
+            for x in range(char.x, char.x + char.width):
+                for y in range(char.y, char.y + char.height):
+                    if self.is_valid_xy(x,y) == False:
+                        empty = False
+                    elif self.get_tile(x,y) in block_tiles:
+                        empty = False
+                        break
+
+        elif isinstance(char, Boss) is True:
+            empty_tiles = Tiles.MONSTER_EMPTY_TILES
+            for x in range(char.x, char.x + char.width):
+                for y in range(char.y, char.y + char.height):
+                    if self.is_valid_xy(x,y) == False:
+                        empty = False
+                    elif self.get_tile(x,y) not in empty_tiles:
+                        empty = False
+                        break
+
+        return empty
 
     def move_monsters(self):
 
@@ -1421,6 +1527,19 @@ class Floor:
             raise Exception("We lost a monster x={0},y={1},type={2}".format(x,y,monster_type))
 
         self.monsters = new_monsters
+
+        if self.boss is not None:
+            self.move_boss()
+
+    def move_boss(self):
+        # ..look at a random square around the boss...
+        new_x, new_y = random.choice(((0, 0), (-1, 0), (1, 0), (0, -1), (0, 1)))
+        self.boss.x += new_x
+        self.boss.y += new_y
+
+        if self.is_empty(self.boss) is False:
+            self.boss.back()
+
 
     def kill_monster(self, x : int = None, y : int = None):
 
@@ -1605,6 +1724,30 @@ class FloorBuilder:
     def load_floor_plans(self):
 
         logging.info("Starting loading floor plans...")
+
+        arena = [
+            '        (N)         ',
+            '                    ',
+            '                    ',
+            '                    ',
+            '                    ',
+            '                    ',
+            '                    ',
+            '                 K  ',
+            '                    ',
+            '                    ',
+            '                    ',
+            '                    ',
+            '                    ',
+            '                    ',
+            '                    ',
+            '                    ',
+            '                    ',
+            '                    ',
+            '        /F\         ',
+            '        :S:         ',
+
+        ]
 
         # Start of the Game - Forest Level
         new_floor_plan = [
@@ -2062,6 +2205,9 @@ class FloorBuilder:
         floor_id += 1
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
+        floor_id = 98
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(arena))
+
         # Portal1
         new_floor_plan = [
             '::::::::::::::::::::',
@@ -2347,6 +2493,9 @@ class FloorBuilder:
 
         floor_id +=1
         self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+
+        floor_id = 198
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(arena))
 
         # Frozen End
         new_floor_plan = (
@@ -2701,6 +2850,9 @@ class FloorBuilder:
         floor_id += 1
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
+        floor_id = 298
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(arena))
+
         # Desert Level End
         new_floor_plan = (
             '::::::ww:N:ww:::::::',
@@ -3037,6 +3189,9 @@ class FloorBuilder:
 
         floor_id +=1
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        floor_id = 398
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(arena))
 
         # Cave Level End
         new_floor_plan = (
@@ -3428,6 +3583,8 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (3, "Library of Zastaross",2,3,1,(4,0,0),1,(Tiles.DOOR,Tiles.DOOR_OPEN))
         self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (98,"Arena",0,0,0,(0,5,0),0)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (99,"Portal Between Worlds",5,3,0,(0,5,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
@@ -3481,6 +3638,8 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (108, "Shard Mountain", 4, 3, 1, (4, 4, 0), 1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (198, "Arena", 0, 0, 0, (0, 5, 0), 0)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (199,"Frozen End",2,3,0,(5,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
@@ -3508,6 +3667,8 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (210,"Palace of the Djinn",2,4,1,(0,0,6),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (298, "Arena", 0, 0, 0, (0, 5, 0), 0)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (299,"Sanctum of the Sands",2,3,1,(2,3,2),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
@@ -3534,6 +3695,8 @@ class FloorBuilder:
         new_floor_data = (309,"Chasm of Fire",2,3,0,(0,5,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (310,"Dragon Hoard",2,3,0,(0,5,0),1,(Tiles.TREASURE_CHEST,Tiles.DOWN))
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (398, "Arena", 0, 0, 0, (0, 5, 0), 0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (399,"Elemental Vault",2,3,0,(2,0,2),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -3604,6 +3767,17 @@ class FloorBuilder:
 
         logging.info("Finished building floors. {0} floors built".format(len(self.floors.keys())))
 
+        self.add_bosses()
+
+    def add_bosses(self):
+        boss = Boss("Fallen Knight", width = 2, height = 2)
+        self.floors[98].add_boss(boss)
+
+        boss = Boss("Ice Dragon", width = 2, height = 2)
+        self.floors[198].add_boss(boss)
+
+        boss = Boss("Goblin King", width = 2, height = 2)
+        self.floors[298].add_boss(boss)
 
 class LevelBuilder:
 
