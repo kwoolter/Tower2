@@ -676,7 +676,7 @@ class FloorView(View):
             HP = self.floor.boss.HP
 
             x = int(((self.floor.boss.x + self.floor.boss.width/2) * self.tile_width) - HP)
-            y = int((self.floor.boss.y + self.floor.boss.height) * self.tile_height) - 4
+            y = int((self.floor.boss.y + self.floor.boss.height) * self.tile_height) - 6
 
             if HP > 20:
                 colour = Colours.GREEN

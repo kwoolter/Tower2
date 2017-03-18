@@ -1258,7 +1258,7 @@ class Floor:
     ENTRANCE = "Entrance"
     EXIT = "Exit"
     MONSTER_MOVE_RATE = 3
-    BOSS_MOVE_RATE = 2
+    BOSS_MOVE_RATE = 1
     EXPLODABLE_COUNTDOWN_RATE = 4
     EXPLODABLE_COUNTDOWN = 10
     SECRET_COUNTDOWN = 4
@@ -1561,7 +1561,7 @@ class Floor:
         attempts = 2
 
         if self.boss.HP <=10:
-            attempts = 5
+            attempts = 6
         elif self.boss.HP <=20:
             attempts = 3
 
@@ -1576,7 +1576,6 @@ class Floor:
                 self.boss.back()
                 attempts -= 1
             else:
-                print("Moved boss with {0} attempts left".format(attempts))
                 break
 
     def kill_monster(self, x : int = None, y : int = None):
@@ -1769,18 +1768,18 @@ class FloorBuilder:
         logging.info("Starting loading floor plans...")
 
         arena = [
-            '/)      (N)       (\\',
+            '/)     (:N:)      (\\',
             ')                  (',
             '                    ',
             '                    ',
             '                    ',
             '                    ',
             '                    ',
-            '     :       :      ',
-            ':    :   :   :     :',
-            'R    :   :   :     R',
-            ':    :   :   :     :',
-            '     :       :      ',
+            '     !       !      ',
+            ':    !   !   !     :',
+            'R    !   !   !     R',
+            ':    !   !   !     :',
+            '     !       !      ',
             '                    ',
             '                    ',
             '                    ',
@@ -1788,7 +1787,7 @@ class FloorBuilder:
             '                    ',
             '                    ',
             '\       /F\        /',
-            '(\      :S:       /)',
+            '(\     j:S:j      /)',
 
         ]
 
@@ -2248,26 +2247,27 @@ class FloorBuilder:
 
         # Arena
         new_floor_plan = (
+            'j       (:R:)      j',
             '                    ',
             '                    ',
             '                    ',
             '                    ',
-            '                    ',
-            '                    ',
-            '                   /',
-            '\                  :',
+            '        !    !      ',
+            '        !    !     /',
+            '\       !    !     :',
             ':::\              /:',
             ':``:              ::',
             'W``F              `E',
             ':``:              ::',
             ':::)              (:',
-            ')                  :',
-            '                   (',
+            ')       !    !     :',
+            '        !    !     (',
+            '        !    !      ',
             '                    ',
             '                    ',
             '                    ',
-            '                    ',
-            '                    ',
+            'j       /:R:\      j',
+
         )
 
         floor_id = 98
