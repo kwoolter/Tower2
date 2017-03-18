@@ -4,6 +4,7 @@ import game_template.utils as utils
 import game_template.utils.trpg as trpg
 import time
 from operator import itemgetter
+import pickle
 
 
 class Player():
@@ -162,6 +163,41 @@ class Game:
 
         return trophy_count
 
+    def save(self, file_name : str = None):
+
+        self.pause(pause = True)
+
+        if file_name is None:
+            file_name = "RPGWorld_" + self.get_current_player().name + ".rpg"
+
+        game_file = open(file_name, "wb")
+        pickle.dump(self, game_file)
+        game_file.close()
+
+        self.add_status_message("Game Saved")
+
+        logging.info("%s saved." % file_name)
+
+    def load(self, file_name : str = None):
+
+        self.pause(pause = True)
+
+        if file_name is None:
+            file_name = "RPGWorld_" + self.get_current_player().name + ".rpg"
+        try:
+            game_file = open(file_name, "rb")
+            new_game = pickle.load(game_file)
+            game_file.close()
+
+            self.add_status_message("Game Loaded")
+
+            logging.info("\n%s loaded.\n" % file_name)
+
+        except IOError:
+
+            logging.warning("High Score Table file %s not found." % file_name)
+
+        return new_game
 
     def get_current_floor(self):
         return self.level_factory.get_floor(self.current_floor_id)
@@ -402,6 +438,15 @@ class Game:
             current_floor.set_player_tile(Tiles.EMPTY)
             self.add_status_message("You feel healthier!")
             print("Some HP restored")
+
+        elif tile == Tiles.REPLENISH:
+            if current_player.HP < 10:
+                current_player.HP = 10
+                self.add_status_message("You are fully healed!")
+                current_floor.set_player_tile(Tiles.EMPTY)
+            else:
+                self.add_status_message("You have full health!")
+                current_player.back()
 
         elif tile in Tiles.SWAP_TILES.keys() and self.get_current_player().moved() is True:
             current_floor.set_player_tile(Tiles.SWAP_TILES[tile])
@@ -701,12 +746,16 @@ class Game:
         self._state = Game.PLAYING
         self.game_start = time.time()
 
-    def pause(self, pause : bool = True):
+    def pause(self, pause : bool = None):
 
         if self.state not in (Game.PLAYING, Game.PAUSED):
             raise Exception("Game is in state {0} so can't be paused!".format(self.state))
 
-        if self.state == Game.PLAYING:
+        if pause is True:
+            self._state = Game.PAUSED
+        elif pause is False:
+            self._state = Game.PLAYING
+        elif self.state == Game.PLAYING:
             self._state = Game.PAUSED
         else:
             self._state = Game.PLAYING
@@ -928,6 +977,7 @@ class Tiles:
     EMPTY = ' '
     EXIT_KEY = '%'
     HEART = 'HP'
+    REPLENISH = "H"
     KEY = '?'
     MAP = 'M'
     MONSTER1 = '1'
@@ -2061,7 +2111,7 @@ class FloorBuilder:
             '   z8z            ::',
             '    8   T    T  z  !',
             '!                  !',
-            ':\    !!:`:    /:\ !',
+            ':\    !!:`:    /:\H!',
             ':::www!::S::www:::!!',
 
         )
@@ -2349,7 +2399,7 @@ class FloorBuilder:
             '                  ww',
             'w       T T        w',
             'w                  w',
-            'ww      :D:    www w',
+            'ww      :D:    wwwHw',
             'wwww   /:S:\  wwwwww',
 
         )
@@ -2698,7 +2748,7 @@ class FloorBuilder:
             ')           /:\    :',
             '\           ::)   /:',
             ':           :)    ::',
-            ':  /:\     /:    /::',
+            ':  /:\     /:H   /::',
             ':\ :::\   /::\   :::',
             ':::::::\S/::::::::::',
 
@@ -3036,7 +3086,7 @@ class FloorBuilder:
             '         `````` ()  ',
             '         `          ',
             '\/\     /D\         ',
-            ':::\    :S:         ',
+            ':::\    :S:        H',
 
         )
 
@@ -3054,14 +3104,14 @@ class FloorBuilder:
             '\                www',
             ':\        B       `w',
             'ww`     /:::\     `w',
-            'W````  8D`,`D8    `w',
+            'W````  8D`,`D8    `E',
             'ww`     (:::)     `w',
-            ':)        B      www',
-            ')                 (:',
-            '\                  :',
-            ':    _ w  _  w _   (',
-            ':      w`````w     /',
-            ':      wwwwwww     :',
+            ':)        B       `w',
+            ')                www',
+            '\                 (:',
+            ':    _ w  _  w _   :',
+            ':      w`````w     (',
+            ':      wwwwwww     /',
             ':        (:)       :',
             ':\        :     - /:',
             '(:::::::\/:\/::::::)',
@@ -3195,7 +3245,7 @@ class FloorBuilder:
             ':)    (:::!!!:)   (:',
             ':        (:::)    /:',
             ')               T ::',
-            '\ /ww  T          (:',
+            '\-/ww  T          (:',
             ':::ww       T      (',
             ':::)               /',
             ':)      /\    /:\  :',
@@ -3211,6 +3261,89 @@ class FloorBuilder:
             ':        `         /',
             ':\       `        /:',
             '(:::\/::\S/::\/::::)',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Divide
+        new_floor_plan = (
+            '/:)    (wNw)     (:\\',
+            ':)      w`w       (:',
+            ')        `         (',
+            '         `         /',
+            '       ww`ww      /:',
+            '\     /w```w\     (:',
+            'wwwwwwww`M`wwwwwwwww',
+            '!!!!!!!w```w!!!!!!!!',
+            '!!!!!!!wwwww!!!!!!!!',
+            '!!!!!!!w```w!!!!!!!!',
+            'wwwwwwww`+`wwwwwwwww',
+            ':)    (w```w)    (::',
+            ')      ww`ww      (:',
+            '         `         :',
+            '         `         (',
+            '         `          ',
+            '         `          ',
+            '\        `         /',
+            ':\      w`w       /:',
+            '(:\    /wSw\     /:)',
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # tunnel
+        new_floor_plan = (
+            '/:)(::::)N(:::::)(:\\',
+            ':)  (::) ` (:::)  (:',
+            ')    ::  `  (::\   (',
+            '     :: ```  (:)    ',
+            '     ()  `          ',
+            '                   /',
+            '                   (',
+            '        /:\         ',
+            '    /\ /:::\ /:\    ',
+            '  /:::::::::::::\   ',
+            '  :::::)R:::)j(::   ',
+            '  (::)  /::)  /::   ',
+            '   (:   :::\  (:)   ',
+            '    :R  ()()        ',
+            '    :\              ',
+            '    ()   `      /\  ',
+            '        ```     ()  ',
+            '\        `         /',
+            ':\     /w`w\      /:',
+            '(:\   /:wSw::\/:\/:)',
+
+        )
+
+        floor_id += 1
+        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
+
+        # Map Room
+        new_floor_plan = (
+            '/::::)(wwwwww)(::::\\',
+            ':)                (:',
+            ':                  :',
+            ':   _    M   _     :',
+            ':                  :',
+            ':\     _           :',
+            ':w        _     _ /:',
+            ':w  _        _    ww',
+            'www               `w',
+            'W``            ````w',
+            'www    _  _  _ ¬¬¬_w',
+            ':w             ````w',
+            ':w                `w',
+            ':)  _             ww',
+            ':                 (:',
+            ':       wDw  _  _  :',
+            ':  _    wDw        :',
+            ':       wDw        :',
+            ':\     /w,w\      /:',
+            '(:::\/::::::\/:::::)',
 
         )
 
@@ -3407,7 +3540,7 @@ class FloorBuilder:
 
         # id,name,treasures,traps,keys,monsters(1,2,3),secrets, switch tiles
 
-        new_floor_data = (900, "Edge of Sanity",2,5,2,(2,2,2),1)
+        new_floor_data = (900, "Edge of Reality",2,5,2,(2,2,2),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (901, "Chamber of the Deceiver",2,5,0,(2,2,2),1,(Tiles.TREASURE, Tiles.RED_POTION))
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -3426,6 +3559,12 @@ class FloorBuilder:
         new_floor_data = (910, "Pilgrim's Reach",10,5,2,(6,0,0),1,(Tiles.EMPTY,Tiles.DOWN))
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (911, "Shadow Cave",10,5,2,(2,3,3),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (912, "Great Divide",10,5,2,(2,3,3),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (913, "Tunnel of Illusion",10,5,2,(2,3,3),1)
+        self.floor_configs[new_floor_data[0]] = new_floor_data
+        new_floor_data = (914, "Map Room",5,0,0,(2,3,3),1,(Tiles.TRAP2, Tiles.TRAP1))
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         new_floor_data = (999, "Escape the Asylum",0,10,0,(5,5,5),0)
@@ -3498,7 +3637,7 @@ class LevelBuilder:
         new_level_data = (4, "Underground World", (300,301,302,303,304,305,306,307,308,309,310,399),"cave")
         self.level_data[4] = new_level_data
 
-        new_level_data = (90, "Chaos World", (900,901,902,903,904,905,906,907,910,911,999),"chaos")
+        new_level_data = (90, "Chaos World", (900,901,902,903,904,905,906,907,910,911,912,913,914,999),"chaos")
         self.level_data[90] = new_level_data
 
 

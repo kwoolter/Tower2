@@ -311,6 +311,17 @@ class StatusBar(View):
             x += StatusBar.ICON_WIDTH
             draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.RUNE, count=player.runes_collected(self.game.get_current_level().id))
 
+        elif self.game.state == model.Game.PAUSED:
+            msg = "F8:Save   F9:Load"
+            draw_text(self.surface,
+                      msg=msg,
+                      x=10,
+                      y=int(pane_rect.height / 2),
+                      fg_colour=StatusBar.FG_COLOUR,
+                      bg_colour=StatusBar.BG_COLOUR,
+                      size=StatusBar.STATUS_TEXT_FONT_SIZE,
+                      centre=False)
+
 
 
 class HighScoreTableView(View):

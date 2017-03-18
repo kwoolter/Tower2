@@ -81,6 +81,8 @@ class ImageManager:
                                     model.Tiles.RUNE5: "rune5.png",
                                     model.Tiles.SHOP: "door.png",
                                     model.Tiles.HEART : "heart2.png",
+                                    model.Tiles.REPLENISH: ("replenish1.png","replenish2.png","replenish3.png","replenish4.png",\
+                                                            "replenish1.png","replenish4.png","replenish3.png","replenish2.png"),
                                     model.Tiles.PLAYER : ("player1.png","player.png","player2.png","player.png"),
                                     model.Tiles.SHOP_KEEPER : "shop_keeper.png",
                                     model.Tiles.DOOR : "door.png",
@@ -185,7 +187,7 @@ class ImageManager:
                                     model.Tiles.TRAP1: ("spear_trap1.png", "spear_trap2.png", "spear_trap3.png",
                                     "spear_trap4.png", "spear_trap4.png","spear_trap3.png","spear_trap2.png","spear_trap1.png"),
                                     model.Tiles.MONSTER1: ("snake1.png", "snake2.png"),
-                                    model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png", "skeleton1.png", "skeleton3.png"),
+                                    model.Tiles.MONSTER2: ("devil1.png", "devil2.png"),
                                     model.Tiles.MONSTER3: ("beholder.png", "beholder2.png", "beholder.png", "beholder3.png"),
                                     })
 
@@ -234,8 +236,10 @@ class ImageManager:
                                     model.Tiles.DOOR_OPEN: "chaos_portal_open.png",
                                     model.Tiles.KEY: "chaos_key.png",
                                     model.Tiles.TREASURE: "treasure_purple.png",
+                                    model.Tiles.TRAP2: ("treasure_map.png"),
                                     model.Tiles.TREE: "chaos_tree.png",
                                     model.Tiles.TILE1: "tile6.png",
+                                    model.Tiles.TILE2: "tile5.png",
                                     model.Tiles.DOT1: ("lava1.png", "lava2.png","lava3.png", "lava4.png"),
                                     model.Tiles.MONSTER1: ("chaos_beast1.png", "chaos_beast2.png"),
                                     model.Tiles.MONSTER2: ("shadow_ghost1.png", "shadow_ghost2.png"),
@@ -349,7 +353,7 @@ def draw_icon(surface, x, y, icon_name, count : int = None, tick : int = 0):
         count_pos.right = iconpos.right
         surface.blit(icon_count, count_pos)
 
-def draw_text(surface, msg, x, y, size=32, fg_colour=Colours.WHITE, bg_colour=Colours.BLACK, alpha : int = 255):
+def draw_text(surface, msg, x, y, size=32, fg_colour=Colours.WHITE, bg_colour=Colours.BLACK, alpha : int = 255, centre : bool = True):
 
     font = pygame.font.Font(None, size)
     if bg_colour is not None:
@@ -357,7 +361,12 @@ def draw_text(surface, msg, x, y, size=32, fg_colour=Colours.WHITE, bg_colour=Co
     else:
         text = font.render(msg, 1, fg_colour)
     textpos = text.get_rect()
-    textpos.centerx = x
+
+    if centre is True:
+        textpos.centerx = x
+    else:
+        textpos.x = x
+
     textpos.centery = y
     surface.blit(text, textpos)
     surface.set_alpha(alpha)

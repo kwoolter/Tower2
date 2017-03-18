@@ -5,7 +5,8 @@ from pygame.locals import *
 
 import game_template.model as model
 import game_template.view as view
-
+import pickle
+import logging
 
 class Controller:
 
@@ -94,6 +95,15 @@ class Controller:
                             except Exception as err:
                                 print(str(err))
 
+                        elif event.key in (K_UP, K_w):
+                            self.game.move_player(0, -1)
+                        elif event.key in (K_DOWN, K_s):
+                            self.game.move_player(0, 1)
+                        elif event.key in (K_LEFT, K_a):
+                            self.game.move_player(-1, 0)
+                        elif event.key in (K_RIGHT, K_d):
+                            self.game.move_player(1, 0)
+
                         elif event.key == Controller.KEY_PAUSE:
                             try:
                                 self.game.pause()
@@ -167,16 +177,20 @@ class Controller:
                             except Exception as err:
                                 print(str(err))
 
-                        elif event.key in (K_UP, K_w):
-                            self.game.move_player(0, -1)
-                        elif event.key in (K_DOWN, K_s):
-                            self.game.move_player(0, 1)
-                        elif event.key in (K_LEFT, K_a):
-                            self.game.move_player(-1, 0)
-                        elif event.key in (K_RIGHT, K_d):
-                            self.game.move_player(1, 0)
-
-
+                        elif event.key == K_F8:
+                            try:
+                                if self.game.state == model.Game.PAUSED:
+                                    self.save()
+                                    print("Game saved")
+                            except Exception as err:
+                                print(str(err))
+                        elif event.key == K_F9:
+                            try:
+                                if self.game.state == model.Game.PAUSED:
+                                    self.load()
+                                    print("Game loaded")
+                            except Exception as err:
+                                print(str(err))
 
                     # If we are in Inventory mode...
                     elif self.mode == Controller.INVENTORY:
@@ -243,6 +257,19 @@ class Controller:
         elif self.game.state == model.Game.SHOPPING:
             self.game.exit_shop()
 
+    def save(self):
+
+        self.game.save()
+
+
+    def load(self):
+
+        new_game = self.game.load()
+
+        del self.game
+
+        self.game = new_game
+        self.view.initialise(self.game)
 
     def end(self):
         self.view.end()
