@@ -3871,6 +3871,7 @@ class FloorBuilder:
         self.add_bosses()
 
     def add_bosses(self):
+
         boss = Boss("The Fallen Knight", width = 3, height = 3)
         self.floors[98].add_boss(boss)
 

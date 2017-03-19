@@ -146,7 +146,8 @@ class ImageManager:
                                     model.Tiles.MONSTER1: ("snow_beast.png", "snow_beast2.png","snow_beast.png", "snow_beast3.png"),
                                     model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png", "skeleton1.png", "skeleton3.png"),
                                     model.Tiles.DOT1: ("ice_wall.png"),
-                                    model.Tiles.TREE: "winter_tree.png"
+                                    model.Tiles.TREE: "winter_tree.png",
+                                    model.Tiles.BOSS: ("dragon1.png", "dragon2.png", "dragon3.png","dragon2.png")
                                     })
         ImageManager.skins[new_skin_name] = new_skin
 
