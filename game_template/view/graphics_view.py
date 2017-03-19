@@ -664,23 +664,32 @@ class FloorView(View):
                         tile, count = self.floor.explodables[(x, y)]
                         draw_text(self.surface, str(count), (x + 0.5) * self.tile_width, (y + 0.75) * self.tile_height,size=20)
 
-        tile = model.Tiles.BOSS
-        image = View.image_manager.get_skin_image(tile_name=tile, skin_name=self.skin_name, tick=self.tick_count)
+
 
         if self.floor.boss is not None and image is not None:
-            image = pygame.transform.scale(image, (self.floor.boss.width * self.tile_width,
-                                                   self.floor.boss.height * self.tile_height))
+
+            tile = model.Tiles.BOSS
+
+            image = View.image_manager.get_skin_image(tile_name=tile,
+                                                      skin_name=self.skin_name,
+                                                      tick=self.tick_count,
+                                                      width=self.floor.boss.width * self.tile_width,
+                                                      height=self.floor.boss.height * self.tile_height)
+
+            # image = pygame.transform.scale(image, (self.floor.boss.width * self.tile_width,
+            #                                        self.floor.boss.height * self.tile_height))
             self.surface.blit(image, (self.floor.boss.x * self.tile_width,
                                       self.floor.boss.y * self.tile_height))
 
             HP = self.floor.boss.HP
+            HP_pct = int(HP*100/self.floor.boss._HP)
 
-            x = int(((self.floor.boss.x + self.floor.boss.width/2) * self.tile_width) - HP)
+            x = int(((self.floor.boss.x + self.floor.boss.width/2) * self.tile_width) - HP/2)
             y = int((self.floor.boss.y + self.floor.boss.height) * self.tile_height) - 6
 
-            if HP > 20:
+            if HP_pct > 60:
                 colour = Colours.GREEN
-            elif HP > 10:
+            elif HP_pct > 35:
                 colour = Colours.YELLOW
             else:
                 colour = Colours.RED
@@ -688,7 +697,7 @@ class FloorView(View):
             pygame.draw.line(self.surface,
                         colour,
                         (x, y),
-                        (x + HP * 2, y),
+                        (x + HP, y),
                         4)
 
         tile = model.Tiles.PLAYER

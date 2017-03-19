@@ -167,6 +167,10 @@ class ImageManager:
                                     model.Tiles.MONSTER1: ("goblin1.png", "goblin2.png","goblin1.png", "goblin3.png"),
                                     model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png","skeleton1.png","skeleton3.png" ),
                                     model.Tiles.MONSTER3: ("biter.png", "biter1.png", "biter.png","biter2.png","biter.png"),
+                                    model.Tiles.BOSS: ("fallen_knight1.png","fallen_knight2.png","fallen_knight3.png", \
+                                                       "fallen_knight2.png","fallen_knight1.png","fallen_knight4.png", \
+                                                       "fallen_knight5.png","fallen_knight4.png"
+                                                       ),
                                     })
 
         ImageManager.skins[new_skin_name] = new_skin
@@ -222,6 +226,7 @@ class ImageManager:
                                     model.Tiles.MONSTER1: ("biter.png", "biter1.png", "biter.png","biter2.png","biter.png"),
                                     model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png", "skeleton1.png", "skeleton3.png"),
                                     model.Tiles.MONSTER3: ("goblin1.png", "goblin2.png", "goblin1.png", "goblin3.png"),
+                                    model.Tiles.BOSS: ("goblin_king1.png", "goblin_king2.png","goblin_king1.png","goblin_king3.png"),
                                     })
 
         ImageManager.skins[new_skin_name] = new_skin
@@ -248,6 +253,7 @@ class ImageManager:
                                     model.Tiles.MONSTER1: ("chaos_beast1.png", "chaos_beast2.png"),
                                     model.Tiles.MONSTER2: ("shadow_ghost1.png", "shadow_ghost2.png"),
                                     model.Tiles.MONSTER3: ("beholder.png", "beholder2.png", "beholder.png", "beholder3.png"),
+                                    model.Tiles.BOSS: ("skull1.png", "skull2.png"),
                                     })
 
         ImageManager.skins[new_skin_name] = new_skin
@@ -289,7 +295,7 @@ class ImageManager:
 
         ImageManager.skins[new_skin_name] = new_skin
 
-    def get_skin_image(self, tile_name: str, skin_name: str = DEFAULT_SKIN, tick=0):
+    def get_skin_image(self, tile_name: str, skin_name: str = DEFAULT_SKIN, tick=0, width : int = 32, height : int =32):
 
         if skin_name not in ImageManager.skins.keys():
             raise Exception("Can't find specified skin {0}".format(skin_name))
@@ -313,10 +319,10 @@ class ImageManager:
             else:
                 tile_file_name = tile_file_names[tick % len(tile_file_names)]
 
-            image = self.get_image(tile_file_name)
+            image = self.get_image(image_file_name=tile_file_name, width=width, height=height)
 
         else:
-            image = self.get_image(tile_file_names)
+            image = self.get_image(tile_file_names,width=width, height=height)
 
         return image
 

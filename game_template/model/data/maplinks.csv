@@ -53,7 +53,7 @@ FromID,ToID,Direction,Description,Lockable,Locked,LockedDescription,Reversible,H
 301,308,DOWN,on a ladder,,,,,
 310,309,DOWN,a secret passageway,,,,,
 900,998,SOUTH,through the rubble,,,,,
-998,990,SOUTH,through an archway,,,,,
+998,999,SOUTH,through an archway,,,,,
 900,901,EAST,through a door,,,,,
 901,902,DOWN,on a rocky chute,,,,,
 900,903,WEST,over some boulders,,,,,

@@ -35,6 +35,7 @@ class Controller:
     def initialise(self):
 
         self._mode = Controller.PLAYING
+        self._test_mode = False
 
         self.game = model.Game("Adventure World")
         self.view = view.MainFrame(width=20*32, height=730)
@@ -110,21 +111,21 @@ class Controller:
                             except Exception as err:
                                 print(str(err))
 
-                        elif event.key == K_n:
+                        elif event.key == K_n and self._test_mode is True:
                             try:
                                 if self.game.state == model.Game.PLAYING:
                                     self.game.next_floor()
                             except Exception as err:
                                 print(str(err))
 
-                        elif event.key == K_l:
+                        elif event.key == K_l and self._test_mode is True:
                             try:
                                 if self.game.state == model.Game.PLAYING:
                                     self.game.next_level()
                             except Exception as err:
                                 print(str(err))
 
-                        elif event.key == Controller.KEY_HINT:
+                        elif event.key == Controller.KEY_HINT and self._test_mode is True:
                             self.game.hint()
 
                         elif event.key == Controller.KEY_INVENTORY:
@@ -184,11 +185,27 @@ class Controller:
                                     print("Game saved")
                             except Exception as err:
                                 print(str(err))
+
                         elif event.key == K_F9:
                             try:
                                 if self.game.state == model.Game.PAUSED:
                                     self.load()
                                     print("Game loaded")
+                            except Exception as err:
+                                print(str(err))
+
+                        elif event.key == K_F12:
+                            try:
+
+                                if self._test_mode is False:
+                                    print("Test mode ON")
+                                    self._test_mode = True
+                                    model.Game.TARGET_RUNE_COUNT = 0
+                                else:
+                                    print("Test mode OFF")
+                                    self._test_mode = False
+                                    model.Game.TARGET_RUNE_COUNT = 4
+
                             except Exception as err:
                                 print(str(err))
 

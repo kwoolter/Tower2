@@ -9,8 +9,9 @@ import pickle
 
 class Character():
 
-    def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1):
+    def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1, HP : int = 20):
         self.name = name
+        self._HP = HP
         self._x = x
         self._y = y
         self.height = height
@@ -20,7 +21,7 @@ class Character():
         self.initialise()
 
     def initialise(self):
-        self.HP = 10
+        self.HP = self._HP
 
     @property
     def x(self):
@@ -49,8 +50,8 @@ class Character():
         self._y = self.old_y
 
 class Player(Character):
-    def __init__(self, name : str, x : int = 1, y : int = 1):
-        super(Player, self).__init__(name=name, x=x, y=y)
+    def __init__(self, name : str, x : int = 1, y : int = 1, HP : int = 10):
+        super(Player, self).__init__(name=name, x=x, y=y, HP=HP)
         self.initialise()
 
     # Set player's attributes back to starting values
@@ -118,16 +119,39 @@ class Player(Character):
 
 
 class Boss(Character):
-    def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1):
-        super(Boss, self).__init__(name=name, x=x, y=y, width=width, height=height)
+
+    NORMAL = "Normal"
+    ANGRY = "Angry"
+    ANGRY_PCT = 60
+    RAGE = "Rage"
+    RAGE_PCT = 30
+
+    HP_PCT_TO_STATE = {}
+
+    def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1, HP : int = 30):
+        super(Boss, self).__init__(name=name, x=x, y=y, HP=HP)
         self.height = height
         self.width = width
         self.initialise()
 
     def initialise(self):
         super(Boss,self).initialise()
-        self.HP = 30
+        self.state = Boss.NORMAL
 
+    def change_state(self):
+        HP_pct = int(self.HP*100/self._HP)
+        if HP_pct <= Boss.RAGE_PCT:
+            new_state = Boss.RAGE
+        elif HP_pct <= Boss.ANGRY_PCT:
+            new_state = Boss.ANGRY
+        else:
+            new_state = Boss.NORMAL
+
+        if new_state != self.state:
+            self.state = new_state
+            return True
+        else:
+            return False
 
 class Game:
 
@@ -141,7 +165,7 @@ class Game:
     EFFECT_COUNTDOWN_RATE = 4
     DOT_DAMAGE_RATE = 3
     ENEMY_DAMAGE_RATE = 2
-    TARGET_RUNE_COUNT = 0
+    TARGET_RUNE_COUNT = 4
     MAX_STATUS_MESSAGES = 5
     STATUS_MESSAGE_LIFETIME = 8
 
@@ -728,6 +752,7 @@ class Game:
                     print("You defended yourself with your shield")
                 elif self.tick_count % Game.ENEMY_DAMAGE_RATE == 0:
                     self.get_current_player().HP -= 1
+                    self.get_current_floor().boss.HP += 1
                     print("HP down to %i" % self.get_current_player().HP)
 
                 if self.get_current_floor().boss.HP <= 0:
@@ -1270,6 +1295,7 @@ class Floor:
                  monster_count : tuple = (0,0,0),
                  secret_count : int = 0,
                  switch_tiles : list = None):
+
         self.id = id
         self.name = name
         self.treasure_count = treasure_count
@@ -1577,6 +1603,11 @@ class Floor:
                 attempts -= 1
             else:
                 break
+
+        if self.boss.change_state() is True:
+            print("adding difficulties...")
+            self.place_tiles(item_count=5,item_type=Tiles.TRAP1)
+            self.place_tiles(item_count=5, item_type=Tiles.MONSTER1)
 
     def kill_monster(self, x : int = None, y : int = None):
 
@@ -3840,19 +3871,19 @@ class FloorBuilder:
         self.add_bosses()
 
     def add_bosses(self):
-        boss = Boss("The Fallen Knight", width = 2, height = 2)
+        boss = Boss("The Fallen Knight", width = 3, height = 3)
         self.floors[98].add_boss(boss)
 
-        boss = Boss("The Ice Dragon", width = 2, height = 2)
+        boss = Boss("The Ice Dragon", width = 2, height = 2, HP = 35)
         self.floors[198].add_boss(boss)
 
-        boss = Boss("The Goblin King", width = 2, height = 2)
+        boss = Boss("The Evil Djinn", width = 2, height = 2, HP = 45)
         self.floors[298].add_boss(boss)
 
-        boss = Boss("The Evil Djinn", width = 2, height = 2)
+        boss = Boss("The Goblin King", width = 3, height = 3, HP = 40)
         self.floors[398].add_boss(boss)
 
-        boss = Boss("The Mind Master", width = 2, height = 2)
+        boss = Boss("The Mind Master", width = 3, height = 3, HP = 50)
         self.floors[998].add_boss(boss)
 
 class LevelBuilder:
