@@ -65,7 +65,7 @@ class Player(Character):
         self.trophies = 0
         self.kills = 0
         self.boss_kills = 0
-        self.weapon = 1
+        self.weapon = 10
         self.shield = 1
         self.bombs = 0
         self.maps = 0
@@ -1336,7 +1336,8 @@ class Floor:
 
                 if tile_name in Tiles.MONSTERS:
                     self.floor_plan.set_tile(Tiles.EMPTY, x, y)
-                    self.monsters[(x,y)] = tile_name
+                    if (x,y) not in self.monsters.keys():
+                        self.monsters[(x,y)] = tile_name
 
                 elif tile_name in Tiles.EXPLODABLES:
                     self.floor_plan.set_tile(Tiles.EMPTY, x, y)
@@ -1459,10 +1460,8 @@ class Floor:
 
                     logging.info("Placed a {0} at {1},{2}".format(item_type, x, y))
 
-                    # if item_type in Tiles.MONSTERS:
-                    #     self.monsters[(x, y)] = item_type
-                    # else:
-                    #     self.floor_plan.set_tile(item_type, x, y)
+                    if item_type in Tiles.MONSTERS:
+                        self.monsters[(x, y)] = item_type
 
                     self.floor_plan.set_tile(item_type, x, y)
 
@@ -3881,10 +3880,10 @@ class FloorBuilder:
         boss = Boss("The Evil Djinn", width = 2, height = 2, HP = 45)
         self.floors[298].add_boss(boss)
 
-        boss = Boss("The Goblin King", width = 3, height = 3, HP = 40)
+        boss = Boss("The Goblin King", width = 3, height = 3, HP = 60)
         self.floors[398].add_boss(boss)
 
-        boss = Boss("The Mind Master", width = 3, height = 3, HP = 50)
+        boss = Boss("The Mind Master", width = 3, height = 3, HP = 80)
         self.floors[998].add_boss(boss)
 
 class LevelBuilder:
