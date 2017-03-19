@@ -1462,8 +1462,8 @@ class Floor:
 
                     if item_type in Tiles.MONSTERS:
                         self.monsters[(x, y)] = item_type
-
-                    self.floor_plan.set_tile(item_type, x, y)
+                    else:
+                        self.floor_plan.set_tile(item_type, x, y)
 
                     break
                 attempts += 1
@@ -1826,7 +1826,7 @@ class FloorBuilder:
             '        TNT         ',
             'T        `       T  ',
             '    T    `  T       ',
-            ' T      T`          ',
+            ' T      T`         1',
             '         `      Z T ',
             '    T    `          ',
             '  Z     Z`   T      ',
