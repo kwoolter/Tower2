@@ -84,6 +84,8 @@ class ImageManager:
                                     model.Tiles.REPLENISH: ("replenish1.png","replenish2.png","replenish3.png","replenish4.png",\
                                                             "replenish1.png","replenish4.png","replenish3.png","replenish2.png"),
                                     model.Tiles.PLAYER : ("player1.png","player.png","player2.png","player.png"),
+                                    model.Tiles.NPC1 : "imprisoned1.png",
+                                    model.Tiles.NPC2: "imprisoned2.png",
                                     model.Tiles.SHOP_KEEPER : "shop_keeper.png",
                                     model.Tiles.DOOR : "door.png",
                                     model.Tiles.DOOR_OPEN: "door_open.png",
@@ -130,6 +132,8 @@ class ImageManager:
         new_skin_name = "winter"
         new_skin = (new_skin_name, {
                                     model.Tiles.SECRET_WALL: "stone_wall.png",
+                                    model.Tiles.NPC1: "imprisoned3.png",
+                                    model.Tiles.NPC2: "imprisoned4.png",
                                     model.Tiles.DOOR : "winter_door.png",
                                     model.Tiles.DOOR_OPEN: "winter_door_open.png",
                                     model.Tiles.SHOP: "winter_door.png",

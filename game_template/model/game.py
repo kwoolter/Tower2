@@ -7,6 +7,96 @@ from operator import itemgetter
 import pickle
 
 
+class Tiles:
+
+    # Define Tiles
+    # Cut and Paste
+    BANG = '$'
+    BOMB = 'q'
+    BOMB_LIT = 'Q'
+    BOSS_DOOR = 'F'
+    BOSS_DOOR_OPEN = 'f'
+    BRAZIER = 'B'
+    DECORATION1 = 'z'
+    DECORATION2 = 'Z'
+    DOOR = 'D'
+    DOOR_OPEN = 'd'
+    DOT1 = '!'
+    DOT2 = '£'
+    DOWN = '-'
+    EAST = 'E'
+    EMPTY = ' '
+    EXIT_KEY = '%'
+    HEART = 'HP'
+    REPLENISH = "H"
+    KEY = '?'
+    MAP = 'M'
+    MONSTER1 = '1'
+    MONSTER2 = '2'
+    MONSTER3 = '3'
+    BOSS = '4'
+    BOSS_KEY = 'K'
+    NEXT_LEVEL = 'L'
+    NORTH = 'N'
+    PLAYER = 'P'
+    NPC1 = 'Y'
+    NPC2 = 'y'
+    PREVIOUS_LEVEL = 'l'
+    RED_POTION = 'R'
+    RUNE = 'u'
+    RUNE1 = 'R1'
+    RUNE2 = 'R2'
+    RUNE3 = 'R3'
+    RUNE4 = 'R4'
+    RUNE5 = 'R5'
+    SAFETY = '8'
+    SECRET_TREASURE = 'J'
+    SECRET_WALL = ';'
+    SHIELD = 'O'
+    SHOP = 's'
+    SHOP_KEEPER = 'SHOP'
+    SOUTH = 'S'
+    START_POSITION = '='
+    SWITCH = ','
+    SWITCH_LIT = '<'
+    SWITCH_TILE = '_'
+    TILE1 = '`'
+    TILE2 = '¬'
+    TILE3 = '.'
+    TILE4 = '~'
+    TRAP1 = '^'
+    TRAP2 = '&'
+    TRAP3 = '['
+    TREASURE = '*'
+    TREASURE_CHEST = 'j'
+    TREASURE10 = 'x'
+    TREASURE25 = 'X'
+    TREE = 'T'
+    TROPHY = 'G'
+    UP = '+'
+    WALL = ':'
+    WALL_BL = '('
+    WALL_BR = ')'
+    WALL_TL = '/'
+    WALL_TR = '\\'
+    WALL2 = 'w'
+    WALL3 = 'e'
+    WEAPON = '|'
+    WEST = 'W'
+
+    MONSTERS = (MONSTER1, MONSTER2, MONSTER3)
+    NPCS = (NPC1, NPC2)
+    EXPLODABLES = (BOMB_LIT)
+    FLOOR_TILES = (TILE1, TILE2, TILE3, TILE4)
+    INDESTRUCTIBLE_ITEMS = (KEY, TREE, TROPHY, NORTH, SOUTH, EAST, WEST, UP, DOWN, SHOP, DOOR, RUNE)
+    TRAPS = (TRAP1, TRAP2, TRAP3)
+    RUNES = (RUNE1, RUNE2, RUNE3, RUNE4, RUNE5)
+    MONSTER_EMPTY_TILES = (EMPTY, PLAYER, DOOR_OPEN) + FLOOR_TILES
+    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WALL2, WALL3, BRAZIER, RUNE, DECORATION1, DECORATION2)
+    PLAYER_DOT_TILES = (DOT1, DOT2)
+    PLAYER_EQUIPABLE_ITEMS = (WEAPON, SHIELD, RED_POTION, BOMB)
+    SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
+
 class Character():
 
     def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1, HP : int = 20):
@@ -128,10 +218,11 @@ class Boss(Character):
 
     HP_PCT_TO_STATE = {}
 
-    def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1, HP : int = 30):
+    def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1, HP : int = 30, speed : int = 3):
         super(Boss, self).__init__(name=name, x=x, y=y, HP=HP)
         self.height = height
         self.width = width
+        self.speed = speed
         self.initialise()
 
     def initialise(self):
@@ -153,6 +244,19 @@ class Boss(Character):
         else:
             return False
 
+
+class NPC(Character):
+
+    def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1, HP : int = 30, tile = Tiles.NPC1):
+        super(NPC, self).__init__(name=name, x=x, y=y, HP=HP)
+        self.height = height
+        self.width = width
+        self.initialise()
+        self.tile = tile
+
+    def initialise(self):
+        super(NPC,self).initialise()
+
 class Game:
 
     LOADED = "LOADED"
@@ -167,7 +271,7 @@ class Game:
     ENEMY_DAMAGE_RATE = 2
     TARGET_RUNE_COUNT = 4
     MAX_STATUS_MESSAGES = 5
-    STATUS_MESSAGE_LIFETIME = 8
+    STATUS_MESSAGE_LIFETIME = 16
 
     DATA_FILES_DIR = os.path.dirname(__file__) + "\\data\\"
 
@@ -187,6 +291,7 @@ class Game:
 
         self.level_factory = LevelBuilder()
         self.shop = Shop()
+        self._conversations = trpg.ConversationFactory(Game.DATA_FILES_DIR + "conversations.xml")
 
         ##
 
@@ -367,6 +472,30 @@ class Game:
         self._state = Game.PLAYING
         self.get_current_player().y += 1
 
+    def talk(self, npc : NPC):
+
+        # talk to them...
+        msg = "You talk to {0}".format(npc.name)
+        self.add_status_message(msg)
+        conversation = self._conversations.get_conversation(npc.name)
+
+        # If they don't have a conversation then raise failure message
+        if conversation is None:
+            msg = "{0} has nothing to say to you.".format(npc.name)
+
+        # Otherwise attempt the conversation
+        else:
+            # Get the next line in the conversation
+            next_line = conversation.get_next_line()
+
+            # Attempt it and if it succeeds...
+            if next_line.attempt():
+
+                # Print what the NPC has to say
+                msg = "'{0}'".format(next_line.text)
+
+        self.add_status_message(msg)
+
 
     def initialise(self):
 
@@ -399,6 +528,8 @@ class Game:
         self.maps = trpg.MapFactory(self.locations)
         self.maps.load("RuneQuest", 1, Game.DATA_FILES_DIR + "maplinks.csv")
         self.current_map = self.maps.get_map(1)
+
+        self._conversations.load()
 
     def add_player(self, new_player : Player):
 
@@ -477,6 +608,11 @@ class Game:
         elif tile in Tiles.MONSTERS:
             print("Hit a monster!")
 
+        elif tile in Tiles.NPCS:
+            current_player.back()
+            if current_floor.npc is not None:
+                self.talk(current_floor.npc)
+
         elif tile in Tiles.TRAPS:
             current_player.HP -= 1
             current_floor.set_player_tile(Tiles.EMPTY)
@@ -484,8 +620,6 @@ class Game:
             print("Hit a trap!")
 
         elif tile in Tiles.PLAYER_DOT_TILES:
-            # current_player.HP -= 1
-            # self.add_status_message("You are losing health!")
             print("You stood in something nasty!")
 
         elif tile == Tiles.RED_POTION:
@@ -567,6 +701,7 @@ class Game:
             current_floor.set_player_tile(Tiles.EMPTY)
             current_player.trophies += 1
             print("You found a trophy!")
+            self.add_status_message("You found a chalice!")
             if current_player.trophies == self.trophies:
                 self.game_over()
 
@@ -1039,95 +1174,6 @@ class Shop:
         shop_keeper.maps = random.randint(0, 5)
 
 
-class Tiles:
-
-    # Define Tiles
-    # Cut and Paste
-    BANG = '$'
-    BOMB = 'q'
-    BOMB_LIT = 'Q'
-    BOSS_DOOR = 'F'
-    BOSS_DOOR_OPEN = 'f'
-    BRAZIER = 'B'
-    DECORATION1 = 'z'
-    DECORATION2 = 'Z'
-    DOOR = 'D'
-    DOOR_OPEN = 'd'
-    DOT1 = '!'
-    DOT2 = '£'
-    DOWN = '-'
-    EAST = 'E'
-    EMPTY = ' '
-    EXIT_KEY = '%'
-    HEART = 'HP'
-    REPLENISH = "H"
-    KEY = '?'
-    MAP = 'M'
-    MONSTER1 = '1'
-    MONSTER2 = '2'
-    MONSTER3 = '3'
-    BOSS = '4'
-    BOSS_KEY = 'K'
-    NEXT_LEVEL = 'L'
-    NORTH = 'N'
-    PLAYER = 'P'
-    PREVIOUS_LEVEL = 'l'
-    RED_POTION = 'R'
-    RUNE = 'u'
-    RUNE1 = 'R1'
-    RUNE2 = 'R2'
-    RUNE3 = 'R3'
-    RUNE4 = 'R4'
-    RUNE5 = 'R5'
-    SAFETY = '8'
-    SECRET_TREASURE = 'J'
-    SECRET_WALL = ';'
-    SHIELD = 'O'
-    SHOP = 's'
-    SHOP_KEEPER = 'SHOP'
-    SOUTH = 'S'
-    START_POSITION = '='
-    SWITCH = ','
-    SWITCH_LIT = '<'
-    SWITCH_TILE = '_'
-    TILE1 = '`'
-    TILE2 = '¬'
-    TILE3 = '.'
-    TILE4 = '~'
-    TRAP1 = '^'
-    TRAP2 = '&'
-    TRAP3 = '['
-    TREASURE = '*'
-    TREASURE_CHEST = 'j'
-    TREASURE10 = 'x'
-    TREASURE25 = 'X'
-    TREE = 'T'
-    TROPHY = 'G'
-    UP = '+'
-    WALL = ':'
-    WALL_BL = '('
-    WALL_BR = ')'
-    WALL_TL = '/'
-    WALL_TR = '\\'
-    WALL2 = 'w'
-    WALL3 = 'e'
-    WEAPON = '|'
-    WEST = 'W'
-
-    MONSTERS = (MONSTER1, MONSTER2, MONSTER3)
-    EXPLODABLES = (BOMB_LIT)
-    FLOOR_TILES = (TILE1, TILE2, TILE3, TILE4)
-    INDESTRUCTIBLE_ITEMS = (KEY, TREE, TROPHY, NORTH, SOUTH, EAST, WEST, UP, DOWN, SHOP, DOOR, RUNE)
-    TRAPS = (TRAP1, TRAP2, TRAP3)
-    RUNES = (RUNE1, RUNE2, RUNE3, RUNE4, RUNE5)
-    MONSTER_EMPTY_TILES = (EMPTY, PLAYER, DOOR_OPEN) + FLOOR_TILES
-    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WALL2, WALL3, BRAZIER, RUNE, DECORATION1, DECORATION2)
-    PLAYER_DOT_TILES = (DOT1, DOT2)
-    PLAYER_EQUIPABLE_ITEMS = (WEAPON, SHIELD, RED_POTION, BOMB)
-    SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
-
-
-
 class FloorPlan:
 
     EXIT_NORTH = "NORTH"
@@ -1313,6 +1359,7 @@ class Floor:
         self.floor_plan = None
         self.player = None
         self.boss = None
+        self.npc = None
         self.exits = {}
 
     def initialise(self, floor_plan : FloorPlan):
@@ -1439,7 +1486,30 @@ class Floor:
             if attempts > tries:
                 print("Can't find an empty tile to place boss {0} after {1} tries".format(boss.name, attempts))
                 break
+    def add_npc(self, npc : NPC):
 
+        print("Adding NPC {0} to Floor {1}...".format(npc.name, self.name))
+
+        tries = 30
+        attempts = 0
+        while True:
+            x = random.randint(0, self.width - 1)
+            y = random.randint(0, self.height - 1)
+            npc.x = x
+            npc.y = y
+
+            if self.is_empty(npc) is True:
+                self.npc = npc
+                logging.info("Placed {0} at {1},{2}".format(self.npc.name, x, y))
+                print("Placed {0} at {1},{2}".format(self.npc.name, x, y))
+                break
+
+            attempts += 1
+
+            # We tried several times to find an empty square, time to give up!
+            if attempts > tries:
+                print("Can't find an empty tile to place npc {0} after {1} tries".format(npc.name, attempts))
+                break
 
     def add_explodable(self, tile, x : int, y : int):
 
@@ -1497,6 +1567,8 @@ class Floor:
             collision = True
         elif self.hit_boss() is True:
             collision = True
+        elif self.hit_npc() is True:
+            collision = True
 
         return collision
 
@@ -1510,6 +1582,16 @@ class Floor:
                     if self.is_valid_xy(x,y) == False:
                         empty = False
                     elif self.get_tile(x,y) in block_tiles:
+                        empty = False
+                        break
+
+        if isinstance(char, NPC) is True:
+            empty_tiles = Tiles.MONSTER_EMPTY_TILES
+            for x in range(char.x, char.x + char.width):
+                for y in range(char.y, char.y + char.height):
+                    if self.is_valid_xy(x,y) == False:
+                        empty = False
+                    elif self.get_tile(x,y) not in empty_tiles:
                         empty = False
                         break
 
@@ -1534,6 +1616,14 @@ class Floor:
                 self.player.y >= self.boss.y and \
                 self.player.y <= (self.boss.y + self.boss.height -1 ):
                 hit = True
+
+        return hit
+
+    def hit_npc(self):
+        hit = False
+
+        if self.npc is not None:
+            pass
 
         return hit
 
@@ -1581,6 +1671,9 @@ class Floor:
     def move_boss(self):
 
         if self.boss is None:
+            return
+
+        if self.tick_count % self.boss.speed !=0:
             return
 
         attempts = 2
@@ -1688,6 +1781,9 @@ class Floor:
                 tile = self.switch_tiles[1]
             else:
                 tile = self.switch_tiles[0]
+
+        elif self.npc is not None and (x,y) == (self.npc.x, self.npc.y):
+            tile = self.npc.tile
 
         if tile == Tiles.SECRET_TREASURE:
             tile = Tiles.EMPTY
@@ -3868,23 +3964,38 @@ class FloorBuilder:
         logging.info("Finished building floors. {0} floors built".format(len(self.floors.keys())))
 
         self.add_bosses()
+        self.add_npcs()
 
     def add_bosses(self):
 
-        boss = Boss("The Fallen Knight", width = 3, height = 3)
+        boss = Boss("The Fallen Knight", width = 3, height = 3, speed = 4)
         self.floors[98].add_boss(boss)
 
-        boss = Boss("The Ice Dragon", width = 2, height = 2, HP = 35)
+        boss = Boss("The Ice Dragon", width = 2, height = 2, HP = 35, speed = 3)
         self.floors[198].add_boss(boss)
 
-        boss = Boss("The Evil Djinn", width = 2, height = 2, HP = 45)
+        boss = Boss("The Evil Djinn", width = 2, height = 2, HP = 45, speed = 3)
         self.floors[298].add_boss(boss)
 
-        boss = Boss("The Goblin King", width = 3, height = 3, HP = 60)
+        boss = Boss("The Goblin King", width = 3, height = 3, HP = 60, speed =2)
         self.floors[398].add_boss(boss)
 
-        boss = Boss("The Mind Master", width = 3, height = 3, HP = 80)
+        boss = Boss("The Mind Master", width = 3, height = 3, HP = 80, speed = 1)
         self.floors[998].add_boss(boss)
+
+    def add_npcs(self):
+
+        npc = NPC("Jack")
+        self.floors[0].add_npc(npc)
+
+        npc = NPC("Rosie", tile=Tiles.NPC2)
+        self.floors[99].add_npc(npc)
+
+        npc = NPC("Oliver")
+        self.floors[100].add_npc(npc)
+
+        npc = NPC("Skids", tile=Tiles.NPC2)
+        self.floors[199].add_npc(npc)
 
 class LevelBuilder:
 

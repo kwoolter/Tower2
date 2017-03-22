@@ -1,0 +1,51 @@
+<conversations>
+    <conversation id="Jack">
+        <npc_name>Jack</npc_name>
+        <linear>True</linear>
+        <line id="1">
+            <text>Welcome to the Forest World!</text>
+        </line>
+        <line id="2">
+            <text>Are you enjoying it so far?</text>
+        </line>
+        <line id="3">
+            <text>I love maps and adventures. Do you?</text>
+        </line>
+        <line id="4">
+            <text>There are some interesting places around here!</text>
+        </line>
+    </conversation>
+    <conversation id="Rosie">
+        <npc_name>Rosie</npc_name>
+        <linear>True</linear>
+        <line id="1">
+            <text>You made it this far!</text>
+        </line>
+        <line id="2">
+            <text>I am quite surprised!</text>
+        </line>
+        <line id="3">
+            <text>Step into the portal to leave this world!</text>
+        </line>
+    </conversation>
+	<conversation id="Oliver">
+        <npc_name>Oliver</npc_name>
+        <linear>True</linear>
+        <line id="1">
+            <text>Whoa! Where did you come from?</text>
+        </line>
+		<line id="2">
+            <text>This is Winter World! Welcome?</text>
+        </line>
+    </conversation>
+	<conversation id="Skids">
+        <npc_name>Skids</npc_name>
+        <linear>True</linear>
+        <line id="1">
+            <text>You made it across this harsh world!</text>
+        </line>
+		<line id="2">
+            <text>Go! Leave this world for the next!</text>
+        </line>
+    </conversation>
+</conversations>

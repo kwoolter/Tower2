@@ -209,6 +209,9 @@ class Controller:
                             except Exception as err:
                                 print(str(err))
 
+                        elif event.key == K_t:
+                           self.game.talk()
+
                     # If we are in Inventory mode...
                     elif self.mode == Controller.INVENTORY:
                         if event.key in (Controller.KEY_INVENTORY, K_ESCAPE):

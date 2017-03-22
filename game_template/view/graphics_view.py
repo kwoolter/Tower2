@@ -226,8 +226,8 @@ class StatusBar(View):
     BG_COLOUR = Colours.BLACK
     ICON_WIDTH = 40
     PADDING = 40
-    STATUS_TEXT_FONT_SIZE = 24
-    MESSAGE_TICK_DURATION = 7
+    STATUS_TEXT_FONT_SIZE = 20
+    MESSAGE_TICK_DURATION = 8
 
     def __init__(self, width: int, height: int):
 
@@ -666,7 +666,7 @@ class FloorView(View):
 
 
 
-        if self.floor.boss is not None and image is not None:
+        if self.floor.boss is not None:
 
             tile = model.Tiles.BOSS
 
@@ -678,27 +678,43 @@ class FloorView(View):
 
             # image = pygame.transform.scale(image, (self.floor.boss.width * self.tile_width,
             #                                        self.floor.boss.height * self.tile_height))
-            self.surface.blit(image, (self.floor.boss.x * self.tile_width,
-                                      self.floor.boss.y * self.tile_height))
 
-            HP = self.floor.boss.HP
-            HP_pct = int(HP*100/self.floor.boss._HP)
+            if image is not None:
+                self.surface.blit(image, (self.floor.boss.x * self.tile_width,
+                                          self.floor.boss.y * self.tile_height))
 
-            x = int(((self.floor.boss.x + self.floor.boss.width/2) * self.tile_width) - HP/2)
-            y = int((self.floor.boss.y + self.floor.boss.height) * self.tile_height) - 6
+                HP = self.floor.boss.HP
+                HP_pct = int(HP*100/self.floor.boss._HP)
 
-            if HP_pct > 60:
-                colour = Colours.GREEN
-            elif HP_pct > 35:
-                colour = Colours.YELLOW
-            else:
-                colour = Colours.RED
+                x = int(((self.floor.boss.x + self.floor.boss.width/2) * self.tile_width) - HP/2)
+                y = int((self.floor.boss.y + self.floor.boss.height) * self.tile_height) - 6
 
-            pygame.draw.line(self.surface,
-                        colour,
-                        (x, y),
-                        (x + HP, y),
-                        4)
+                if HP_pct > 60:
+                    colour = Colours.GREEN
+                elif HP_pct > 35:
+                    colour = Colours.YELLOW
+                else:
+                    colour = Colours.RED
+
+                pygame.draw.line(self.surface,
+                            colour,
+                            (x, y),
+                            (x + HP, y),
+                            4)
+
+        if self.floor.npc is not None:
+
+            tile = self.floor.npc.tile
+
+            image = View.image_manager.get_skin_image(tile_name=tile,
+                                                      skin_name=self.skin_name,
+                                                      tick=self.tick_count,
+                                                      width=self.floor.npc.width * self.tile_width,
+                                                      height=self.floor.npc.height * self.tile_height)
+
+            if image is not None:
+                self.surface.blit(image, (self.floor.npc.x * self.tile_width,
+                                          self.floor.npc.y * self.tile_height))
 
         tile = model.Tiles.PLAYER
         image = View.image_manager.get_skin_image(tile_name=tile, skin_name=self.skin_name, tick=self.tick_count)

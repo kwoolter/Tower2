@@ -1,1 +1,2 @@
-from . RPGMaps import *
+from .RPGMaps import *
+from .RPGConversations import *
