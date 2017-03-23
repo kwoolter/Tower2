@@ -9,7 +9,7 @@ from .graphics_utils import *
 class MainFrame(View):
 
     TITLE_HEIGHT = 80
-    STATUS_HEIGHT = 40
+    STATUS_HEIGHT = 50
 
     INVENTORY = "Inventory"
     PLAYING = "Playing"
@@ -226,7 +226,7 @@ class StatusBar(View):
     BG_COLOUR = Colours.BLACK
     ICON_WIDTH = 40
     PADDING = 40
-    STATUS_TEXT_FONT_SIZE = 20
+    STATUS_TEXT_FONT_SIZE = 18
     MESSAGE_TICK_DURATION = 8
 
     def __init__(self, width: int, height: int):
@@ -234,6 +234,7 @@ class StatusBar(View):
         super(StatusBar, self).__init__()
 
         self.surface = pygame.Surface((width, height))
+        self.text_box = pygame.Surface((width/2, height-4))
         self.status_messages = []
         self.game = None
 
@@ -270,19 +271,24 @@ class StatusBar(View):
 
         pane_rect = self.surface.get_rect()
 
-        draw_text(self.surface,
-                  msg=msg,
-                  x=pane_rect.centerx,
-                  y=int(pane_rect.height / 2),
-                  fg_colour=StatusBar.FG_COLOUR,
-                  bg_colour=StatusBar.BG_COLOUR,
-                  size=StatusBar.STATUS_TEXT_FONT_SIZE)
+        text_rect = pygame.Rect(0,0,pane_rect.width/2-4,pane_rect.height-4)
+
+        self.text_box.fill(StatusBar.BG_COLOUR)
+
+        drawText(surface=self.text_box,
+                 text=msg,
+                 color=StatusBar.FG_COLOUR,
+                 rect = text_rect,
+                 font=pygame.font.SysFont(pygame.font.get_default_font(),StatusBar.STATUS_TEXT_FONT_SIZE),
+                 bkg=StatusBar.BG_COLOUR)
+
+        self.surface.blit(self.text_box, (pane_rect.width/4,4))
 
         if self.game.state == model.Game.PLAYING:
 
             player = self.game.get_current_player()
 
-            y = pane_rect.top + 4
+            y = 8
             x = 0
 
             for equipped_item in player.equipment_slots:
@@ -297,7 +303,7 @@ class StatusBar(View):
 
                 x += StatusBar.ICON_WIDTH
 
-            y = pane_rect.top + 4
+            y = 8
             x = int(pane_rect.width*3/4)
 
             draw_icon(self.surface, x=x,y=y,icon_name=model.Tiles.HEART, count=player.HP)

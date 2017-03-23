@@ -219,9 +219,7 @@ class Boss(Character):
     HP_PCT_TO_STATE = {}
 
     def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1, HP : int = 30, speed : int = 3):
-        super(Boss, self).__init__(name=name, x=x, y=y, HP=HP)
-        self.height = height
-        self.width = width
+        super(Boss, self).__init__(name=name, x=x, y=y, HP=HP, width=width, height=height)
         self.speed = speed
         self.initialise()
 
@@ -248,11 +246,10 @@ class Boss(Character):
 class NPC(Character):
 
     def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1, HP : int = 30, tile = Tiles.NPC1):
-        super(NPC, self).__init__(name=name, x=x, y=y, HP=HP)
-        self.height = height
-        self.width = width
-        self.initialise()
+        super(NPC, self).__init__(name=name, x=x, y=y, HP=HP, width=width, height = height)
         self.tile = tile
+        self.initialise()
+
 
     def initialise(self):
         super(NPC,self).initialise()
@@ -474,9 +471,11 @@ class Game:
 
     def talk(self, npc : NPC):
 
+        life = 20
+
         # talk to them...
-        msg = "You talk to {0}".format(npc.name)
-        self.add_status_message(msg)
+        # msg = "You talk to {0}".format(npc.name)
+        # self.add_status_message(msg)
         conversation = self._conversations.get_conversation(npc.name)
 
         # If they don't have a conversation then raise failure message
@@ -492,9 +491,9 @@ class Game:
             if next_line.attempt():
 
                 # Print what the NPC has to say
-                msg = "'{0}'".format(next_line.text)
+                msg = "{0}:'{1}'".format(npc.name, next_line.text)
 
-        self.add_status_message(msg)
+        self.add_status_message(msg, life)
 
 
     def initialise(self):
@@ -1009,8 +1008,8 @@ class Game:
             for effect in expired_effects:
                 del self.effects[effect]
 
-    def add_status_message(self, new_msg : str):
-        self.status_messages[new_msg] = Game.STATUS_MESSAGE_LIFETIME
+    def add_status_message(self, new_msg : str, life : int = STATUS_MESSAGE_LIFETIME):
+        self.status_messages[new_msg] = life
 
     def update_status_messages(self):
 
@@ -3985,7 +3984,7 @@ class FloorBuilder:
 
     def add_npcs(self):
 
-        npc = NPC("Jack")
+        npc = NPC("Imprisoned One", width=3, height=3)
         self.floors[0].add_npc(npc)
 
         npc = NPC("Rosie", tile=Tiles.NPC2)
@@ -3996,6 +3995,12 @@ class FloorBuilder:
 
         npc = NPC("Skids", tile=Tiles.NPC2)
         self.floors[199].add_npc(npc)
+
+        npc = NPC("Jack", tile=Tiles.NPC1)
+        self.floors[200].add_npc(npc)
+
+        npc = NPC("Rosie", tile=Tiles.NPC2)
+        self.floors[299].add_npc(npc)
 
 class LevelBuilder:
 

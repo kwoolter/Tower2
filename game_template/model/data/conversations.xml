@@ -1,18 +1,15 @@
 <conversations>
-    <conversation id="Jack">
-        <npc_name>Jack</npc_name>
+    <conversation id="Imprisoned One">
+        <npc_name>Imprisoned One</npc_name>
         <linear>True</linear>
         <line id="1">
             <text>Welcome to the Forest World!</text>
         </line>
         <line id="2">
-            <text>Are you enjoying it so far?</text>
+            <text>I have lost count of how many years I have been here...</text>
         </line>
         <line id="3">
-            <text>I love maps and adventures. Do you?</text>
-        </line>
-        <line id="4">
-            <text>There are some interesting places around here!</text>
+            <text>If you go South from here you'll find The Arena.  Beat the Boss and then you get a reward!</text>
         </line>
     </conversation>
     <conversation id="Rosie">
@@ -22,10 +19,13 @@
             <text>You made it this far!</text>
         </line>
         <line id="2">
-            <text>I am quite surprised!</text>
+            <text>I am quite surprised you got here!</text>
         </line>
         <line id="3">
             <text>Step into the portal to leave this world!</text>
+        </line>
+        <line id="4">
+            <text>Good luck and safe travels!</text>
         </line>
     </conversation>
 	<conversation id="Oliver">
@@ -37,6 +37,9 @@
 		<line id="2">
             <text>This is Winter World! Welcome?</text>
         </line>
+        <line id="3">
+            <text>Try not to step on the ice!</text>
+        </line>
     </conversation>
 	<conversation id="Skids">
         <npc_name>Skids</npc_name>
@@ -46,6 +49,9 @@
         </line>
 		<line id="2">
             <text>Go! Leave this world for the next!</text>
+        </line>
+        <line id="3">
+            <text>May you have good fortune in the next world!</text>
         </line>
     </conversation>
 </conversations>
