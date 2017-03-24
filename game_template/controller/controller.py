@@ -212,6 +212,22 @@ class Controller:
                         elif event.key == K_t:
                            self.game.talk()
 
+                        elif event.key == K_p:
+                            try:
+                                if self.game.state == model.Game.READY:
+                                    print("enter your name")
+                                    width = 300
+                                    main_rect = self.view.surface.get_rect()
+                                    x = int(main_rect.centerx - width/2)
+                                    enter_name = view.EnterNameView(self.view.surface, x=x,y=20, width=width)
+                                    new_name = enter_name.run()
+                                    print("Player name = '{0}'".format(new_name))
+                                    if new_name != "":
+                                        self.game.get_current_player().name = new_name
+
+                            except Exception as err:
+                                print(str(err))
+
                     # If we are in Inventory mode...
                     elif self.mode == Controller.INVENTORY:
                         if event.key in (Controller.KEY_INVENTORY, K_ESCAPE):

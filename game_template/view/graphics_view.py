@@ -4,6 +4,7 @@ import os
 import game_template.utils as utils
 import time, logging
 from .graphics_utils import *
+from pygame.locals import *
 
 
 class MainFrame(View):
@@ -279,7 +280,7 @@ class StatusBar(View):
                  text=msg,
                  color=StatusBar.FG_COLOUR,
                  rect = text_rect,
-                 font=pygame.font.SysFont(pygame.font.get_default_font(),StatusBar.STATUS_TEXT_FONT_SIZE),
+                 font=pygame.font.SysFont(pygame.font.get_default_font(), StatusBar.STATUS_TEXT_FONT_SIZE),
                  bkg=StatusBar.BG_COLOUR)
 
         self.surface.blit(self.text_box, (pane_rect.width/4,4))
@@ -418,8 +419,13 @@ class GameReadyView(View):
         x = pane_rect.centerx
         y = 20
 
+        msg = "R E A D Y !"
+        current_player = self.game.get_current_player()
+        if current_player is not None:
+            msg="Ready {0}!".format(current_player.name)
+
         draw_text(self.surface,
-                  msg="R E A D Y !",
+                  msg=msg,
                   x=x,
                   y=y,
                   size=40,
@@ -1118,6 +1124,69 @@ class ShopView(View):
         x=int(pane_rect.width/2)
 
         self.surface.blit(self.shop_keeper_inventory.surface, (x, y))
+
+
+class EnterNameView:
+
+    FG_COLOUR = Colours.WHITE
+    BG_COLOUR = Colours.DARK_GREY
+    BORDER_COLOUR = Colours.GOLD
+    BORDER_WIDTH = 2
+    FONT_SIZE = 26
+
+    def __init__(self, surface, x, y, width = 200, height = 30):
+        self.text_box = pygame.Surface((width,height))
+        self.surface = surface
+        self.x = x
+        self.y = y
+
+    def run(self):
+        txtbx = utils.eztext.Input(maxlength=10, color=EnterNameView.FG_COLOUR,
+                                   font=pygame.font.SysFont(pygame.font.get_default_font(),EnterNameView.FONT_SIZE), \
+                             x=8,
+                             y=6,
+                             prompt='Name? ')
+
+        # create the pygame clock
+        clock = pygame.time.Clock()
+
+        # main loop!
+        loop = True
+        while loop:
+            # make sure the program is running at 30 fps
+            clock.tick(30)
+
+            # events for txtbx
+            events = pygame.event.get()
+            # process other events
+            for event in events:
+                # close it x button is pressed
+                if event.type == QUIT:
+                    loop = False
+                    break
+                elif event.type == KEYDOWN and event.key in (K_RETURN, K_ESCAPE):
+                    loop = False
+                    break
+
+            # update txtbx
+            txtbx.update(events)
+
+            # blit txtbx on the screen
+            self.text_box.fill(EnterNameView.BG_COLOUR)
+
+            txtbx.draw(self.text_box)
+
+            pygame.draw.rect(self.text_box,
+                             EnterNameView.BORDER_COLOUR,
+                             self.surface.get_rect(),
+                             EnterNameView.BORDER_WIDTH)
+
+            self.surface.blit(self.text_box,(self.x,self.y))
+
+            # refresh the display
+            pygame.display.flip()
+
+        return txtbx.value
 
 
 

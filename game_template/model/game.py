@@ -3982,7 +3982,7 @@ class FloorBuilder:
         boss = Boss("The Ice Dragon", width = 2, height = 2, HP = 35, speed = 3)
         self.floors[198].add_boss(boss)
 
-        boss = Boss("The Scorpion", width = 3, height = 3, HP = 45, speed = 2)
+        boss = Boss("The Evil Scorpion", width = 3, height = 3, HP = 45, speed = 2)
         self.floors[298].add_boss(boss)
 
         boss = Boss("The Goblin King", width = 3, height = 3, HP = 60, speed =2)
