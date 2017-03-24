@@ -986,18 +986,18 @@ class CharacterView(View):
 
         pane_rect = self.surface.get_rect()
 
-        x = pane_rect.centerx
-        y = 20
+        # x = pane_rect.centerx
+        # y = 20
+        #
+        # draw_text(self.surface,
+        #           msg="Character View",
+        #           x=x,
+        #           y=y,
+        #           size=30,
+        #           fg_colour=CharacterView.FG_COLOUR,
+        #           bg_colour=CharacterView.BG_COLOUR)
 
-        draw_text(self.surface,
-                  msg="Character View",
-                  x=x,
-                  y=y,
-                  size=30,
-                  fg_colour=CharacterView.FG_COLOUR,
-                  bg_colour=CharacterView.BG_COLOUR)
-
-        y+=20
+        y = 0
         x = 0
 
         self.inventory_view.draw()

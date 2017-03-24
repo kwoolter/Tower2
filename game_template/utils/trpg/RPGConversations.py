@@ -114,7 +114,7 @@ class ConversationFactory(object):
 
             logging.info("%s.load(): Loading Conversation for NPC '%s'...", __class__, new_conversation.owner)
 
-            # Next get a list of all of the challenges
+            # Next get a list of all of the lines
             lines = conversation.getElementsByTagName("line")
 
             # For each line...
@@ -131,7 +131,7 @@ class ConversationFactory(object):
 
             logging.info("%s.load(): Conversation '%s' loaded", __class__, new_conversation.owner)
 
-            # Add the new quest to the dictionary
+            # Add the new conversation to the dictionary
             self._conversations[new_conversation.owner] = new_conversation
 
         self._dom.unlink()

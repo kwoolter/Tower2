@@ -1,9 +1,11 @@
 import logging
 
 import game_template.controller as controller
-
+import os
 
 def main():
+
+    os.environ["SDL_VIDEO_CENTERED"] = "1"
     c = controller.Controller()
     c.initialise()
     c.run()

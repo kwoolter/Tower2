@@ -1485,30 +1485,39 @@ class Floor:
             if attempts > tries:
                 print("Can't find an empty tile to place boss {0} after {1} tries".format(boss.name, attempts))
                 break
-    def add_npc(self, npc : NPC):
+    def add_npc(self, npc : NPC, xy : tuple = None):
 
         print("Adding NPC {0} to Floor {1}...".format(npc.name, self.name))
 
-        tries = 30
-        attempts = 0
-        while True:
-            x = random.randint(0, self.width - 1)
-            y = random.randint(0, self.height - 1)
+        if xy is not None:
+            x,y = xy
             npc.x = x
             npc.y = y
+            self.npc = npc
+            logging.info("Placed {0} at {1},{2}".format(self.npc.name, x, y))
+            print("Placed {0} at {1},{2}".format(self.npc.name, x, y))
 
-            if self.is_empty(npc) is True:
-                self.npc = npc
-                logging.info("Placed {0} at {1},{2}".format(self.npc.name, x, y))
-                print("Placed {0} at {1},{2}".format(self.npc.name, x, y))
-                break
+        else:
+            tries = 30
+            attempts = 0
+            while True:
+                x = random.randint(0, self.width - 1)
+                y = random.randint(0, self.height - 1)
+                npc.x = x
+                npc.y = y
 
-            attempts += 1
+                if self.is_empty(npc) is True:
+                    self.npc = npc
+                    logging.info("Placed {0} at {1},{2}".format(self.npc.name, x, y))
+                    print("Placed {0} at {1},{2}".format(self.npc.name, x, y))
+                    break
 
-            # We tried several times to find an empty square, time to give up!
-            if attempts > tries:
-                print("Can't find an empty tile to place npc {0} after {1} tries".format(npc.name, attempts))
-                break
+                attempts += 1
+
+                # We tried several times to find an empty square, time to give up!
+                if attempts > tries:
+                    print("Can't find an empty tile to place npc {0} after {1} tries".format(npc.name, attempts))
+                    break
 
     def add_explodable(self, tile, x : int, y : int):
 
@@ -3973,7 +3982,7 @@ class FloorBuilder:
         boss = Boss("The Ice Dragon", width = 2, height = 2, HP = 35, speed = 3)
         self.floors[198].add_boss(boss)
 
-        boss = Boss("The Evil Djinn", width = 2, height = 2, HP = 45, speed = 3)
+        boss = Boss("The Scorpion", width = 3, height = 3, HP = 45, speed = 2)
         self.floors[298].add_boss(boss)
 
         boss = Boss("The Goblin King", width = 3, height = 3, HP = 60, speed =2)
@@ -3985,7 +3994,7 @@ class FloorBuilder:
     def add_npcs(self):
 
         npc = NPC("Imprisoned One", width=3, height=3)
-        self.floors[0].add_npc(npc)
+        self.floors[0].add_npc(npc, xy=(0,19))
 
         npc = NPC("Rosie", tile=Tiles.NPC2)
         self.floors[99].add_npc(npc)

@@ -204,6 +204,7 @@ class ImageManager:
                                     model.Tiles.MONSTER1: ("snake1.png", "snake2.png"),
                                     model.Tiles.MONSTER2: ("devil1.png", "devil2.png"),
                                     model.Tiles.MONSTER3: ("beholder.png", "beholder2.png", "beholder.png", "beholder3.png"),
+                                    model.Tiles.BOSS: ("scorpion1.png", "scorpion2.png","scorpion3.png", "scorpion4.png"),
                                     })
 
         ImageManager.skins[new_skin_name] = new_skin
