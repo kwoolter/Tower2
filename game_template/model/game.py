@@ -4011,6 +4011,21 @@ class FloorBuilder:
         npc = NPC("The Old One", tile=Tiles.NPC2)
         self.floors[299].add_npc(npc, xy=(13,6))
 
+        npc = NPC("Golum", tile=Tiles.NPC1)
+        self.floors[300].add_npc(npc, xy=(16,18))
+
+        npc = NPC("Baylor", tile=Tiles.NPC2)
+        self.floors[399].add_npc(npc, xy=(15,2))
+
+        npc = NPC("The Wretched", tile=Tiles.NPC1)
+        self.floors[900].add_npc(npc, xy=(7,19))
+
+        npc = NPC("The Warlock", tile=Tiles.NPC2)
+        self.floors[999].add_npc(npc, xy=(1,14))
+
+        npc = NPC("The Guardian", tile=Tiles.NPC1)
+        self.floors[1000].add_npc(npc, xy=(9,9))
+
 class LevelBuilder:
 
     def __init__(self):

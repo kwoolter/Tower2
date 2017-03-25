@@ -261,6 +261,7 @@ class ImageManager:
                                     model.Tiles.MONSTER1: ("chaos_beast1.png", "chaos_beast2.png"),
                                     model.Tiles.MONSTER2: ("shadow_ghost1.png", "shadow_ghost2.png"),
                                     model.Tiles.MONSTER3: ("beholder.png", "beholder2.png", "beholder.png", "beholder3.png"),
+                                    model.Tiles.NPC1: "imprisoned7.png",
                                     model.Tiles.BOSS: ("skull1.png", "skull2.png"),
                                     })
 
@@ -294,6 +295,7 @@ class ImageManager:
         new_skin_name = "end"
         new_skin = (new_skin_name, {
                                     model.Tiles.TILE2: "tile4.png",
+                                    model.Tiles.NPC1: "imprisoned10.png",
                                     model.Tiles.WALL: "stone_wall.png",
                                     model.Tiles.WALL_TR: "stone_wall_tr.png",
                                     model.Tiles.WALL_TL: "stone_wall_tl.png",

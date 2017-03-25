@@ -101,4 +101,87 @@
             <text>The Desert is a tough place, but the next world...ha ha ha!</text>
         </line>
     </conversation>
+        <conversation id="Golum">
+        <npc_name>Golum</npc_name>
+        <linear>True</linear>
+        <line id="1">
+            <text>Welcome to Cave World, blah blah blah...</text>
+        </line>
+        <line id="2">
+            <text>What are you looking at, ugly!</text>
+        </line>
+		<line id="3">
+            <text>Go on then!  Heal yourself at the Pool of Replenishment.  Don't just stand there.</text>
+        </line>
+        <line id="4">
+            <text>Shouldn't you be going off adventuring somewhere else than here!  Off you go!</text>
+        </line>
+    </conversation>
+        <conversation id="Baylor">
+        <npc_name>Baylor</npc_name>
+        <linear>True</linear>
+        <line id="1">
+            <text>Here the power of the Elements combine.</text>
+        </line>
+        <line id="2">
+            <text>The Forces of Nature are great in this ancient Vault.  Air, Fire, Ice and Water!</text>
+        </line>
+		<line id="3">
+            <text>What lies beyong here is the Kingdom of the Mad.  Do not go there!</text>
+        </line>
+        <line id="4">
+            <text>I can not save you from what lies beyond that portal.</text>
+        </line>
+    </conversation>
+    <conversation id="The Wretched">
+        <npc_name>The Wretched</npc_name>
+        <linear>True</linear>
+        <line id="1">
+            <text>Welcome to Chaos.  Why have you come to this place?</text>
+        </line>
+        <line id="2">
+            <text>I lost my mind many years ago.</text>
+        </line>
+		<line id="3">
+            <text>I wish I could help you, but you look helpless!</text>
+        </line>
+        <line id="4">
+            <text>The Deceiver has laid many traps here! Beware as his illusions are everywhere.</text>
+        </line>
+        <line id="5">
+            <text>Good luck....you will need it!</text>
+        </line>
+    </conversation>
+    <conversation id="The Warlock">
+        <npc_name>The Warlock</npc_name>
+        <linear>True</linear>
+        <line id="1">
+            <text>Welcome to End of Time.</text>
+        </line>
+        <line id="2">
+            <text>Are you sure that you know what you are doing?</text>
+        </line>
+		<line id="3">
+            <text>No one has got out of here alive.</text>
+        </line>
+        <line id="4">
+            <text>Try the portal - you might survive the journey to the next world!</text>
+        </line>
+    </conversation>
+    <conversation id="The Guardian">
+        <npc_name>The Guardian</npc_name>
+        <linear>True</linear>
+        <line id="1">
+            <text>And so, here you stand!</text>
+        </line>
+        <line id="2">
+            <text>What is your Quest?</text>
+        </line>
+		<line id="3">
+            <text>Do you seek the True Grail?  The Sacred Chalice?</text>
+        </line>
+        <line id="4">
+            <text>Let the Great Sword guide you.</text>
+        </line>
+    </conversation>
 </conversations>
