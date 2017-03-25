@@ -43,7 +43,7 @@ class Controller:
         self.game.initialise()
         self.view.initialise(self.game)
 
-        new_player = model.Player("Keith")
+        new_player = model.Player("Player1")
         self.game.add_player(new_player)
 
     @property
@@ -219,7 +219,7 @@ class Controller:
                                     width = 300
                                     main_rect = self.view.surface.get_rect()
                                     x = int(main_rect.centerx - width/2)
-                                    enter_name = view.EnterNameView(self.view.surface, x=x,y=20, width=width)
+                                    enter_name = view.EnterNameView(self.view.surface, x=x,y=20, width=width, height=50)
                                     new_name = enter_name.run()
                                     print("Player name = '{0}'".format(new_name))
                                     if new_name != "":

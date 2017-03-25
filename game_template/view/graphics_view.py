@@ -319,7 +319,18 @@ class StatusBar(View):
             draw_icon(self.surface, x=x, y=y, icon_name=model.Tiles.RUNE, count=player.runes_collected(self.game.get_current_level().id))
 
         elif self.game.state == model.Game.PAUSED:
-            msg = "F8:Save   F9:Load"
+            msg = "F8:Save   F9:Load   Esc:Resume"
+            draw_text(self.surface,
+                      msg=msg,
+                      x=10,
+                      y=int(pane_rect.height / 2),
+                      fg_colour=StatusBar.FG_COLOUR,
+                      bg_colour=StatusBar.BG_COLOUR,
+                      size=StatusBar.STATUS_TEXT_FONT_SIZE,
+                      centre=False)
+
+        elif self.game.state == model.Game.READY:
+            msg = "P:Change Name   SPACE:Start"
             draw_text(self.surface,
                       msg=msg,
                       x=10,
@@ -422,7 +433,7 @@ class GameReadyView(View):
         msg = "R E A D Y !"
         current_player = self.game.get_current_player()
         if current_player is not None:
-            msg="Ready {0}!".format(current_player.name)
+            msg="Ready {0}  !".format(current_player.name)
 
         draw_text(self.surface,
                   msg=msg,
@@ -1131,10 +1142,10 @@ class EnterNameView:
     FG_COLOUR = Colours.WHITE
     BG_COLOUR = Colours.DARK_GREY
     BORDER_COLOUR = Colours.GOLD
-    BORDER_WIDTH = 2
+    BORDER_WIDTH = 4
     FONT_SIZE = 26
 
-    def __init__(self, surface, x, y, width = 200, height = 30):
+    def __init__(self, surface, x, y, width = 200, height = 50):
         self.text_box = pygame.Surface((width,height))
         self.surface = surface
         self.x = x
@@ -1176,9 +1187,13 @@ class EnterNameView:
 
             txtbx.draw(self.text_box)
 
+            border = self.text_box.get_rect()
+            border.width -= EnterNameView.BORDER_WIDTH
+            border.height -= EnterNameView.BORDER_WIDTH
+
             pygame.draw.rect(self.text_box,
                              EnterNameView.BORDER_COLOUR,
-                             self.surface.get_rect(),
+                             border,
                              EnterNameView.BORDER_WIDTH)
 
             self.surface.blit(self.text_box,(self.x,self.y))

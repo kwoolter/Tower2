@@ -3997,19 +3997,19 @@ class FloorBuilder:
         self.floors[0].add_npc(npc, xy=(0,19))
 
         npc = NPC("Rosie", tile=Tiles.NPC2)
-        self.floors[99].add_npc(npc)
+        self.floors[99].add_npc(npc,xy=(17,8))
 
         npc = NPC("Oliver")
-        self.floors[100].add_npc(npc)
+        self.floors[100].add_npc(npc,xy=(18,5))
 
         npc = NPC("Skids", tile=Tiles.NPC2)
-        self.floors[199].add_npc(npc)
+        self.floors[199].add_npc(npc,xy=(13,12))
 
-        npc = NPC("Jack", tile=Tiles.NPC1)
+        npc = NPC("Monty", tile=Tiles.NPC1)
         self.floors[200].add_npc(npc)
 
-        npc = NPC("Rosie", tile=Tiles.NPC2)
-        self.floors[299].add_npc(npc)
+        npc = NPC("The Old One", tile=Tiles.NPC2)
+        self.floors[299].add_npc(npc, xy=(13,6))
 
 class LevelBuilder:
 

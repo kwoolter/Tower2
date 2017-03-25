@@ -6,9 +6,12 @@
             <text>Welcome to the Forest World!</text>
         </line>
         <line id="2">
-            <text>I have lost count of how many years I have been here...</text>
+            <text>How are you enjoying it so far?</text>
         </line>
         <line id="3">
+            <text>I have lost count of how many years I have been here...</text>
+        </line>
+        <line id="4">
             <text>If you go South from here you'll find The Arena.  Beat the Boss and then you get a reward!</text>
         </line>
     </conversation>
@@ -19,12 +22,15 @@
             <text>You made it this far!</text>
         </line>
         <line id="2">
-            <text>I am quite surprised you got here!</text>
+            <text>I am quite surprised you got here to be honest!</text>
         </line>
         <line id="3">
             <text>Step into the portal to leave this world!</text>
         </line>
         <line id="4">
+            <text>Collect ancient runes to activate the portal!</text>
+        </line>
+        <line id="5">
             <text>Good luck and safe travels!</text>
         </line>
     </conversation>
@@ -35,10 +41,16 @@
             <text>Whoa! Where did you come from?</text>
         </line>
 		<line id="2">
-            <text>This is Winter World! Welcome?</text>
+            <text>This is Winter World! Welcome.</text>
         </line>
         <line id="3">
+            <text>Err yeah!  You may have noticed it is pretty cold here!</text>
+        </line>
+        <line id="4">
             <text>Try not to step on the ice!</text>
+        </line>
+        <line id="5">
+            <text>The Pool of Replenishment only works once!</text>
         </line>
     </conversation>
 	<conversation id="Skids">
@@ -47,11 +59,46 @@
         <line id="1">
             <text>You made it across this harsh world!</text>
         </line>
-		<line id="2">
+        <line id="2">
+            <text>Have you collected enough ancient runes to activate the portal?</text>
+        </line>
+		<line id="3">
             <text>Go! Leave this world for the next!</text>
         </line>
-        <line id="3">
+        <line id="4">
             <text>May you have good fortune in the next world!</text>
+        </line>
+    </conversation>
+    <conversation id="Monty">
+        <npc_name>Monty</npc_name>
+        <linear>True</linear>
+        <line id="1">
+            <text>Welcome to The Desert!</text>
+        </line>
+        <line id="2">
+            <text>I don't get many visitors here.</text>
+        </line>
+		<line id="3">
+            <text>Lots of ancient stuff to explore here!</text>
+        </line>
+        <line id="4">
+            <text>You don't have any water do you? I'm a bit parched.</text>
+        </line>
+    </conversation>
+    <conversation id="The Old One">
+        <npc_name>The Old One</npc_name>
+        <linear>True</linear>
+        <line id="1">
+            <text>I have waited here for many centuries!</text>
+        </line>
+        <line id="2">
+            <text>Few have passed this way.</text>
+        </line>
+		<line id="3">
+            <text>The Desert drives men mad.</text>
+        </line>
+        <line id="4">
+            <text>The Desert is a tough place, but the next world...ha ha ha!</text>
         </line>
     </conversation>
 </conversations>
