@@ -98,7 +98,7 @@ class ImageManager:
                                     model.Tiles.NEXT_LEVEL: "next_level.png",
                                     model.Tiles.PREVIOUS_LEVEL: "previous_level.png",
                                     model.Tiles.KEY : "key.png",
-                                    model.Tiles.MAP : "treasure_map.png",
+                                    model.Tiles.MAP : "treasure_map2.png",
                                     model.Tiles.WEAPON: "sword.png",
                                     model.Tiles.SHIELD: "shield.png",
                                     model.Tiles.BANG: ("bang1.png","bang2.png"),
@@ -140,6 +140,7 @@ class ImageManager:
                                     model.Tiles.KEY : "key_silver.png",
                                     model.Tiles.TILE2: "tile4.png",
                                     model.Tiles.DECORATION1: "frost_tree.png",
+                                    model.Tiles.DECORATION2: "stalacmites.png",
                                     model.Tiles.WALL: "stone_wall.png",
                                     model.Tiles.WALL2: "snow.png",
                                     model.Tiles.WALL_TR: "stone_wall_tr.png",
@@ -149,6 +150,7 @@ class ImageManager:
                                     model.Tiles.TREASURE: "treasure_blue.png",
                                     model.Tiles.MONSTER1: ("snow_beast.png", "snow_beast2.png","snow_beast.png", "snow_beast3.png"),
                                     model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png", "skeleton1.png", "skeleton3.png"),
+                                    model.Tiles.MONSTER3: ("Snow Ghost-1.png", "Snow Ghost-2.png"),
                                     model.Tiles.DOT1: ("ice_wall.png"),
                                     model.Tiles.TREE: "winter_tree.png",
                                     model.Tiles.BOSS: ("dragon1.png", "dragon2.png", "dragon3.png","dragon2.png")
@@ -171,7 +173,7 @@ class ImageManager:
                                     model.Tiles.TREE: "forest_tree.png",
                                     model.Tiles.MONSTER1: ("goblin1.png", "goblin2.png","goblin1.png", "goblin3.png"),
                                     model.Tiles.MONSTER2: ("skeleton1.png", "skeleton2.png","skeleton1.png","skeleton3.png" ),
-                                    model.Tiles.MONSTER3: ("biter.png", "biter1.png", "biter.png","biter2.png","biter.png"),
+                                    model.Tiles.MONSTER3: ("biter1.png", "biter2.png"),
                                     model.Tiles.BOSS: ("fallen_knight1.png","fallen_knight2.png","fallen_knight3.png", \
                                                        "fallen_knight2.png","fallen_knight1.png","fallen_knight4.png", \
                                                        "fallen_knight5.png","fallen_knight4.png"
@@ -219,6 +221,7 @@ class ImageManager:
                                     model.Tiles.WALL_BL: "cave_wall_bl.png",
                                     model.Tiles.SECRET_WALL: "cave_wall.png",
                                     model.Tiles.DECORATION1: "goal.png",
+                                    model.Tiles.DECORATION2: "stalacmites.png",
                                     model.Tiles.DOOR: "cave_door.png",
                                     model.Tiles.DOOR_OPEN: "cave_door_open.png",
                                     model.Tiles.KEY: "key.png",
@@ -248,7 +251,7 @@ class ImageManager:
                                     model.Tiles.WALL_BR: "chaos_wall_br.png",
                                     model.Tiles.WALL_BL: "chaos_wall_bl.png",
                                     model.Tiles.SECRET_WALL: "chaos_wall.png",
-                                    model.Tiles.DECORATION1: "palm_tree.png",
+                                    model.Tiles.DECORATION2: "stalacmites.png",
                                     model.Tiles.DOOR: "chaos_portal.png",
                                     model.Tiles.DOOR_OPEN: "chaos_portal_open.png",
                                     model.Tiles.KEY: "chaos_key.png",

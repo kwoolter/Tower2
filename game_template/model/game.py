@@ -1903,26 +1903,25 @@ class FloorBuilder:
 
         arena = [
             '/)     (:N:)      (\\',
-            ')                  (',
+            ')       888        (',
             '                    ',
             '                    ',
             '                    ',
+            '!                  !',
+            '!                  !',
+            '!\   !       !    /!',
+            ':)8  !   !   !   8(:',
+            'R88  !   !   !   88R',
+            ':\8  !   !   !   8/:',
+            '!)   !       !    (!',
+            '!                  !',
+            '!                  !',
             '                    ',
             '                    ',
-            '     !       !      ',
-            ':    !   !   !     :',
-            'R    !   !   !     R',
-            ':    !   !   !     :',
-            '     !       !      ',
             '                    ',
-            '                    ',
-            '                    ',
-            '                    ',
-            '                    ',
-            '                    ',
+            '        888         ',
             '\       /F\        /',
             '(\     j:S:j      /)',
-
         ]
 
         # Start of the Game - Forest Level
@@ -1953,10 +1952,6 @@ class FloorBuilder:
         floor_id = 0
         self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
 
-        floor_id = 300
-        self.floor_plans[floor_id] = FloorPlan(floor_id, deepcopy(new_floor_plan))
-
-        floor_id = 0
 
         # Chapel
         new_floor_plan = [
@@ -2019,7 +2014,7 @@ class FloorBuilder:
         new_floor_plan = [
 
             '::::::::::::::::::::',
-            ':,D     (:)       ?:',
+            ':,D     (:)        :',
             ':::                :',
             ':                  :',
             ':    \        /    :',
@@ -2036,7 +2031,7 @@ class FloorBuilder:
             ':                  :',
             ':\     B   B      /:',
             '::`:   :   :    :`::',
-            ':j`:   :\ /:   ?:`j:',
+            ':j`:   :\ /:    :`j:',
             ':::::::::S::::::::::',
 
         ]
@@ -2382,30 +2377,30 @@ class FloorBuilder:
         # Arena
         new_floor_plan = (
             'j       (:R:)      j',
-            '                    ',
-            '                    ',
-            '                    ',
-            '                    ',
+            '!                  !',
+            '!                  !',
+            '!                  (',
+            ')                   ',
             '        !    !      ',
             '        !    !     /',
             '\       !    !     :',
             ':::\              /:',
-            ':``:              ::',
-            'W``F              `E',
-            ':``:              ::',
+            ':``:8            8::',
+            'W``F8            8`E',
+            ':``:8            8::',
             ':::)              (:',
             ')       !    !     :',
             '        !    !     (',
-            '        !    !      ',
-            '                    ',
-            '                    ',
-            '                    ',
-            'j       /:R:\      j',
+            '\       !    !      ',
+            '!                   ',
+            '!                   ',
+            '!      /\  /\       ',
+            'j   /!!!::R:!!!!\  j',
 
         )
 
         floor_id = 98
-        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(arena))
 
         # Portal1
         new_floor_plan = [
@@ -2472,18 +2467,18 @@ class FloorBuilder:
             'ww    w     !!    ww',
             'ww           !    ww',
             'ww                w:',
-            'www      /        w:',
-            'w!       :        ::',
+            'www      /     Z  w:',
+            'w!      Z:        ::',
             'w!     /::!w      `E',
-            'w     www!!ww   !!::',
+            'w  Z  www!!ww   !!::',
             '!      wwwww   !!!!:',
             '!         w   !!  !:',
             '!   \             !w',
-            'w   :              w',
-            'w   :\        ww   w',
+            'w   :       Z      w',
+            'w   :\Z       ww   w',
             'w   (::w      w:   w',
             'w     www   www:   w',
-            'ww    ww:  wwww:!  w',
+            'ww    ww: Zwwww:!  w',
             'ww!!!www:`:wwww:!! w',
             'wwwwwwww:S:wwww:wwww',
 
@@ -2677,17 +2672,16 @@ class FloorBuilder:
             'w:)  :   :         w',
             'w:```::  :          ',
             'w:M``D8  :          ',
-            'w:```::  :     :   E',
-            'w:\  :   :     :    ',
+            'w:```::  :     Z   E',
+            'w:\  :   :Z    :    ',
             'ww:::)   ::    :    ',
             'wwwww          :   w',
             'www                w',
             'ww                 w',
-            'ww          :    !!w',
+            'ww     Z    :    !!w',
             'ww!!   :  :::   !!ww',
-            'www!!! ::::www !!www',
+            'www!!! ::::wwwZ!!www',
             'wwwwwwwwwwwwwwwwwwww',
-
         )
 
         floor_id +=1
@@ -3086,7 +3080,7 @@ class FloorBuilder:
             ':)         () ()  (:',
             ':   l              :',
             ')                /::',
-            '\      /\        :ee',
+            '\      /\    Z   :ee',
             ':      (::\      :ee',
             ':  /\   :::      (::',
             ':  ::\  (::\       :',
@@ -3095,7 +3089,7 @@ class FloorBuilder:
             ':\            ()  (:',
             '::                 :',
             ':)    /:\          (',
-            ':     (:)          /',
+            ':   Z (:)          /',
             ')           /:\    :',
             '\           ::)   /:',
             ':           :)    ::',
@@ -3121,7 +3115,7 @@ class FloorBuilder:
             ')      weew   ```  :',
             'W      weew       /:',
             '\      weewwwwwwwwww',
-            ':      weeeeeeeeeeee',
+            ':  Z   weeeeeeeeeeee',
             ':      weeeeeeeeeeee',
             ':      wwwwwwwwwwwww',
             ':       (:)    (::::',
@@ -3129,7 +3123,7 @@ class FloorBuilder:
             ':::)            (:::',
             '::)             /:::',
             '::\             ::::',
-            ':::\    /\     /::::',
+            ':::\  Z /\    Z/::::',
             ':::::::::::\S/::::::',
 
         )
@@ -3142,22 +3136,22 @@ class FloorBuilder:
             ':::::::)N(::::::::::',
             ':::::)      (:::::::',
             '::)             (:::',
-            ':                 (:',
-            ':\                 :',
+            ':      Z          (:',
+            ':\        Z        :',
             ':w   B             :',
             ':w              B  :',
             'ww`      /:\       :',
             'W``    /:::::\     :',
-            'ww`    ::::::)     :',
+            'ww`    ::::::)  Z  :',
             ':w     (:::)      /:',
-            ':w      (:)      /::',
+            ':w Z    (:)      /::',
             ':)       :\   /:::::',
             ':        (:   (:::::',
             ':   B    /:       (:',
-            ':        (:\       :',
-            ')        /::   B  -:',
+            ':      Z (:\       :',
+            ')        /::    Z  -:',
             '\        :::       :',
-            ':\      /:::\     /:',
+            ':\     Z/:::\     /:',
             '::::\/::::::::::::::',
 
         )
@@ -3199,7 +3193,7 @@ class FloorBuilder:
             ':-   ()  www      (:',
             ')         B        (',
             '\                  /',
-            ':\                 (',
+            ':\   Z         Z   (',
             'w:                 :',
             'w: B               :',
             'w:jw   ww   ww    /:',
@@ -3211,7 +3205,7 @@ class FloorBuilder:
             'w:jw   ww   ww    (:',
             'w: B               :',
             'w:                 (',
-            ':)                 /',
+            ':)              Z  /',
             ':\        B        :',
             '::\/\    www      /:',
             ':::::\/::www:\/:\/::',
@@ -3258,16 +3252,16 @@ class FloorBuilder:
             ':        D        /:',
             ':        w        (:',
             ')     wwwwwww      :',
-            '\    /w)    w      :',
+            '\   Z/w)    w      :',
             ':\ /::w ``` w\    /:',
             '::;:::w ``` wwwwwww:',
             '::;) (w  `  w)    (:',
             ':)    ww ` ww      :',
             ')      B ` B       :',
-            '\        `         :',
+            '\        `     Z   :',
             ':   w    `         (',
             ':\  w    `         /',
-            ':wwww   B`B      /::',
+            ':wwww   B`B  Z   /::',
             ':)      w`w     /:ee',
             ':       w`w     :eee',
             ':\     /w`w\    :eee',
@@ -3312,8 +3306,8 @@ class FloorBuilder:
             'eee:)  ()    (:::ee:',
             'e::)         /::eeee',
             ':)         /:::eeeee',
-            ':         /:eeeeewwe',
-            ')        B:eeeewwwww',
+            ':      Z  /:eeeeewwe',
+            ')  Z     B:eeeewwwww',
             '\         ()   w  Bw',
             '::\          ¬    Rw',
             ' (:\   B    ¬¬¬¬¬  w',
@@ -3322,12 +3316,13 @@ class FloorBuilder:
             '::)          ¬    Rw',
             ':         /\   w  Bw',
             ')        B:eeeewwwww',
-            '\         (:eeeeewww',
+            '\  Z  Z   (:eeeeewww',
             ':          (::eeewwe',
             ':\          (::eeeee',
             'e::\         (::eeee',
-            'eee:::\  =    ::eee:',
+            'eee:::\Z =    ::eee:',
             'eeeeee:::::\/:::::::',
+
         )
 
         floor_id +=1
@@ -3339,7 +3334,7 @@ class FloorBuilder:
             ':::)(::w¬¬¬w::)   (:',
             ':)    (w¬¬¬w)      :',
             ':     Bw¬¬¬wB      :',
-            ':                  (',
+            ':              Z   (',
             ':\                 /',
             '::\   /w!!!w\    /::',
             '!!!!!!!!!!!!!!!!!!!!',
@@ -3347,13 +3342,13 @@ class FloorBuilder:
             '!!!!!!!!!!!!!!!!!!!!',
             '::)   (:w!w:)     (:',
             ':)     ww`ww       (',
-            ':       w`w        /',
+            ':       w`w      Z /',
             ':       w`w        :',
-            ')        `         :',
-            '\        `         :',
+            ') Z      `    Z    :',
+            '\     Z  `         :',
             ':        `        /:',
             ':       w`w      /::',
-            ':\     ww`ww     ;=:',
+            ':\  Z  ww`ww Z   ;=:',
             '::\/::::wSw:::\/::::',
 
         )
@@ -3449,26 +3444,26 @@ class FloorBuilder:
 
         # Chamber of the Deceiver
         new_floor_plan = (
-            '/:)(::::)(:)(::::::\\',
-            ':)        :       (:',
-            ':        /:\       :',
-            ':      wwwwwww     :',
-            ':      w`````w     :',
-            ')    _ w  _  w _  /:',
-            '\                www',
-            ':\        B       `w',
-            'ww`     /:::\     `w',
-            'W````  8D`,`D8    `E',
-            'ww`     (:::)     `w',
-            ':)        B       `w',
-            ')                www',
-            '\                 (:',
-            ':    _ w  _  w _   :',
-            ':      w`````w     (',
-            ':      wwwwwww     /',
-            ':        (:)       :',
-            ':\        :     - /:',
-            '(:::::::\/:\/::::::)',
+            ':\    (:::::)  N  (:',
+            '::      (:)        (',
+            ':)       :          ',
+            ')       /:\   /\   /',
+            '   /\   :::   ()   :',
+            '   ()   (:)        (',
+            '        `l`        /',
+            '\       ```        :',
+            'W``````````` ` ``  :',
+            ')        `      ` /:',
+            '    Z        /\ ` ::',
+            '             () ` ()',
+            ' /\    /\/\     `  /',
+            ' ()    ::::   `````E',
+            '       (::)   `    (',
+            '              ` /\  ',
+            '         `````` ()  ',
+            '         `          ',
+            '\/\     /D\         ',
+            ':::\ Z  :S:  Z  Z  H',
 
         )
 
@@ -3482,18 +3477,18 @@ class FloorBuilder:
             '!!!!:)()()(::)(:!!!!',
             '!!!:)          (:!!!',
             '!!:)            (:!!',
-            '!!:              :!!',
+            '!!:    Z    Z    :!!',
             '!!w\     `      /w!!',
             '!!wwwB   `    Bwww!!',
             '!ww     ```      ww!',
             '!w`   ```+```    `w!',
             '!w`     ```      `w!',
-            '!ww\     `       ww!',
+            '!ww\     `      Zww!',
             '!!wwwB   `    Bwww!!',
             '!!w)            jw!!',
             '!!\              :!!',
             '!!:\     M      /:!!',
-            '!!!:\          /:!!!',
+            '!!!:\  Z       /:!!!',
             '!!!!:\/:\/\/:\/:!!!!',
             'w!!!!!!!!!!!!!!!!!!!',
             'ww!!!!!!!!!!!!!!!!!!',
@@ -3513,14 +3508,14 @@ class FloorBuilder:
             ':    !!!w`w!!!!!   :',
             ':\     !w`w!!!!    :',
             'ww     ww`ww      /:',
-            'w`       `        ww',
+            'w`  Z    `        ww',
             'W`       `        `w',
-            'w`  ``````      ```E',
+            'w`  ``````  Z   ```E',
             'ww   ww  `        `w',
             ':)   ww  `        ww',
             ':        `  ````  (:',
             ':        `  `ww    :',
-            ':        ````ww    :',
+            ':   Z    ````ww    :',
             '!        `         :',
             '!!!      `         :',
             '!!!!!  ww`ww\     /:',
@@ -3537,9 +3532,9 @@ class FloorBuilder:
             ':)                (:',
             ':                  :',
             ':        T         :',
-            ':   T          T   :',
+            ':   T          Z   :',
             ':                  :',
-            ':       ```        :',
+            ':      Z```      Z :',
             ':     ww```ww      :',
             ':      w```w       :',
             ') T  `````````     (',
@@ -3551,7 +3546,7 @@ class FloorBuilder:
             ':                  :',
             ':   T    T     T   :',
             ':                  :',
-            ':\                /:',
+            ':\ Z  Z      Z   Z/:',
             '(:::::::\S/::::::::)',
 
         )
@@ -3570,22 +3565,22 @@ class FloorBuilder:
             'wwww)(::)N(:::)(wwww',
             'wR`w     `      w`|w',
             'w``w     `      w``w',
-            'wwDw     `      wDww',
+            'wwDw     ` Z    wDww',
             ':)       `        (:',
             ')        `         (',
             '\       B`B        /',
-            ':      ww`ww       :',
-            ':     Bw```wB      :',
+            ':      ww`ww    Z  :',
+            ':  Z  Bw```wB      :',
             ':      ``M``       :',
             ':\    Bw```wB      :',
             ':)     ww`ww       :',
             ':       B B        :',
-            ':                ? (',
+            ':  Z             ? (',
             ':                  /',
-            ':                 /:',
+            ':      Z          /:',
             ')               wDww',
             '\_/\            w``w',
-            '::::\    /\    /w`,w',
+            '::::\  Z /\   Z/w`,w',
             ':::::\/:::::\/::wwww',
 
         )
@@ -3625,10 +3620,10 @@ class FloorBuilder:
         new_floor_plan = (
             '/:)    (wNw)     (:\\',
             ':)      w`w       (:',
-            ')        `         (',
-            '         `         /',
+            ')        `    Z    (',
+            '   Z     `         /',
             '       ww`ww      /:',
-            '\     /w```w\     (:',
+            '\  Z  /w```w\     (:',
             'wwwwwwww`M`wwwwwwwww',
             '!!!!!!!w```w!!!!!!!!',
             '!!!!!!!wwwww!!!!!!!!',
@@ -3636,13 +3631,14 @@ class FloorBuilder:
             'wwwwwwww`+`wwwwwwwww',
             ':)    (w```w)    (::',
             ')      ww`ww      (:',
-            '         `         :',
-            '         `         (',
-            '         `          ',
-            '         `          ',
-            '\        `         /',
+            '         `    Z    :',
+            '  Z      `         (',
+            '         `Z         ',
+            '     Z   `          ',
+            '\        `     Z   /',
             ':\      w`w       /:',
             '(:\    /wSw\     /:)',
+
         )
 
         floor_id += 1
@@ -3653,23 +3649,23 @@ class FloorBuilder:
             '/:)(::::)N(:::::)(:\\',
             ':)  (::) ` (:::)  (:',
             ')    ::  `  (::\   (',
-            '     :: ```  (:)    ',
+            '  Z  :: ```  (:)    ',
             '     ()  `          ',
             '                   /',
             '                   (',
             '        /:\         ',
             '    /\ /:::\ /:\    ',
-            '  /:::::::::::::\   ',
+            '  /:::::::::::::\  Z',
             '  :::::)R:::)j(::   ',
             '  (::)  /::)  /::   ',
             '   (:   :::\  (:)   ',
             '    :R  ()()        ',
             '    :\              ',
-            '    ()   `      /\  ',
+            '    ()   `   Z  /\  ',
             '        ```     ()  ',
             '\        `         /',
             ':\     /w`w\      /:',
-            '(:\   /:wSw::\/:\/:)',
+            '(:\ Z /:wSw::\/:\/:)',
 
         )
 
@@ -3681,22 +3677,22 @@ class FloorBuilder:
             '/::::)(wwwwww)(::::\\',
             ':)                (:',
             ':                  :',
-            ':   _    M   _     :',
+            ':   _    M   _  Z  :',
             ':                  :',
             ':\     _           :',
             ':w        _     _ /:',
-            ':w  _        _    ww',
-            'www               `w',
+            ':wZ _        _    ww',
+            'www     Z         `w',
             'W``            ````w',
             'www    _  _  _ ¬¬¬_w',
             ':w             ````w',
             ':w                `w',
             ':)  _             ww',
             ':                 (:',
-            ':       wDw  _  _  :',
+            ':     Z wDw  _  _  :',
             ':  _    wDw        :',
             ':       wDw        :',
-            ':\     /w,w\      /:',
+            ':\     /w,w\   Z  /:',
             '(:::\/::::::\/:::::)',
 
         )
@@ -3712,7 +3708,7 @@ class FloorBuilder:
             '/:::::::)N(::::::::\\',
             ':)       `        (:',
             ':       ```        :',
-            ':       ```        (',
+            ':   Z   ```    Z   (',
             '\      ww`ww       /',
             ':\     ww`ww      /:',
             ':::\   (w`w)     /::',
@@ -3723,7 +3719,7 @@ class FloorBuilder:
             ':     `&```&`      /',
             ') j      &      j  :',
             '\        `         (',
-            ':        `         /',
+            ':     Z  `  Z      /',
             ':       `¬`    /:\ (',
             ')/:\    `¬`   /:!:\/',
             '/:!:\   `¬`  /:!!!::',
@@ -3783,7 +3779,7 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (2,"Crypts of Eternity",5,3,0,(0,7,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (3, "Library of Zastaross",2,3,1,(4,0,0),1,(Tiles.DOOR,Tiles.DOOR_OPEN))
+        new_floor_data = (3, "Library of Zastaross",2,3,2,(4,0,0),1,(Tiles.DOOR,Tiles.DOOR_OPEN))
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (98,"Arena",0,5,0,(0,5,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -3826,11 +3822,11 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (101, "Cave of Ice", 2, 3, 1, (5, 0, 0), 1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (102, "Castle Black", 6, 3, 1, (5, 0, 0), 1)
+        new_floor_data = (102, "Castle Black", 6, 3, 1, (0, 0, 5), 1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (103, "Frost Bite Dungeon", 6, 3, 4, (2, 2, 0), 1)
+        new_floor_data = (103, "Frost Bite Dungeon", 6, 3, 4, (2, 2, 2), 1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (104, "Oubliette", 4, 3, 1, (4, 4, 0), 1)
+        new_floor_data = (104, "Oubliette", 4, 3, 1, (0, 4, 4), 1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (105, "Shard Throne", 4, 3, 1, (4, 4, 0), 1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -3842,7 +3838,7 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (198, "Arena", 0, 5, 0, (0, 5, 0), 0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (199,"Frozen End",2,3,0,(5,0,0),0)
+        new_floor_data = (199,"Frozen End",2,3,0,(0,0,5),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         # id,name,treasures,traps,keys,monsters(1,2,3),secrets
