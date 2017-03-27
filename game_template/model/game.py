@@ -147,7 +147,7 @@ class Player(Character):
     # Set player's attributes back to starting values
     def initialise(self):
         super(Player, self).initialise()
-        self.keys = 10
+        self.keys = 1
         self.red_potions = 0
         self.exit_keys = 0
         self.boss_keys = 0
@@ -155,7 +155,7 @@ class Player(Character):
         self.trophies = 0
         self.kills = 0
         self.boss_kills = 0
-        self.weapon = 10
+        self.weapon = 1
         self.shield = 1
         self.bombs = 0
         self.maps = 0
@@ -2400,7 +2400,7 @@ class FloorBuilder:
         )
 
         floor_id = 98
-        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(arena))
+        self.floor_plans[floor_id] = FloorPlan(floor_id,deepcopy(new_floor_plan))
 
         # Portal1
         new_floor_plan = [
@@ -3444,26 +3444,26 @@ class FloorBuilder:
 
         # Chamber of the Deceiver
         new_floor_plan = (
-            ':\    (:::::)  N  (:',
-            '::      (:)        (',
-            ':)       :          ',
-            ')       /:\   /\   /',
-            '   /\   :::   ()   :',
-            '   ()   (:)        (',
-            '        `l`        /',
-            '\       ```        :',
-            'W``````````` ` ``  :',
-            ')        `      ` /:',
-            '    Z        /\ ` ::',
-            '             () ` ()',
-            ' /\    /\/\     `  /',
-            ' ()    ::::   `````E',
-            '       (::)   `    (',
-            '              ` /\  ',
-            '         `````` ()  ',
-            '         `          ',
-            '\/\     /D\         ',
-            ':::\ Z  :S:  Z  Z  H',
+            '/:)(::::)(:)(::::::\\',
+            ':)        :       (:',
+            ':        /:\       :',
+            ':      wwwwwww     :',
+            ':      w`````w     :',
+            ')    _ w  _  w _  /:',
+            '\                www',
+            ':\        B       `w',
+            'ww`     /:::\     `w',
+            'W````  8D`,`D8    `E',
+            'ww`     (:::)     `w',
+            ':)        B       `w',
+            ')                www',
+            '\                 (:',
+            ':    _ w  _  w _   :',
+            ':      w`````w     (',
+            ':      wwwwwww     /',
+            ':        (:)       :',
+            ':\        :     - /:',
+            '(:::::::\/:\/::::::)',
 
         )
 
@@ -3777,7 +3777,7 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (1,"Chapel of the Damned",5,5,0,(0,5,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (2,"Crypts of Eternity",5,3,0,(0,7,0),1)
+        new_floor_data = (2,"Crypts of Eternity",5,3,0,(0,5,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (3, "Library of Zastaross",2,3,2,(4,0,0),1,(Tiles.DOOR,Tiles.DOOR_OPEN))
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -3786,15 +3786,15 @@ class FloorBuilder:
         new_floor_data = (99,"Portal Between Worlds",5,3,0,(0,5,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
-        new_floor_data = (20,"The Forest Temple",5,2,1,(6,0,0),0)
+        new_floor_data = (20,"The Forest Temple",5,2,1,(5,0,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (21,"The Colonnade",5,4,1,(6,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (22,"The Shrine of the Snake God",5,4,1,(6,0,0),1)
+        new_floor_data = (22,"The Shrine of the Snake God",5,4,1,(5,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (23,"Priest Quarters",5,4,1,(6,0,0),1)
+        new_floor_data = (23,"Priest Quarters",5,4,1,(5,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (24,"Altar of Sacrifice",5,4,1,(6,0,0),1)
+        new_floor_data = (24,"Altar of Sacrifice",5,4,1,(5,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
 
         # The Ruins
@@ -3806,7 +3806,7 @@ class FloorBuilder:
         # The Old Tower
         new_floor_data = (50,"The Old Tower",0,0,0,(0,5,0),0)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (51,"Back and Forth",3,6,0,(8,0,0),1)
+        new_floor_data = (51,"Back and Forth",3,6,0,(5,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (52,"The Maze",3,3,0,(5,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
@@ -3847,7 +3847,7 @@ class FloorBuilder:
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (201,"Tomb Entrance",2,2,0,(6,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
-        new_floor_data = (202,"Tomb of the Pharoah",2,2,0,(5,0,0),1)
+        new_floor_data = (202,"Tomb of the Pharoah",2,5,0,(5,0,0),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
         new_floor_data = (203,"Chamber of the Sarcophagus",2,2,0,(0,0,6),1)
         self.floor_configs[new_floor_data[0]] = new_floor_data
