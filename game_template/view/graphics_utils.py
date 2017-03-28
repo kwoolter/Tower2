@@ -212,13 +212,13 @@ class ImageManager:
         ImageManager.skins[new_skin_name] = new_skin
 
         new_skin_name = "cave"
-        new_skin = (new_skin_name, {model.Tiles.WALL: "cave_wall.png",
+        new_skin = (new_skin_name, {model.Tiles.WALL: "cave_wall2.png",
                                     model.Tiles.WALL2: "forest_wall.png",
                                     model.Tiles.WALL3: ("water.png", "water2.png", "water3.png", "water4.png"),
-                                    model.Tiles.WALL_TR: "cave_wall_tr.png",
-                                    model.Tiles.WALL_TL: "cave_wall_tl.png",
-                                    model.Tiles.WALL_BR: "cave_wall_br.png",
-                                    model.Tiles.WALL_BL: "cave_wall_bl.png",
+                                    model.Tiles.WALL_TR: "cave_wall2_tr.png",
+                                    model.Tiles.WALL_TL: "cave_wall2_tl.png",
+                                    model.Tiles.WALL_BR: "cave_wall2_br.png",
+                                    model.Tiles.WALL_BL: "cave_wall2_bl.png",
                                     model.Tiles.SECRET_WALL: "cave_wall.png",
                                     model.Tiles.DECORATION1: "goal.png",
                                     model.Tiles.DECORATION2: "stalacmites.png",
