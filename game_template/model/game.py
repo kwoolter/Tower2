@@ -299,7 +299,7 @@ class Game:
             self.game_over()
 
         elif self.is_game_complete() is True:
-            self.game_over()
+            self._state = Game.GAME_OVER
 
         return self._state
 
@@ -1047,18 +1047,22 @@ class Game:
 
     def game_over(self):
 
-        logging.info("Game Over {0}...".format(self.name))
+        if self._state != Game.GAME_OVER:
 
-        self.status_messages = {}
+            logging.info("Game Over {0}...".format(self.name))
 
-        player = self.get_current_player()
+            print("Game Over")
 
-        self.player_scores[player.name] = player.score
+            self.status_messages = {}
 
-        self.hst.add(player.name, player.score)
-        self.hst.save()
+            player = self.get_current_player()
 
-        self._state=Game.GAME_OVER
+            self.player_scores[player.name] = player.score
+
+            self.hst.add(player.name, player.score)
+            self.hst.save()
+
+            self._state=Game.GAME_OVER
 
     def end(self):
 
@@ -3194,7 +3198,7 @@ class FloorBuilder:
             ')         B        (',
             '\                  /',
             ':\   Z         Z   (',
-            'w:                 :',
+            'w:                 /',
             'w: B               :',
             'w:jw   ww   ww    /:',
             'wwww   ww   ww  ww::',
