@@ -24,6 +24,9 @@ Just copy the whole template and write your own:-
 <p>Cactus</p>
 
 
+##Screen Shots
 
+<img src="cactus.png" alt="cactus">
+<p>Cactus</p>
 
 
