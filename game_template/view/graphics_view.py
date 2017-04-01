@@ -566,7 +566,7 @@ class GameOverView(View):
         image_height = 200
 
         if self.game.is_game_complete() is True:
-            tile_name = model.Tiles.PLAYER
+            tile_name = model.Tiles.PLAYER_GOLD
             tile_name2 = model.Tiles.TROPHY
         else:
             tile_name = model.Tiles.MONSTER1
@@ -739,7 +739,8 @@ class FloorView(View):
                 self.surface.blit(image, (self.floor.npc.x * self.tile_width,
                                           self.floor.npc.y * self.tile_height))
 
-        tile = model.Tiles.PLAYER
+        tile = self.floor.player.armour
+
         image = View.image_manager.get_skin_image(tile_name=tile, skin_name=self.skin_name, tick=self.tick_count)
 
         if self.floor.player is not None and image is not None:

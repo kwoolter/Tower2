@@ -39,6 +39,9 @@ class Tiles:
     NEXT_LEVEL = 'L'
     NORTH = 'N'
     PLAYER = 'P'
+    PLAYER_KNIGHT = 'p'
+    PLAYER_GOLD = 'g'
+    PLAYER_SPIKE = 'A'
     NPC1 = 'Y'
     NPC2 = 'y'
     PREVIOUS_LEVEL = 'l'
@@ -95,6 +98,7 @@ class Tiles:
     PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WALL2, WALL3, BRAZIER, RUNE, DECORATION1, DECORATION2)
     PLAYER_DOT_TILES = (DOT1, DOT2)
     PLAYER_EQUIPABLE_ITEMS = (WEAPON, SHIELD, RED_POTION, BOMB)
+    PLAYER_ARMOUR = (PLAYER_KNIGHT, PLAYER_SPIKE, PLAYER_GOLD)
     SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
 
 class Character():
@@ -159,6 +163,7 @@ class Player(Character):
         self.shield = 1
         self.bombs = 0
         self.maps = 0
+        self.armour = Tiles.PLAYER
         self.treasure_maps = {}
         self.runes = {}
         self.equipment_slots=[]
@@ -245,9 +250,10 @@ class Boss(Character):
 
 class NPC(Character):
 
-    def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1, HP : int = 30, tile = Tiles.NPC1):
+    def __init__(self, name : str, x : int = 1, y : int = 1, width : int = 1, height : int = 1, HP : int = 30, tile = Tiles.NPC1, reward = None):
         super(NPC, self).__init__(name=name, x=x, y=y, HP=HP, width=width, height = height)
         self.tile = tile
+        self.reward = reward
         self.initialise()
 
 
@@ -482,6 +488,10 @@ class Game:
         if conversation is None:
             msg = "{0} has nothing to say to you.".format(npc.name)
 
+        elif conversation.is_completed() and npc.reward is not None:
+            msg = "{0} vanishes and leaves behind a reward!".format(npc.name)
+            self.get_current_floor().vanish_npc()
+
         # Otherwise attempt the conversation
         else:
             # Get the next line in the conversation
@@ -494,6 +504,8 @@ class Game:
                 msg = "{0}:'{1}'".format(npc.name, next_line.text)
 
         self.add_status_message(msg, life)
+
+
 
 
     def initialise(self):
@@ -664,12 +676,12 @@ class Game:
                 rewards = [Tiles.KEY, Tiles.SHIELD, Tiles.WEAPON,Tiles.BOMB, Tiles.RED_POTION, \
                                                                  Tiles.TREASURE10, Tiles.TREASURE25]
 
-                #  If the progress allows the add a map as an optional reward
-                level_progress = current_player.runes_collected(current_level.id) + \
-                                 len(current_player.maps_collected(current_level.id))
-
-                if level_progress < Game.TARGET_RUNE_COUNT:
-                    rewards.append(Tiles.MAP)
+                # #  If the progress allows the add a map as an optional reward
+                # level_progress = current_player.runes_collected(current_level.id) + \
+                #                  len(current_player.maps_collected(current_level.id))
+                #
+                # if level_progress < Game.TARGET_RUNE_COUNT:
+                #     rewards.append(Tiles.MAP)
 
                 current_floor.set_player_tile(random.choice(rewards))
                 self.add_status_message("You opened the treasure chest!")
@@ -695,6 +707,12 @@ class Game:
             current_floor.set_player_tile(Tiles.EMPTY)
             current_player.bombs += 1
             print("You found a bomb!")
+
+        elif tile in Tiles.PLAYER_ARMOUR:
+            current_floor.set_player_tile(Tiles.EMPTY)
+            current_player.armour = tile
+            self.add_status_message("You found some armour!")
+            print("You found some armour!")
 
         elif tile == Tiles.TROPHY:
             current_floor.set_player_tile(Tiles.EMPTY)
@@ -1639,6 +1657,17 @@ class Floor:
 
         return hit
 
+    # NPC vanishes and is replaced by a reward if they had one to give
+    def vanish_npc(self):
+        if self.npc is not None:
+            if self.npc.reward is None:
+                tile = Tiles.EMPTY
+            else:
+                tile = self.npc.reward
+
+            self.floor_plan.set_tile(x=self.npc.x, y=self.npc.y, tile_name=tile)
+            self.npc = None
+
     def move_monsters(self):
 
         new_monsters = {}
@@ -2409,10 +2438,10 @@ class FloorBuilder:
         # Portal1
         new_floor_plan = [
             '::::::::::::::::::::',
-            ':)     : j :      (:',
-            ':      :   :       :',
+            ':)     :`j`:      (:',
+            ':      :```:       :',
             ':      (:D:)       :',
-            ':                  :',
+            ':       888        :',
             ':R                 :',
             ':B  B              :',
             ':::::```     B:\   :',
@@ -2423,10 +2452,10 @@ class FloorBuilder:
             ':`````¬```     /) (:',
             ':::::```     B:)   :',
             ':B  B              :',
-            ':x                 :',
+            ':x      888        :',
             ':      /:D:\       :',
-            ':      :   :       :',
-            ':\     : j :      /:',
+            ':      :```:       :',
+            ':\     :```:      /:',
             '::::::::::::::::::::',
 
         ]
@@ -3996,8 +4025,8 @@ class FloorBuilder:
         npc = NPC("Imprisoned One", width=3, height=3)
         self.floors[0].add_npc(npc, xy=(0,19))
 
-        npc = NPC("Rosie", tile=Tiles.NPC2)
-        self.floors[99].add_npc(npc,xy=(17,8))
+        npc = NPC("Rosie", tile=Tiles.NPC2, reward=Tiles.PLAYER_KNIGHT)
+        self.floors[99].add_npc(npc,xy=(9,18))
 
         npc = NPC("Oliver")
         self.floors[100].add_npc(npc,xy=(18,5))
@@ -4008,13 +4037,13 @@ class FloorBuilder:
         npc = NPC("Monty", tile=Tiles.NPC1)
         self.floors[200].add_npc(npc)
 
-        npc = NPC("The Old One", tile=Tiles.NPC2)
+        npc = NPC("The Old One", tile=Tiles.NPC2, reward=Tiles.PLAYER_SPIKE)
         self.floors[299].add_npc(npc, xy=(13,6))
 
         npc = NPC("Golum", tile=Tiles.NPC1)
         self.floors[300].add_npc(npc, xy=(16,18))
 
-        npc = NPC("Baylor", tile=Tiles.NPC2)
+        npc = NPC("Baylor", tile=Tiles.NPC2, reward=Tiles.PLAYER_GOLD)
         self.floors[399].add_npc(npc, xy=(15,2))
 
         npc = NPC("The Wretched", tile=Tiles.NPC1)

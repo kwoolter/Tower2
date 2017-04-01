@@ -25,13 +25,16 @@
             <text>I am quite surprised you got here to be honest!</text>
         </line>
         <line id="3">
-            <text>Step into the portal to leave this world!</text>
+            <text>Collect ancient runes to activate the portal!</text>
         </line>
         <line id="4">
-            <text>Collect ancient runes to activate the portal!</text>
+            <text>Step into the portal to leave this world!</text>
         </line>
         <line id="5">
             <text>Good luck and safe travels!</text>
+        </line>
+        <line id="6">
+            <text>...and take this gift as a sign of my goodwill.  Goodbye....</text>
         </line>
     </conversation>
 	<conversation id="Oliver">
@@ -51,6 +54,9 @@
         </line>
         <line id="5">
             <text>The Pool of Replenishment only works once!</text>
+        </line>
+        <line id="6">
+            <text>Go on then! All I have to give you is advice!</text>
         </line>
     </conversation>
 	<conversation id="Skids">
@@ -100,6 +106,9 @@
         <line id="4">
             <text>The Desert is a tough place, but the next world...ha ha ha!</text>
         </line>
+        <line id="5">
+            <text>Farewell....oh, and this might come in handy, I have little use for it anymore...</text>
+        </line>
     </conversation>
         <conversation id="Golum">
         <npc_name>Golum</npc_name>
@@ -131,6 +140,9 @@
         </line>
         <line id="4">
             <text>I can not save you from what lies beyond that portal.</text>
+        </line>
+        <line id="5">
+            <text>Here! Take this!  It may be your only hope! Goodbye....</text>
         </line>
     </conversation>
     <conversation id="The Wretched">
