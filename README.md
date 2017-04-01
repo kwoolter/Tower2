@@ -19,6 +19,9 @@ Just copy the whole template and write your own:-
 - Model - model\game.py\Game class
 - View - view\graphics_view.py\GameView class
 - Controller - controller\controller.py\Controller class
+<br>
+<img src="cactus.png" alt="cactus">
+
 
 
 
