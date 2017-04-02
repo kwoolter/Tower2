@@ -29,6 +29,7 @@ class Tiles:
     EXIT_KEY = '%'
     HEART = 'HP'
     REPLENISH = "H"
+    REPLENISH_SPENT = "h"
     KEY = '?'
     MAP = 'M'
     MONSTER1 = '1'
@@ -43,6 +44,7 @@ class Tiles:
     PLAYER_GOLD = 'g'
     PLAYER_SPIKE = 'A'
     PLAYER_THIEF = 'a'
+    PLAYER_SKY = 'U'
     NPC1 = 'Y'
     NPC2 = 'y'
     NPC3 = 'U'
@@ -97,10 +99,10 @@ class Tiles:
     TRAPS = (TRAP1, TRAP2, TRAP3)
     RUNES = (RUNE1, RUNE2, RUNE3, RUNE4, RUNE5)
     MONSTER_EMPTY_TILES = (EMPTY, PLAYER, DOOR_OPEN) + FLOOR_TILES
-    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WALL2, WALL3, BRAZIER, RUNE, DECORATION1, DECORATION2)
+    PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WALL2, WALL3, BRAZIER, RUNE, DECORATION1, DECORATION2, REPLENISH_SPENT)
     PLAYER_DOT_TILES = (DOT1, DOT2)
     PLAYER_EQUIPABLE_ITEMS = (WEAPON, SHIELD, RED_POTION, BOMB)
-    PLAYER_ARMOUR = (PLAYER_KNIGHT, PLAYER_SPIKE, PLAYER_GOLD, PLAYER_THIEF)
+    PLAYER_ARMOUR = (PLAYER_KNIGHT, PLAYER_SPIKE, PLAYER_GOLD, PLAYER_THIEF, PLAYER_SKY)
     SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
 
 class Character():
@@ -165,7 +167,7 @@ class Player(Character):
         self.shield = 1
         self.bombs = 0
         self.maps = 0
-        self.armour = Tiles.PLAYER_THIEF
+        self.armour = Tiles.PLAYER_SKY
         self.available_armour = [Tiles.PLAYER]
         self.treasure_maps = {}
         self.runes = {}
@@ -216,6 +218,7 @@ class Player(Character):
         return maps
 
 
+    # How much damage does a player take from a monster collision?
     def damage_multiplier(self):
         multiplier = 1
 
@@ -227,6 +230,7 @@ class Player(Character):
 
         return multiplier
 
+    # How much damage does a player take from a damage over time tile?
     def dot_multiplier(self):
         multiplier = 1
 
@@ -235,6 +239,7 @@ class Player(Character):
 
         return multiplier
 
+    # How much damage does a monster take from a player collision?
     def monster_damage_multiplier(self):
         multiplier = 0
 
@@ -659,10 +664,23 @@ class Game:
                 self.talk(current_floor.npc)
 
         elif tile in Tiles.TRAPS:
-            current_player.HP -= 1
-            current_floor.set_player_tile(Tiles.EMPTY)
-            self.add_status_message("Ouch! You walked into a trap!")
-            print("Hit a trap!")
+            success = False
+
+            if current_player.armour == Tiles.PLAYER_KNIGHT and random.randint(1,10) > 5:
+                success = True
+                self.add_status_message("Your armour protects you from the trap!")
+
+            elif current_player.armour == Tiles.PLAYER_THIEF and random.randint(1,10) > 5:
+                success = True
+                self.add_status_message("You disabled the trap!")
+
+            if success is False:
+                current_player.HP -= 1
+                current_floor.set_player_tile(Tiles.EMPTY)
+                self.add_status_message("Ouch! You walked into a trap!")
+
+            elif success is True:
+                current_floor.set_player_tile(Tiles.EMPTY)
 
         elif tile in Tiles.PLAYER_DOT_TILES:
             print("You stood in something nasty!")
@@ -674,13 +692,16 @@ class Game:
             print("Some HP restored")
 
         elif tile == Tiles.REPLENISH:
+
             if current_player.HP < 10:
                 current_player.HP = 10
                 self.add_status_message("You are fully healed!")
-                current_floor.set_player_tile(Tiles.EMPTY)
+                current_floor.set_player_tile(Tiles.REPLENISH_SPENT)
             else:
                 self.add_status_message("You have full health!")
-                current_player.back()
+
+            current_player.back()
+
 
         elif tile in Tiles.SWAP_TILES.keys() and self.get_current_player().moved() is True:
             current_floor.set_player_tile(Tiles.SWAP_TILES[tile])
@@ -960,8 +981,9 @@ class Game:
                 elif Tiles.SHIELD in self.effects.keys():
                     print("You defended yourself with your shield")
                 elif self.tick_count % Game.ENEMY_DAMAGE_RATE == 0:
-                    self.get_current_player().HP -= 1
-                    self.get_current_floor().boss.HP += 1
+                    damage = self.get_current_player().damage_multiplier()
+                    self.get_current_player().HP -= damage
+                    self.get_current_floor().boss.HP += damage
                     print("HP down to %i" % self.get_current_player().HP)
 
                 if self.get_current_floor().boss.HP <= 0:
