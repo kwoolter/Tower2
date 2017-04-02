@@ -163,7 +163,8 @@ class Player(Character):
         self.shield = 1
         self.bombs = 0
         self.maps = 0
-        self.armour = Tiles.PLAYER
+        self.armour = Tiles.PLAYER_KNIGHT
+        self.available_armour = [Tiles.PLAYER]
         self.treasure_maps = {}
         self.runes = {}
         self.equipment_slots=[]
@@ -212,6 +213,33 @@ class Player(Character):
 
         return maps
 
+
+    def damage_multiplier(self):
+        multiplier = 1
+
+        if self.armour == Tiles.PLAYER_SPIKE:
+            multiplier = 2
+        elif self.armour == Tiles.PLAYER_KNIGHT and random.randint(1,10) > 7:
+            multiplier = 0
+            print("Your armour protects you!")
+
+        return multiplier
+
+    def dot_multiplier(self):
+        multiplier = 1
+
+        if self.armour == Tiles.PLAYER_GOLD:
+            multiplier = 0
+
+        return multiplier
+
+    def monster_damage_multiplier(self):
+        multiplier = 0
+
+        if self.armour == Tiles.PLAYER_SPIKE:
+            multiplier = 1
+
+        return multiplier
 
 class Boss(Character):
 
@@ -477,6 +505,8 @@ class Game:
 
     def talk(self, npc : NPC):
 
+        self.clear_status_messages()
+
         life = 20
 
         # talk to them...
@@ -492,6 +522,10 @@ class Game:
             msg = "{0} vanishes and leaves behind a reward!".format(npc.name)
             self.get_current_floor().vanish_npc()
 
+        elif conversation.is_completed() and random.randint(1,10) > 7:
+            msg = "{0} vanishes and leaves without a trace.".format(npc.name)
+            self.get_current_floor().vanish_npc()
+
         # Otherwise attempt the conversation
         else:
             # Get the next line in the conversation
@@ -504,8 +538,6 @@ class Game:
                 msg = "{0}:'{1}'".format(npc.name, next_line.text)
 
         self.add_status_message(msg, life)
-
-
 
 
     def initialise(self):
@@ -886,15 +918,20 @@ class Game:
                     print("You defended yourself with your shield")
 
                 elif self.tick_count % Game.ENEMY_DAMAGE_RATE == 0:
-                    self.get_current_player().HP -= 1
+                    self.get_current_player().HP -= 1 * self.get_current_player().damage_multiplier()
                     print("HP down to %i" % self.get_current_player().HP)
+
+                    if self.get_current_player().monster_damage_multiplier() > 0:
+                        self.get_current_player().kills += 1
+                        self.get_current_floor().kill_monster()
+                        print("You killed an enemy when ypu collided with it!")
 
             elif current_tile in Tiles.PLAYER_DOT_TILES:
 
                 if Tiles.SHIELD in self.effects.keys():
                     print("You defended yourself with your shield")
                 elif self.tick_count % Game.DOT_DAMAGE_RATE == 0:
-                    self.get_current_player().HP -= 1
+                    self.get_current_player().HP -= 1  * self.get_current_player().dot_multiplier()
                     print("HP down to %i" % self.get_current_player().HP)
 
             elif self.get_current_floor().hit_boss() is True:
@@ -1028,6 +1065,9 @@ class Game:
 
     def add_status_message(self, new_msg : str, life : int = STATUS_MESSAGE_LIFETIME):
         self.status_messages[new_msg] = life
+
+    def clear_status_messages(self):
+        self.status_messages = {}
 
     def update_status_messages(self):
 
