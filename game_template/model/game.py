@@ -163,7 +163,7 @@ class Player(Character):
         self.shield = 1
         self.bombs = 0
         self.maps = 0
-        self.armour = Tiles.PLAYER_KNIGHT
+        self.armour = Tiles.PLAYER
         self.available_armour = [Tiles.PLAYER]
         self.treasure_maps = {}
         self.runes = {}
@@ -924,7 +924,7 @@ class Game:
                     if self.get_current_player().monster_damage_multiplier() > 0:
                         self.get_current_player().kills += 1
                         self.get_current_floor().kill_monster()
-                        print("You killed an enemy when ypu collided with it!")
+                        print("You killed an enemy when you collided with it!")
 
             elif current_tile in Tiles.PLAYER_DOT_TILES:
 
