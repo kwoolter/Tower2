@@ -45,6 +45,7 @@ class Tiles:
     PLAYER_THIEF = 'a'
     NPC1 = 'Y'
     NPC2 = 'y'
+    NPC3 = 'U'
     PREVIOUS_LEVEL = 'l'
     RED_POTION = 'R'
     RUNE = 'u'
@@ -89,7 +90,7 @@ class Tiles:
     WEST = 'W'
 
     MONSTERS = (MONSTER1, MONSTER2, MONSTER3)
-    NPCS = (NPC1, NPC2)
+    NPCS = (NPC1, NPC2, NPC3)
     EXPLODABLES = (BOMB_LIT)
     FLOOR_TILES = (TILE1, TILE2, TILE3, TILE4)
     INDESTRUCTIBLE_ITEMS = (KEY, TREE, TROPHY, NORTH, SOUTH, EAST, WEST, UP, DOWN, SHOP, DOOR, RUNE)
@@ -99,7 +100,7 @@ class Tiles:
     PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WALL2, WALL3, BRAZIER, RUNE, DECORATION1, DECORATION2)
     PLAYER_DOT_TILES = (DOT1, DOT2)
     PLAYER_EQUIPABLE_ITEMS = (WEAPON, SHIELD, RED_POTION, BOMB)
-    PLAYER_ARMOUR = (PLAYER_KNIGHT, PLAYER_SPIKE, PLAYER_GOLD)
+    PLAYER_ARMOUR = (PLAYER_KNIGHT, PLAYER_SPIKE, PLAYER_GOLD, PLAYER_THIEF)
     SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
 
 class Character():
@@ -164,7 +165,7 @@ class Player(Character):
         self.shield = 1
         self.bombs = 0
         self.maps = 0
-        self.armour = Tiles.PLAYER
+        self.armour = Tiles.PLAYER_THIEF
         self.available_armour = [Tiles.PLAYER]
         self.treasure_maps = {}
         self.runes = {}
@@ -703,11 +704,16 @@ class Game:
 
         elif tile == Tiles.TREASURE_CHEST:
             print("You found a treasure chest...")
-            if current_player.keys > 0 or current_player.armour == Tiles.PLAYER_THIEF:
+            success = False
 
-                if current_player.armour != Tiles.PLAYER_THIEF:
-                    current_player.keys -= 1
+            if current_player.keys > 0:
+                current_player.keys -= 1
+                success = True
+            elif current_player.armour == Tiles.PLAYER_THIEF and random.randint(1,10) > 5:
+                success = True
+                print("You picked the lock!")
 
+            if success is True:
                 rewards = [Tiles.KEY, Tiles.SHIELD, Tiles.WEAPON,Tiles.BOMB, Tiles.RED_POTION, \
                                                                  Tiles.TREASURE10, Tiles.TREASURE25]
 
@@ -759,8 +765,19 @@ class Game:
 
         elif tile == Tiles.DOOR:
             print("You found a door...")
-            if current_player.keys > 0:
+            success = False
+
+            # First see if we can pick the lock...
+            if current_player.armour == Tiles.PLAYER_THIEF and random.randint(1,10) > 5:
+                success = True
+                print("You picked the lock!")
+
+            # Then see if we have a key...
+            elif current_player.keys > 0:
                 current_player.keys -= 1
+                success = True
+
+            if success is True:
                 current_floor.set_player_tile(Tiles.DOOR_OPEN)
                 print("...and you opened it!")
             else:
@@ -4094,6 +4111,9 @@ class FloorBuilder:
 
         npc = NPC("The Warlock", tile=Tiles.NPC2)
         self.floors[999].add_npc(npc, xy=(1,14))
+
+        npc = NPC("The Master Thief", tile=Tiles.NPC3, reward=Tiles.PLAYER_THIEF)
+        self.floors[305].add_npc(npc, xy=(18,14))
 
         npc = NPC("The Guardian", tile=Tiles.NPC1)
         self.floors[1000].add_npc(npc, xy=(9,9))

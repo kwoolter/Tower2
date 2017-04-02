@@ -229,6 +229,7 @@ class ImageManager:
                                     model.Tiles.DOOR: "cave_door.png",
                                     model.Tiles.DOOR_OPEN: "cave_door_open.png",
                                     model.Tiles.KEY: "key.png",
+                                    model.Tiles.NPC3: "thief-armour0.png",
                                     model.Tiles.TREASURE: "treasure_red.png",
                                     model.Tiles.TREE: "tree.png",
                                     model.Tiles.TILE1: "tile3.png",
