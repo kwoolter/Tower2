@@ -42,6 +42,7 @@ class Tiles:
     PLAYER_KNIGHT = 'p'
     PLAYER_GOLD = 'g'
     PLAYER_SPIKE = 'A'
+    PLAYER_THIEF = 'a'
     NPC1 = 'Y'
     NPC2 = 'y'
     PREVIOUS_LEVEL = 'l'
@@ -217,7 +218,7 @@ class Player(Character):
     def damage_multiplier(self):
         multiplier = 1
 
-        if self.armour == Tiles.PLAYER_SPIKE:
+        if self.armour in (Tiles.PLAYER_SPIKE, Tiles.PLAYER_THIEF):
             multiplier = 2
         elif self.armour == Tiles.PLAYER_KNIGHT and random.randint(1,10) > 7:
             multiplier = 0
@@ -702,8 +703,10 @@ class Game:
 
         elif tile == Tiles.TREASURE_CHEST:
             print("You found a treasure chest...")
-            if current_player.keys > 0:
-                current_player.keys -= 1
+            if current_player.keys > 0 or current_player.armour == Tiles.PLAYER_THIEF:
+
+                if current_player.armour != Tiles.PLAYER_THIEF:
+                    current_player.keys -= 1
 
                 rewards = [Tiles.KEY, Tiles.SHIELD, Tiles.WEAPON,Tiles.BOMB, Tiles.RED_POTION, \
                                                                  Tiles.TREASURE10, Tiles.TREASURE25]
