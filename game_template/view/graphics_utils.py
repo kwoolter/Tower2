@@ -88,6 +88,7 @@ class ImageManager:
                                     model.Tiles.PLAYER_GOLD: ("player-gold0.png", "player-gold1.png", "player-gold0.png", "player-gold2.png"),
                                     model.Tiles.PLAYER_SPIKE: ("Spike-Armour0.png", "Spike-Armour1.png", "Spike-Armour0.png", "Spike-Armour2.png"),
                                     model.Tiles.PLAYER_THIEF: ("thief-armour0.png","thief-armour1.png","thief-armour0.png","thief-armour2.png"),
+                                    model.Tiles.PLAYER_HERO: ("hero-armour0.png", "hero-armour1.png", "hero-armour0.png", "hero-armour2.png"),
                                     model.Tiles.PLAYER_SKY: ("sky-armour0.png","sky-armour1.png","sky-armour0.png","sky-armour2.png","sky-armour0.png","sky-armour3.png","sky-armour0.png","sky-armour3.png"),
                                     model.Tiles.NPC1 : "imprisoned1.png",
                                     model.Tiles.NPC2: "imprisoned2.png",

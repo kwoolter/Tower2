@@ -174,7 +174,7 @@
             <text>Did anyone follow you in here?</text>
         </line>
 		<line id="3">
-            <text>Well, I am impressed that you have come this far.  Would you like to join the Guild of Thieves?</text>
+            <text>Well, I am impressed that you have come this far.</text>
         </line>
         <line id="4">
             <text>Would you like to join the Guild of Thieves?</text>
@@ -212,7 +212,7 @@
             <text>Do you seek the True Grail?  The Sacred Chalice?</text>
         </line>
         <line id="4">
-            <text>Let the Great Sword guide you.</text>
+            <text>Let the Great Sword guide you and complete your quest.</text>
         </line>
     </conversation>
 </conversations>

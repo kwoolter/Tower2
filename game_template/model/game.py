@@ -45,6 +45,7 @@ class Tiles:
     PLAYER_SPIKE = 'A'
     PLAYER_THIEF = 'a'
     PLAYER_SKY = 'U'
+    PLAYER_HERO = 'I'
     NPC1 = 'Y'
     NPC2 = 'y'
     NPC3 = 'U'
@@ -102,7 +103,7 @@ class Tiles:
     PLAYER_BLOCK_TILES = (WALL, WALL_BL, WALL_BR, WALL_TL, WALL_TR, TREE, WALL2, WALL3, BRAZIER, RUNE, DECORATION1, DECORATION2, REPLENISH_SPENT)
     PLAYER_DOT_TILES = (DOT1, DOT2)
     PLAYER_EQUIPABLE_ITEMS = (WEAPON, SHIELD, RED_POTION, BOMB)
-    PLAYER_ARMOUR = (PLAYER_KNIGHT, PLAYER_SPIKE, PLAYER_GOLD, PLAYER_THIEF, PLAYER_SKY)
+    PLAYER_ARMOUR = (PLAYER_KNIGHT, PLAYER_SPIKE, PLAYER_GOLD, PLAYER_THIEF, PLAYER_SKY, PLAYER_HERO)
     SWAP_TILES = {SECRET_WALL: EMPTY, SWITCH : SWITCH_LIT, SWITCH_LIT : SWITCH}
 
 class Character():
@@ -147,6 +148,7 @@ class Character():
         self._x = self.old_x
         self._y = self.old_y
 
+
 class Player(Character):
     def __init__(self, name : str, x : int = 1, y : int = 1, HP : int = 10):
         super(Player, self).__init__(name=name, x=x, y=y, HP=HP)
@@ -167,8 +169,8 @@ class Player(Character):
         self.shield = 1
         self.bombs = 0
         self.maps = 0
-        self.armour = Tiles.PLAYER_SKY
-        self.available_armour = [Tiles.PLAYER]
+        self._armour = Tiles.PLAYER_HERO
+        self.available_armour = [self._armour]
         self.treasure_maps = {}
         self.runes = {}
         self.equipment_slots=[]
@@ -177,6 +179,17 @@ class Player(Character):
         self.equipment_slots.append(Tiles.SHIELD)
         self.equipment_slots.append(Tiles.BOMB_LIT)
         self.effects = {}
+
+    @property
+    def armour(self):
+        return self._armour
+
+    @armour.setter
+    def armour(self, new_armour):
+        self._armour = new_armour
+        if new_armour not in self.available_armour:
+            self.available_armour.append(new_armour)
+            print("New armour {0} added to the collection {1}".format(new_armour, self.available_armour))
 
     @property
     def score(self):
