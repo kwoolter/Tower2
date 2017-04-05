@@ -5,7 +5,8 @@ import game_template.utils as utils
 import time, logging
 from .graphics_utils import *
 from pygame.locals import *
-
+from copy import deepcopy
+import math
 
 class MainFrame(View):
 
@@ -889,16 +890,38 @@ class InventoryView(View):
         image_height = 100
 
         if is_shop_keeper is True:
-            image_name = model.Tiles.SHOP_KEEPER
+            armour = model.Tiles.SHOP_KEEPER
+            available_armour = []
+            available_armour.append(armour)
         else:
-            image_name = model.Tiles.PLAYER
+            armour = self.player.armour
+            available_armour = deepcopy(self.player.available_armour)
 
-        image = View.image_manager.get_skin_image(image_name, tick=self.tick_count)
-
-        x = int(pane_rect.centerx - image_width/2)
         y += 20
-        image = pygame.transform.scale(image, (image_width,image_height))
-        self.surface.blit(image,(x,y))
+        x = int(pane_rect.centerx - image_width / 2)
+        dx = image_width
+        index = available_armour.index(armour)
+        #print("available armour {0}, index={1}".format(available_armour, index))
+
+        for i in range(0, len(available_armour)):
+
+            image_name = available_armour[index]
+
+            #print("i={0}, x={1}, dx={2},image={3}".format(i,x,dx,image_name))
+
+            image = View.image_manager.get_skin_image(image_name, tick=self.tick_count)
+            image = pygame.transform.scale(image, (image_width,image_height))
+            self.surface.blit(image,(x,y))
+
+            x += dx
+            dx = (i+2) * image_width * math.pow(-1,i+1)
+
+            index += 1
+            if index >= len(available_armour):
+                index = 0
+
+
+
 
         x = int(pane_rect.centerx - InventoryView.ICON_WIDTH/2)
         y += image_height + InventoryView.ICON_PADDING

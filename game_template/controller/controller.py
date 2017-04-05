@@ -241,6 +241,8 @@ class Controller:
                             self.view.inventory_manager.change_selection(-1)
                         elif event.key in (K_DOWN, K_s):
                             self.view.inventory_manager.change_selection(1)
+                        elif event.key in (K_RIGHT, K_d):
+                            self.game.get_current_player().next_armour()
 
                     # If we are in Shop mode...
                     elif self.mode == Controller.SHOP:
