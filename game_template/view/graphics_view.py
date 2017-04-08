@@ -886,8 +886,8 @@ class InventoryView(View):
                   fg_colour=InventoryView.FG_COLOUR,
                   bg_colour=InventoryView.BG_COLOUR)
 
-        image_width = 100
-        image_height = 100
+        image_width = 80
+        image_height = 80
 
         if is_shop_keeper is True:
             armour = model.Tiles.SHOP_KEEPER
@@ -896,31 +896,32 @@ class InventoryView(View):
         else:
             armour = self.player.armour
             available_armour = deepcopy(self.player.available_armour)
+            # armour_index = available_armour.index(armour)
+            # armour_index += 1
+            # if armour_index >= len(available_armour):
+            #     armour_index = 0
 
         y += 20
-        x = int(pane_rect.centerx - image_width / 2)
-        dx = image_width
-        index = available_armour.index(armour)
-        #print("available armour {0}, index={1}".format(available_armour, index))
+        x = int(pane_rect.centerx - (image_width * len(available_armour)) / 2)
 
         for i in range(0, len(available_armour)):
 
-            image_name = available_armour[index]
+            image_name = available_armour[i]
 
-            #print("i={0}, x={1}, dx={2},image={3}".format(i,x,dx,image_name))
+            if image_name == armour:
+                pygame.draw.rect(self.surface,
+                                 InventoryView.SELECTION_BORDER_COLOUR,
+                                 [x,y,int(image_width * 7/8),image_height],
+                                 2)
+                image_scale = 1
+            else:
+                image_scale = 0.75
 
             image = View.image_manager.get_skin_image(image_name, tick=self.tick_count)
-            image = pygame.transform.scale(image, (image_width,image_height))
+            image = pygame.transform.scale(image, (int(image_width * image_scale), int(image_height * image_scale)))
             self.surface.blit(image,(x,y))
 
-            x += dx
-            dx = (i+2) * image_width * math.pow(-1,i+1)
-
-            index += 1
-            if index >= len(available_armour):
-                index = 0
-
-
+            x += image_width
 
 
         x = int(pane_rect.centerx - InventoryView.ICON_WIDTH/2)

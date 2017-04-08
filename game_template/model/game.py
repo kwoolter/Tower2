@@ -44,7 +44,7 @@ class Tiles:
     PLAYER_GOLD = 'g'
     PLAYER_SPIKE = 'A'
     PLAYER_THIEF = 'a'
-    PLAYER_SKY = 'U'
+    PLAYER_SKY = 'C'
     PLAYER_HERO = 'I'
     NPC1 = 'Y'
     NPC2 = 'y'
@@ -169,8 +169,8 @@ class Player(Character):
         self.shield = 1
         self.bombs = 0
         self.maps = 0
-        self._armour = Tiles.PLAYER_HERO
-        self.available_armour = [self._armour, Tiles.PLAYER_KNIGHT, Tiles.PLAYER_GOLD, Tiles.PLAYER_THIEF, Tiles.PLAYER_SPIKE, Tiles.PLAYER_SKY]
+        self._armour = Tiles.PLAYER
+        self.available_armour = [self._armour]
         self.treasure_maps = {}
         self.runes = {}
         self.equipment_slots=[]
@@ -191,12 +191,17 @@ class Player(Character):
             self.available_armour.append(new_armour)
             print("New armour {0} added to the collection {1}".format(new_armour, self.available_armour))
 
-    def next_armour(self):
+    def next_armour(self, next : bool = True):
 
         index = self.available_armour.index(self._armour)
-        index += 1
-        if index >= len(self.available_armour):
-            index = 0
+        if next is True:
+            index += 1
+            if index >= len(self.available_armour):
+                index = 0
+        else:
+            index -= 1
+            if index <0:
+                index = len(self.available_armour) - 1
 
         self._armour = self.available_armour[index]
 
@@ -2491,7 +2496,7 @@ class FloorBuilder:
             '~~~~~.~~~~~~.~~~~~~~',
             '~~~~~~~~~~~~~~~~~.~~',
             '.~~~~:::::::::~~~~~~',
-            '~~~~:) j:-:j (:~.~~~',
+            '~~~~:) j:-:C (:~.~~~',
             '~.~~:   :`:   :~~~~~',
             '~~~~:  ::`::  :~~~.~',
             '~~~~:    `    :~~~~~',
@@ -4159,7 +4164,7 @@ class FloorBuilder:
         npc = NPC("The Master Thief", tile=Tiles.NPC3, reward=Tiles.PLAYER_THIEF)
         self.floors[305].add_npc(npc, xy=(18,14))
 
-        npc = NPC("The Guardian", tile=Tiles.NPC1)
+        npc = NPC("The Guardian", tile=Tiles.NPC1,reward=Tiles.PLAYER_HERO)
         self.floors[1000].add_npc(npc, xy=(9,9))
 
 class LevelBuilder:
