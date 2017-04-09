@@ -495,6 +495,7 @@ class Game:
         else:
             self.add_status_message("{0} not completed yet!".format(self.get_current_level().name))
             self.get_current_player().back()
+            self.audio.get_theme_sound(audio.Sounds.ERROR)
 
     def previous_level(self):
 
@@ -674,6 +675,7 @@ class Game:
 
             try:
                 self.check_exit(FloorPlan.EXIT_TO_DIRECTION[tile])
+                self.audio.get_theme_sound(audio.Sounds.CHANGE_FLOOR)
             except Exception as err:
                 print(err)
                 self.get_current_player().back()
@@ -682,12 +684,14 @@ class Game:
             current_player.keys += 1
             current_floor.set_player_tile(Tiles.EMPTY)
             self.add_status_message("You found a key!")
+            self.audio.get_theme_sound(audio.Sounds.FOUND_KEY)
             print("Found a key!")
 
         elif tile == Tiles.BOSS_KEY:
             current_player.boss_keys += 1
             current_floor.set_player_tile(Tiles.EMPTY)
             self.add_status_message("You found a Boss Key!")
+            self.audio.get_theme_sound(audio.Sounds.FOUND_BOSS_KEY)
             print("Found a boss key!")
 
         elif tile in Tiles.MONSTERS:
@@ -713,6 +717,7 @@ class Game:
                 current_player.HP -= 1
                 current_floor.set_player_tile(Tiles.EMPTY)
                 self.add_status_message("Ouch! You walked into a trap!")
+                self.audio.get_theme_sound(audio.Sounds.HP_DOWN)
 
             elif success is True:
                 current_floor.set_player_tile(Tiles.EMPTY)
@@ -732,6 +737,7 @@ class Game:
                 current_player.HP = 10
                 self.add_status_message("You are fully healed!")
                 current_floor.set_player_tile(Tiles.REPLENISH_SPENT)
+                self.audio.get_theme_sound(audio.Sounds.HP_UP)
             else:
                 self.add_status_message("You have full health!")
 
@@ -741,6 +747,7 @@ class Game:
         elif tile in Tiles.SWAP_TILES.keys() and self.get_current_player().moved() is True:
             current_floor.set_player_tile(Tiles.SWAP_TILES[tile])
             print("You found a {0} to {1} swappable tile!!".format(tile,Tiles.SWAP_TILES[tile]))
+            self.audio.get_theme_sound(audio.Sounds.SWAP_TILE)
 
             if tile in (Tiles.SWITCH, Tiles.SWITCH_LIT):
                 self.get_current_floor().switch()
@@ -758,6 +765,7 @@ class Game:
                 current_player.treasure += 1
             self.add_status_message("You found some treasure!")
             print("You found some treasure!")
+            self.audio.get_theme_sound(audio.Sounds.FOUND_TREASURE)
 
         elif tile == Tiles.TREASURE_CHEST:
             print("You found a treasure chest...")
@@ -774,20 +782,15 @@ class Game:
                 rewards = [Tiles.KEY, Tiles.SHIELD, Tiles.WEAPON,Tiles.BOMB, Tiles.RED_POTION, \
                                                                  Tiles.TREASURE10, Tiles.TREASURE25]
 
-                # #  If the progress allows the add a map as an optional reward
-                # level_progress = current_player.runes_collected(current_level.id) + \
-                #                  len(current_player.maps_collected(current_level.id))
-                #
-                # if level_progress < Game.TARGET_RUNE_COUNT:
-                #     rewards.append(Tiles.MAP)
-
                 current_floor.set_player_tile(random.choice(rewards))
                 self.add_status_message("You opened the treasure chest!")
                 print("...and you opened it!")
+                self.audio.get_theme_sound(audio.Sounds.OPEN_CHEST)
 
             else:
                 print("You don't have a key to open it!")
                 self.add_status_message("You don't have a key to open it!")
+                self.audio.get_theme_sound(audio.Sounds.ERROR)
 
             current_player.back()
 
@@ -837,10 +840,12 @@ class Game:
             if success is True:
                 current_floor.set_player_tile(Tiles.DOOR_OPEN)
                 print("...and you opened it!")
+                self.audio.get_theme_sound(audio.Sounds.UNLOCK)
             else:
                 current_player.back()
                 self.add_status_message("The door is locked!")
                 print("...but the door is locked!")
+                self.audio.get_theme_sound(audio.Sounds.ERROR)
 
         elif tile == Tiles.BOSS_DOOR:
             print("You found a boss door...")
@@ -849,10 +854,12 @@ class Game:
                 current_floor.set_player_tile(Tiles.BOSS_DOOR_OPEN)
                 self.add_status_message("You opened the Boss Door!")
                 print("...and you opened it!")
+                self.audio.get_theme_sound(audio.Sounds.UNLOCK)
             else:
                 current_player.back()
                 self.add_status_message("The Boss Door is locked!")
                 print("...but the boss door is locked!")
+                self.audio.get_theme_sound(audio.Sounds.ERROR)
 
         elif tile == Tiles.NEXT_LEVEL:
             print("You found the entrance to the next level!")
@@ -864,6 +871,7 @@ class Game:
 
         elif tile == Tiles.SHOP:
             self.enter_shop()
+            self.audio.get_theme_sound(audio.Sounds.SHOP)
             self.add_status_message("Welcome to the shop!")
 
         elif tile == Tiles.MAP:
@@ -885,6 +893,7 @@ class Game:
                     current_floor.set_player_tile(Tiles.EMPTY)
                     print("You found a secret treasure map!")
                     self.add_status_message("You found a secret treasure map!")
+                    self.audio.get_theme_sound(audio.Sounds.FOUND_MAP)
 
                 else:
                     print("No more secrets to find for this level!")
@@ -959,6 +968,7 @@ class Game:
                                                                                                  current_player.runes))
 
                 self.add_status_message("You have found a hidden rune!")
+                self.audio.get_theme_sound(audio.Sounds.FOUND_RUNE)
 
             else:
                 pass
@@ -997,6 +1007,7 @@ class Game:
                 elif self.tick_count % Game.ENEMY_DAMAGE_RATE == 0:
                     self.get_current_player().HP -= 1 * self.get_current_player().damage_multiplier()
                     print("HP down to %i" % self.get_current_player().HP)
+                    self.audio.get_theme_sound(audio.Sounds.HP_DOWN)
 
                     if self.get_current_player().monster_damage_multiplier() > 0:
                         self.get_current_player().kills += 1
@@ -1046,6 +1057,7 @@ class Game:
                 player.HP += 1
             elif decrement is False:
                 player.HP += 1
+            self.audio.get_theme_sound(audio.Sounds.HP_UP)
 
         elif item_type in Tiles.EXPLODABLES:
             if current_tile == Tiles.EMPTY and decrement is True:
@@ -1137,6 +1149,8 @@ class Game:
                 elif self.effects[effect] == 0:
                     print("Stopping %s effect." % effect)
                     expired_effects.append(effect)
+                    self.audio.get_theme_sound(audio.Sounds.EFFECT_END)
+
 
             for effect in expired_effects:
                 del self.effects[effect]
