@@ -420,6 +420,7 @@ class GameReadyView(View):
         self.game = game
         self.hst.initialise(self.game.hst)
 
+
     def draw(self):
         if self.game is None:
             raise ("No Game to view!")
@@ -824,6 +825,7 @@ class InventoryView(View):
     FG_COLOUR = Colours.WHITE
 
     SELECTION_BG_COLOUR = Colours.GREY
+    ARMOUR_SELECTION_BG_COLOUR = Colours.BLACK
     SELECTION_BORDER_COLOUR = Colours.GOLD
 
     ICON_WIDTH = 32
@@ -834,13 +836,14 @@ class InventoryView(View):
     ITEMS = (model.Tiles.TREASURE, model.Tiles.KEY, model.Tiles.RED_POTION,
              model.Tiles.WEAPON, model.Tiles.SHIELD, model.Tiles.BOMB)
 
-    def __init__(self, width : int, height : int, tile_width : int = ICON_WIDTH, tile_height : int = ICON_HEIGHT):
+    def __init__(self, width : int, height : int, tile_width : int = ICON_WIDTH, tile_height : int = ICON_HEIGHT, selection : bool = True):
 
         super(InventoryView, self).__init__()
 
         self.surface = pygame.Surface((width, height))
         self.player = None
         self.current_selected_item = -1
+        self.selection = selection
 
     def initialise(self, player : model.Player, item_prices : dict = None):
 
@@ -893,13 +896,13 @@ class InventoryView(View):
             armour = model.Tiles.SHOP_KEEPER
             available_armour = []
             available_armour.append(armour)
+        elif self.selection is False:
+            armour = self.player.armour
+            available_armour = []
+            available_armour.append(armour)
         else:
             armour = self.player.armour
             available_armour = deepcopy(self.player.available_armour)
-            # armour_index = available_armour.index(armour)
-            # armour_index += 1
-            # if armour_index >= len(available_armour):
-            #     armour_index = 0
 
         y += 20
         x = int(pane_rect.centerx - (image_width * len(available_armour)) / 2)
@@ -908,7 +911,15 @@ class InventoryView(View):
 
             image_name = available_armour[i]
 
-            if image_name == armour:
+            if is_shop_keeper is True:
+
+                image_scale = 1.0
+
+            elif image_name == armour and self.selection is True:
+                pygame.draw.rect(self.surface,
+                                 InventoryView.ARMOUR_SELECTION_BG_COLOUR,
+                                 [x,y,int(image_width * 7/8),image_height],
+                                 0)
                 pygame.draw.rect(self.surface,
                                  InventoryView.SELECTION_BORDER_COLOUR,
                                  [x,y,int(image_width * 7/8),image_height],
@@ -922,7 +933,6 @@ class InventoryView(View):
             self.surface.blit(image,(x,y))
 
             x += image_width
-
 
         x = int(pane_rect.centerx - InventoryView.ICON_WIDTH/2)
         y += image_height + InventoryView.ICON_PADDING
@@ -1116,7 +1126,7 @@ class ShopView(View):
         self.surface = pygame.Surface((width, height))
         self.game = None
 
-        self.player_inventory = InventoryView(height=height*3/4,width=width/2)
+        self.player_inventory = InventoryView(height=height*3/4,width=width/2, selection=False)
         self.shop_keeper_inventory = InventoryView(height=height*3/4,width=width/2)
         self.shop_keeper_inventory.current_selected_item = 0
 

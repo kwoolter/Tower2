@@ -4,6 +4,7 @@ import game_template.utils as utils
 import game_template.utils.trpg as trpg
 import time
 from operator import itemgetter
+import game_template.audio as audio
 import pickle
 
 
@@ -170,7 +171,9 @@ class Player(Character):
         self.bombs = 0
         self.maps = 0
         self._armour = Tiles.PLAYER
-        self.available_armour = [self._armour]
+        self.available_armour = [self._armour, Tiles.PLAYER_HERO, Tiles.PLAYER_GOLD, Tiles.PLAYER_KNIGHT, \
+                                 Tiles.PLAYER_SKY, Tiles.PLAYER_THIEF]
+        # self.available_armour = [self._armour]
         self.treasure_maps = {}
         self.runes = {}
         self.equipment_slots=[]
@@ -358,6 +361,8 @@ class Game:
         self.shop = Shop()
         self._conversations = trpg.ConversationFactory(Game.DATA_FILES_DIR + "conversations.xml")
 
+
+        self.audio = None
         ##
 
     @property
@@ -608,6 +613,9 @@ class Game:
 
         self._conversations.load()
 
+        self.audio = audio.AudioManager()
+        self.audio.initialise()
+
     def add_player(self, new_player : Player):
 
         if self.state != Game.READY:
@@ -737,6 +745,7 @@ class Game:
             if tile in (Tiles.SWITCH, Tiles.SWITCH_LIT):
                 self.get_current_floor().switch()
                 self.add_status_message("You operated the switch.")
+                self.audio.get_theme_sound(audio.Sounds.SWITCH)
                 print("You operated the switch. Switch on = {0}".format(self.get_current_floor().switch_on))
 
         elif tile in (Tiles.TREASURE, Tiles.TREASURE10, Tiles.TREASURE25):

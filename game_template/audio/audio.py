@@ -1,0 +1,120 @@
+import pygame
+import os
+
+
+class Sounds:
+
+    OPEN_DOOR = "open door"
+    LEVEL_MUSIC = "level music"
+    GAME_READY = "game ready"
+    GAME_OVER = "game over"
+    INVENTORY = "inventory"
+    SHOP = "shop"
+    UNLOCK = "unlock"
+    SWITCH = "switch"
+
+class AudioManager:
+
+    DEFAULT_THEME = "default"
+    RESOURCES_DIR = os.path.dirname(__file__) + "\\resources\\"
+
+    def __init__(self):
+
+        self.sound_themes = None
+        self.music_themes = None
+        self.sounds_cache = None
+        self.current_music = None
+        self.music_on = True
+        self.sound_on = True
+
+
+    def initialise(self):
+
+        self.sound_themes = {}
+        self.sounds_cache = {}
+        self.music_themes = {}
+
+        self.load_sound_themes()
+        self.load_music_themes()
+
+    def get_theme_sound(self, sound_name : str, sound_theme : str = DEFAULT_THEME, play = True):
+
+        if self.sound_on is False:
+            return None
+
+        if sound_theme not in self.sound_themes.keys():
+            raise Exception("Can't find sound theme {0}.")
+
+        theme = self.sound_themes[sound_theme]
+
+        if sound_name not in theme.keys():
+            theme = self.sound_themes[AudioManager.DEFAUL_THEME]
+
+        if sound_name not in theme.keys():
+            raise Exception("Can't find sound {0} in theme {1}".format(sound_name, sound_theme))
+
+
+        if sound_name in self.sounds_cache.keys():
+            sound =  self.sounds_cache[sound_name]
+
+        else:
+            sound_file_name = theme[sound_name]
+            sound = pygame.mixer.Sound(AudioManager.RESOURCES_DIR + sound_file_name)
+            self.sounds_cache[sound_name] = sound
+
+        if play is True:
+            sound.play()
+
+        return sound
+
+    def load_sound_themes(self):
+
+        new_theme_name = AudioManager.DEFAULT_THEME
+        new_theme = {
+            Sounds.UNLOCK : "default_level.mp3",
+            Sounds.SWITCH : "switch-11.wav"
+        }
+
+        self.sound_themes[new_theme_name] = new_theme
+
+    def load_music_themes(self):
+        new_theme_name = AudioManager.DEFAULT_THEME
+        new_theme = {
+            Sounds.LEVEL_MUSIC : "default_level.mp3",
+            Sounds.GAME_OVER : "game_over.mp3",
+            Sounds.GAME_READY : "Heroic_Age.mp3",
+            Sounds.INVENTORY : "Rains Will Fall.mp3",
+            Sounds.SHOP : "Heroic_Age.mp3"
+        }
+
+        self.music_themes[new_theme_name] = new_theme
+
+    def play_theme_music(self, music_name : str, music_theme : str = DEFAULT_THEME, repeat : int = 1):
+
+        if self.music_on is False:
+            return
+
+        if music_theme not in self.music_themes.keys():
+            raise Exception("Can't find sound theme {0}.")
+
+        theme = self.music_themes[music_theme]
+
+        if music_name not in theme.keys():
+            theme = self.music_themes[AudioManager.DEFAUL_THEME]
+
+        if music_name not in theme.keys():
+            raise Exception("Can't find sound {0} in theme {1}".format(music_name, music_theme))
+
+        music_file_name = theme[music_name]
+
+        pygame.mixer.music.load(AudioManager.RESOURCES_DIR + music_file_name)
+        pygame.mixer.music.play(repeat)
+        self.current_music = music_name
+
+    def stop_music(self):
+
+        pygame.mixer.music.stop()
+
+
+
+
