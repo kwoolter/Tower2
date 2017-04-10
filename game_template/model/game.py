@@ -492,6 +492,8 @@ class Game:
 
             self.add_status_message("Heading to {0}...!".format(self.get_current_level().name))
 
+            self.audio.play_theme_music(audio.Sounds.LEVEL_MUSIC, self.get_current_level().skin_name)
+
         else:
             self.add_status_message("{0} not completed yet!".format(self.get_current_level().name))
             self.get_current_player().back()
@@ -514,6 +516,8 @@ class Game:
         self.get_current_floor().add_player(self.get_current_player(), position = Floor.EXIT)
 
         self.add_status_message("Heading to {0}...!".format(self.get_current_level().name))
+
+        self.audio.play_theme_music(audio.Sounds.LEVEL_MUSIC, self.get_current_level().skin_name)
 
     def is_level_complete(self, player : Player, level_id : int):
 
@@ -1108,6 +1112,8 @@ class Game:
 
         self._state = Game.PLAYING
         self.game_start = time.time()
+
+        self.audio.play_theme_music(audio.Sounds.LEVEL_MUSIC, self.get_current_level().skin_name)
 
     def pause(self, pause : bool = None):
 

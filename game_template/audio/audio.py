@@ -34,6 +34,7 @@ class AudioManager:
 
     DEFAULT_THEME = "default"
     RESOURCES_DIR = os.path.dirname(__file__) + "\\resources\\"
+    RESOURCES_DIR_MUSIC = os.path.dirname(__file__) + "\\resources\\music\\"
 
     def __init__(self):
 
@@ -117,19 +118,42 @@ class AudioManager:
     def load_music_themes(self):
         new_theme_name = AudioManager.DEFAULT_THEME
         new_theme = {
-            Sounds.LEVEL_MUSIC : "Heroic_Age.mp3",
+            Sounds.LEVEL_MUSIC : "Rains Will Fall.mp3",
             Sounds.GAME_OVER : "game_over.mp3",
             Sounds.GAME_READY : "Heroic_Age.mp3",
-            Sounds.INVENTORY : "M02_Firelink Shrine.mp3",
-            Sounds.SHOP : "Heroic_Age.mp3",
+            Sounds.INVENTORY : "M02_Firelink Shrine.ogg",
+            Sounds.INVENTORY : "01-souls-of-fire.mp3",
+            Sounds.SHOP : "Heroic Age.mp3",
         }
 
         self.music_themes[new_theme_name] = new_theme
 
         new_theme_name = "winter"
         new_theme = {
-            Sounds.LEVEL_MUSIC : "Miris Magic Dance.mp3",
+            Sounds.LEVEL_MUSIC : "M02_Firelink Shrine.ogg",
             Sounds.SHOP: "07 Exploring The Ruins.mp3",
+        }
+
+        self.music_themes[new_theme_name] = new_theme
+
+        new_theme_name = "desert"
+        new_theme = {
+            Sounds.LEVEL_MUSIC: "Old Road.mp3",
+            Sounds.LEVEL_MUSIC: "Eastern Thought.mp3",
+        }
+
+        self.music_themes[new_theme_name] = new_theme
+
+        new_theme_name = "chaos"
+        new_theme = {
+            Sounds.LEVEL_MUSIC: "Old Road.mp3",
+        }
+
+        self.music_themes[new_theme_name] = new_theme
+
+        new_theme_name = "end"
+        new_theme = {
+            Sounds.LEVEL_MUSIC: "Heroic Age.mp3",
         }
 
         self.music_themes[new_theme_name] = new_theme
@@ -152,11 +176,11 @@ class AudioManager:
         music_file_name = theme[music_name]
 
         try:
+            if pygame.mixer.music.get_busy():
+                pygame.mixer.music.stop()
             print("playing '{0}' as the {1} music for theme {2}".format(music_file_name, music_name, music_theme))
-            pygame.mixer.music.load(AudioManager.RESOURCES_DIR + music_file_name)
-            pygame.mixer.music.play(repeat)
-            self.current_music = music_name
-
+            pygame.mixer.music.load(AudioManager.RESOURCES_DIR_MUSIC + music_file_name)
+            pygame.mixer.music.play(-1)
         except Exception as err:
             print(str(err))
 
