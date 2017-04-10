@@ -54,6 +54,8 @@ class Controller:
         new_player = model.Player("Player1")
         self.game.add_player(new_player)
 
+        pygame.mixer.init()
+
     @property
     def mode(self):
         controller_mode = self._mode
@@ -326,5 +328,11 @@ class Controller:
         self.view.initialise(self.game)
 
     def end(self):
+
+        print("Ending...")
+
+        self.audio.end()
         self.view.end()
         self.game.end()
+
+

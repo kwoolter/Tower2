@@ -535,9 +535,11 @@ class Game:
     def enter_shop(self):
         self._state = Game.SHOPPING
         self.shop.get_shop_keeper(self.get_current_level().id)
+        self.audio.play_theme_music(audio.Sounds.SHOP, music_theme=self.get_current_level().skin_name)
 
     def get_current_shop_keeper(self):
         return self.shop.current_shop_keeper
+        self.audio.stop_music()
 
     def exit_shop(self):
         self._state = Game.PLAYING

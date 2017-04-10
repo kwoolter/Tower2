@@ -1,5 +1,6 @@
-import pygame
 import os
+
+import pygame
 
 
 class Sounds:
@@ -91,25 +92,24 @@ class AudioManager:
 
         new_theme_name = AudioManager.DEFAULT_THEME
         new_theme = {
-            Sounds.UNLOCK : "door_lock.wav",
-            Sounds.SWITCH : "switch-11.wav",
+            Sounds.UNLOCK: "door_lock.wav",
+            Sounds.SWITCH: "switch-11.wav",
             Sounds.SHOP: "LTTP_Door.wav",
             Sounds.OPEN_CHEST: "LTTP_Chest.wav",
             Sounds.HP_DOWN: "LTTP_Link_Hurt.wav",
             Sounds.EXPLODE: "Bomb+1.wav",
             Sounds.FOUND_TREASURE: "LTTP_Rupee1.wav",
-            Sounds.FOUND_KEY:"LTTP_Get_Key.wav",
-            Sounds.FOUND_BOSS_KEY:None,
-            Sounds.FOUND_RUNE: None,
-            Sounds.FOUND_MAP:"LTTP_Map.wav",
-            Sounds.EFFECT_END:None,
-            Sounds.HP_UP:"LTTP_Get_HeartPiece.wav",
-            Sounds.SWAP_TILE:None,
-            Sounds.CHANGE_SELECTION :"LTTP_Menu_Cursor.wav",
-            Sounds.CHANGE_FLOOR:"LTTP_Stairs_Down.wav",
+            Sounds.FOUND_KEY: "LTTP_Get_Key.wav",
+            Sounds.FOUND_BOSS_KEY: "LA_TrendyGame_Win.wav",
+            Sounds.FOUND_RUNE: "OOT_Song_Correct.wav",
+            Sounds.FOUND_MAP: "LTTP_Map.wav",
+            Sounds.EFFECT_END: None,
+            Sounds.HP_UP: "LTTP_Get_HeartPiece.wav",
+            Sounds.SWAP_TILE: None,
+            Sounds.CHANGE_SELECTION: "LTTP_Menu_Cursor.wav",
+            Sounds.CHANGE_FLOOR: "LTTP_Stairs_Down.wav",
             Sounds.CHANGE_LEVEL: "LTTP_Stairs_FloorDown.wav",
             Sounds.ERROR: "LTTP_Error.wav"
-
         }
 
         self.sound_themes[new_theme_name] = new_theme
@@ -117,41 +117,56 @@ class AudioManager:
     def load_music_themes(self):
         new_theme_name = AudioManager.DEFAULT_THEME
         new_theme = {
-            Sounds.LEVEL_MUSIC : "default_level.mp3",
+            Sounds.LEVEL_MUSIC : "Heroic_Age.mp3",
             Sounds.GAME_OVER : "game_over.mp3",
             Sounds.GAME_READY : "Heroic_Age.mp3",
-            Sounds.INVENTORY : "Rains Will Fall.mp3",
+            Sounds.INVENTORY : "M02_Firelink Shrine.mp3",
             Sounds.SHOP : "Heroic_Age.mp3",
+        }
+
+        self.music_themes[new_theme_name] = new_theme
+
+        new_theme_name = "winter"
+        new_theme = {
+            Sounds.LEVEL_MUSIC : "Miris Magic Dance.mp3",
+            Sounds.SHOP: "07 Exploring The Ruins.mp3",
         }
 
         self.music_themes[new_theme_name] = new_theme
 
     def play_theme_music(self, music_name : str, music_theme : str = DEFAULT_THEME, repeat : int = 1):
 
+        print("Play that funky music...{0} from {1} theme".format(music_name, music_theme))
+
         if self.music_on is False:
             return
 
         if music_theme not in self.music_themes.keys():
-            raise Exception("Can't find sound theme {0}.")
+            music_theme = AudioManager.DEFAULT_THEME
 
         theme = self.music_themes[music_theme]
-
-        if music_name not in theme.keys():
-            theme = self.music_themes[AudioManager.DEFAUL_THEME]
 
         if music_name not in theme.keys():
             raise Exception("Can't find sound {0} in theme {1}".format(music_name, music_theme))
 
         music_file_name = theme[music_name]
 
-        pygame.mixer.music.load(AudioManager.RESOURCES_DIR + music_file_name)
-        pygame.mixer.music.play(repeat)
-        self.current_music = music_name
+        try:
+            print("playing '{0}' as the {1} music for theme {2}".format(music_file_name, music_name, music_theme))
+            pygame.mixer.music.load(AudioManager.RESOURCES_DIR + music_file_name)
+            pygame.mixer.music.play(repeat)
+            self.current_music = music_name
+
+        except Exception as err:
+            print(str(err))
 
     def stop_music(self):
 
         #pygame.mixer.music.stop()
         pygame.mixer.music.fadeout(700)
+
+    def end(self):
+        pygame.mixer.quit()
 
 
 
