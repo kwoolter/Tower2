@@ -213,6 +213,8 @@ class Controller:
                                     print("Test mode ON")
                                     self._test_mode = True
                                     model.Game.TARGET_RUNE_COUNT = 0
+                                    for armour in model.Tiles.PLAYER_ARMOUR:
+                                        self.game.get_current_player().armour = armour
                                 else:
                                     print("Test mode OFF")
                                     self._test_mode = False

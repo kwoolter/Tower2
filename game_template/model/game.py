@@ -171,9 +171,7 @@ class Player(Character):
         self.bombs = 0
         self.maps = 0
         self._armour = Tiles.PLAYER
-        self.available_armour = [self._armour, Tiles.PLAYER_HERO, Tiles.PLAYER_GOLD, Tiles.PLAYER_KNIGHT, \
-                                 Tiles.PLAYER_SKY, Tiles.PLAYER_THIEF]
-        # self.available_armour = [self._armour]
+        self.available_armour = [self._armour]
         self.treasure_maps = {}
         self.runes = {}
         self.equipment_slots=[]
@@ -192,7 +190,7 @@ class Player(Character):
         self._armour = new_armour
         if new_armour not in self.available_armour:
             self.available_armour.append(new_armour)
-            print("New armour {0} added to the collection {1}".format(new_armour, self.available_armour))
+            #print("New armour {0} added to the collection {1}".format(new_armour, self.available_armour))
 
     def next_armour(self, next : bool = True):
 
