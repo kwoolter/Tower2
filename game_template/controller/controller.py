@@ -5,6 +5,7 @@ from pygame.locals import *
 
 import game_template.model as model
 import game_template.view as view
+import game_template.audio as audio
 import pickle
 import logging
 
@@ -30,7 +31,11 @@ class Controller:
     def __init__(self):
         self.game = None
         self.view = None
+        self.audio = None
         self._mode = None
+
+        self.music_on = True
+        self.sound_on = True
 
     def initialise(self):
 
@@ -43,8 +48,14 @@ class Controller:
         self.game.initialise()
         self.view.initialise(self.game)
 
+        self.audio = audio.AudioManager()
+        self.audio.initialise()
+
         new_player = model.Player("Player1")
         self.game.add_player(new_player)
+
+        pygame.mixer.pre_init(44100, -16, 2, 2048)
+        pygame.mixer.init()
 
     @property
     def mode(self):
@@ -132,6 +143,7 @@ class Controller:
                             try:
                                 self.toggle_inventory_mode()
 
+
                             except Exception as err:
                                 print(str(err))
 
@@ -201,6 +213,8 @@ class Controller:
                                     print("Test mode ON")
                                     self._test_mode = True
                                     model.Game.TARGET_RUNE_COUNT = 0
+                                    for armour in model.Tiles.PLAYER_ARMOUR:
+                                        self.game.get_current_player().armour = armour
                                 else:
                                     print("Test mode OFF")
                                     self._test_mode = False
@@ -241,6 +255,10 @@ class Controller:
                             self.view.inventory_manager.change_selection(-1)
                         elif event.key in (K_DOWN, K_s):
                             self.view.inventory_manager.change_selection(1)
+                        elif event.key in (K_RIGHT, K_d):
+                            self.game.get_current_player().next_armour()
+                        elif event.key in (K_LEFT, K_a):
+                            self.game.get_current_player().next_armour(next = False)
 
                     # If we are in Shop mode...
                     elif self.mode == Controller.SHOP:
@@ -279,8 +297,11 @@ class Controller:
 
         if self.mode == Controller.PLAYING:
             self._mode = Controller.INVENTORY
+            self.audio.play_theme_music(audio.Sounds.INVENTORY)
+
         elif self.mode == Controller.INVENTORY:
             self._mode = Controller.PLAYING
+            self.audio.stop_music()
 
         self.game.pause()
         self.view.toggle_inventory_view(self.game.get_current_player())
@@ -289,9 +310,11 @@ class Controller:
 
         if self.game.state == model.Game.PLAYING:
             self.game.enter_shop()
+            self.audio.play_theme_music(audio.Sounds.SHOP)
 
         elif self.game.state == model.Game.SHOPPING:
             self.game.exit_shop()
+            self.audio.stop_music()
 
     def save(self):
 
@@ -308,5 +331,11 @@ class Controller:
         self.view.initialise(self.game)
 
     def end(self):
+
+        print("Ending...")
+
+        self.audio.end()
         self.view.end()
         self.game.end()
+
+

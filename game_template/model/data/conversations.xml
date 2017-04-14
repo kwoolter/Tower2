@@ -164,6 +164,25 @@
             <text>Good luck....you will need it!</text>
         </line>
     </conversation>
+        <conversation id="The Master Thief">
+        <npc_name>The Master Thief</npc_name>
+        <linear>True</linear>
+        <line id="1">
+            <text>How did you find my secret hideout?</text>
+        </line>
+        <line id="2">
+            <text>Did anyone follow you in here?</text>
+        </line>
+		<line id="3">
+            <text>Well, I am impressed that you have come this far.</text>
+        </line>
+        <line id="4">
+            <text>Would you like to join the Guild of Thieves?</text>
+        </line>
+        <line id="5">
+            <text>Take this armour to improve you thieving skills and goodbye...</text>
+        </line>
+    </conversation>
     <conversation id="The Warlock">
         <npc_name>The Warlock</npc_name>
         <linear>True</linear>
@@ -193,7 +212,7 @@
             <text>Do you seek the True Grail?  The Sacred Chalice?</text>
         </line>
         <line id="4">
-            <text>Let the Great Sword guide you.</text>
+            <text>Let the Great Sword guide you and complete your quest.</text>
         </line>
     </conversation>
 </conversations>

@@ -5,7 +5,8 @@ import game_template.utils as utils
 import time, logging
 from .graphics_utils import *
 from pygame.locals import *
-
+from copy import deepcopy
+import math
 
 class MainFrame(View):
 
@@ -419,6 +420,7 @@ class GameReadyView(View):
         self.game = game
         self.hst.initialise(self.game.hst)
 
+
     def draw(self):
         if self.game is None:
             raise ("No Game to view!")
@@ -823,6 +825,7 @@ class InventoryView(View):
     FG_COLOUR = Colours.WHITE
 
     SELECTION_BG_COLOUR = Colours.GREY
+    ARMOUR_SELECTION_BG_COLOUR = Colours.BLACK
     SELECTION_BORDER_COLOUR = Colours.GOLD
 
     ICON_WIDTH = 32
@@ -833,13 +836,14 @@ class InventoryView(View):
     ITEMS = (model.Tiles.TREASURE, model.Tiles.KEY, model.Tiles.RED_POTION,
              model.Tiles.WEAPON, model.Tiles.SHIELD, model.Tiles.BOMB)
 
-    def __init__(self, width : int, height : int, tile_width : int = ICON_WIDTH, tile_height : int = ICON_HEIGHT):
+    def __init__(self, width : int, height : int, tile_width : int = ICON_WIDTH, tile_height : int = ICON_HEIGHT, selection : bool = True):
 
         super(InventoryView, self).__init__()
 
         self.surface = pygame.Surface((width, height))
         self.player = None
         self.current_selected_item = -1
+        self.selection = selection
 
     def initialise(self, player : model.Player, item_prices : dict = None):
 
@@ -885,20 +889,50 @@ class InventoryView(View):
                   fg_colour=InventoryView.FG_COLOUR,
                   bg_colour=InventoryView.BG_COLOUR)
 
-        image_width = 100
-        image_height = 100
+        image_width = 80
+        image_height = 80
 
         if is_shop_keeper is True:
-            image_name = model.Tiles.SHOP_KEEPER
+            armour = model.Tiles.SHOP_KEEPER
+            available_armour = []
+            available_armour.append(armour)
+        elif self.selection is False:
+            armour = self.player.armour
+            available_armour = []
+            available_armour.append(armour)
         else:
-            image_name = model.Tiles.PLAYER
+            armour = self.player.armour
+            available_armour = deepcopy(self.player.available_armour)
 
-        image = View.image_manager.get_skin_image(image_name, tick=self.tick_count)
-
-        x = int(pane_rect.centerx - image_width/2)
         y += 20
-        image = pygame.transform.scale(image, (image_width,image_height))
-        self.surface.blit(image,(x,y))
+        x = int(pane_rect.centerx - (image_width * len(available_armour)) / 2)
+
+        for i in range(0, len(available_armour)):
+
+            image_name = available_armour[i]
+
+            if is_shop_keeper is True:
+
+                image_scale = 1.0
+
+            elif image_name == armour and self.selection is True:
+                pygame.draw.rect(self.surface,
+                                 InventoryView.ARMOUR_SELECTION_BG_COLOUR,
+                                 [x,y,int(image_width * 7/8),image_height],
+                                 0)
+                pygame.draw.rect(self.surface,
+                                 InventoryView.SELECTION_BORDER_COLOUR,
+                                 [x,y,int(image_width * 7/8),image_height],
+                                 2)
+                image_scale = 1
+            else:
+                image_scale = 0.75
+
+            image = View.image_manager.get_skin_image(image_name, tick=self.tick_count)
+            image = pygame.transform.scale(image, (int(image_width * image_scale), int(image_height * image_scale)))
+            self.surface.blit(image,(x,y))
+
+            x += image_width
 
         x = int(pane_rect.centerx - InventoryView.ICON_WIDTH/2)
         y += image_height + InventoryView.ICON_PADDING
@@ -1092,7 +1126,7 @@ class ShopView(View):
         self.surface = pygame.Surface((width, height))
         self.game = None
 
-        self.player_inventory = InventoryView(height=height*3/4,width=width/2)
+        self.player_inventory = InventoryView(height=height*3/4,width=width/2, selection=False)
         self.shop_keeper_inventory = InventoryView(height=height*3/4,width=width/2)
         self.shop_keeper_inventory.current_selected_item = 0
 
