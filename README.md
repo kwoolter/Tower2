@@ -1,7 +1,7 @@
 # GameTemplate
 GameTemplate by kwoolter :monkey: :copyright: 2017
 
-##Summary
+## Summary
 
 A python project that provides the basic structure for a pygame game:-
 - Title bar
@@ -23,9 +23,9 @@ Just copy the whole template and write your own:-
 
 ## Screen Shots
 <br>
-<img height=200 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/title.PNG" alt="title">
+<img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/title.PNG" alt="title">
 <br>
-<img height=200 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game1.PNG" alt="game1">
+<img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game1.PNG" alt="game1">
 
 
 
