@@ -20,13 +20,9 @@ Just copy the whole template and write your own:-
 - View - view\graphics_view.py\GameView class
 - Controller - controller\controller.py\Controller class
 <br>
-<img src="cactus.png" alt="cactus">
-<p>Cactus</p>
-
 
 ##Screen Shots
+<img src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/title.PNG" alt="title">
 
-<img src="cactus.png" alt="cactus">
-<p>Cactus</p>
 
 
