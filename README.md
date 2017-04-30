@@ -22,14 +22,23 @@ Just copy the whole template and write your own:-
 <br>
 
 ## Screen Shots
-<br>
+<table>
+<tr>
+<td>
 <img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/title.PNG" alt="title">
-<br>
+</td>
+<td>
 <img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game1.PNG" alt="game1">
-<br>
+</td>
+</tr>
+<tr>
+<td>
 <img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game2.PNG" alt="game2">
-<br>
+</td>
+<td>
 <img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game3.PNG" alt="game3">
-
+</td>
+</tr>
+</table>
 
 
