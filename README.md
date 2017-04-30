@@ -26,6 +26,10 @@ Just copy the whole template and write your own:-
 <img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/title.PNG" alt="title">
 <br>
 <img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game1.PNG" alt="game1">
+<br>
+<img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game2.PNG" alt="game2">
+<br>
+<img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game3.PNG" alt="game3">
 
 
 
