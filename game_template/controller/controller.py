@@ -279,7 +279,7 @@ class Controller:
                                 self.game.add_status_message(str(err))
                                 print(str(err))
 
-            FPSCLOCK.tick(30)
+            FPSCLOCK.tick(60)
 
             self.view.draw()
             self.view.update()
