@@ -3,6 +3,11 @@ RPG World by kwoolter :monkey: :copyright: 2017
 
 ## Summary
 An arcade adventure game.
+* Cursor keys to move
+* Collect maps
+* Use the maps to locate hidden runes
+* Use the runes to the next world
+* Collect armour sets to gain access to special powers
 
 ## Requirements
 - Python 3.2 - https://www.python.org/downloads/release/python-326/
@@ -12,18 +17,18 @@ An arcade adventure game.
 <table>
 <tr>
 <td>
-<img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/title.PNG" alt="title">
+<img height=300 width=220 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/title.PNG" alt="title">
 </td>
 <td>
-<img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game1.PNG" alt="game1">
+<img height=300 width=220 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game1.PNG" alt="game1">
 </td>
 </tr>
 <tr>
 <td>
-<img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game2.PNG" alt="game2">
+<img height=300 width=220 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game2.PNG" alt="game2">
 </td>
 <td>
-<img height=300 width=200 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game3.PNG" alt="game3">
+<img height=300 width=220 src="https://github.com/kwoolter/Tower2/blob/master/game_template/screenshots/game3.PNG" alt="game3">
 </td>
 </tr>
 </table>
