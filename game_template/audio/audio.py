@@ -116,6 +116,7 @@ class AudioManager:
         self.sound_themes[new_theme_name] = new_theme
 
     def load_music_themes(self):
+
         new_theme_name = AudioManager.DEFAULT_THEME
         new_theme = {
             Sounds.LEVEL_MUSIC : "Rains Will Fall.mp3",
@@ -138,8 +139,9 @@ class AudioManager:
 
         new_theme_name = "desert"
         new_theme = {
-            Sounds.LEVEL_MUSIC: "Old Road.mp3",
+            #Sounds.LEVEL_MUSIC: "Old Road.mp3",
             Sounds.LEVEL_MUSIC: "Eastern Thought.mp3",
+            Sounds.SHOP: "Tabuk.mp3"
         }
 
         self.music_themes[new_theme_name] = new_theme
@@ -169,6 +171,10 @@ class AudioManager:
             music_theme = AudioManager.DEFAULT_THEME
 
         theme = self.music_themes[music_theme]
+
+        if music_name not in theme.keys():
+            print("Can't find sound {0} in theme {1}".format(music_name, music_theme))
+            theme = self.music_themes[AudioManager.DEFAULT_THEME]
 
         if music_name not in theme.keys():
             raise Exception("Can't find sound {0} in theme {1}".format(music_name, music_theme))
