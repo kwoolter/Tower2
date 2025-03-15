@@ -3,12 +3,16 @@ RPG World by kwoolter :monkey: :copyright: 2017
 
 ## Summary
 An arcade adventure game.
-* Cursor keys to move
-* Collect maps and items
-* Use the maps to locate hidden runes
+* `WASD` or cursor keys to move
+* `I` - show inventory
+* `1234` - use an item in slots 1-4
+* `ESC` - pause game
+* Buy items from shops using treasure that you collect
+* Collect maps and use the maps to locate hidden runes
 * Defeat bosses
-* Use the runes to travel the next world
+* Use the runes that you have collected to travel the next world
 * Collect armour sets to gain access to special powers
+
 
 ## Requirements
 - Python 3.2 - https://www.python.org/downloads/release/python-326/
